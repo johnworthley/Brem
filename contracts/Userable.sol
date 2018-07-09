@@ -141,7 +141,7 @@ contract RBAC {
  * of a contract to a new address, even if he is not the owner. 
  * A superuser can transfer his role to a new address. 
  */
-contract Superuser is RBAC {
+contract Superuserable is RBAC {
     
     string public constant ROLE_SUPERUSER = "superuser";
 
@@ -179,7 +179,7 @@ contract Superuser is RBAC {
     }
 }
 
-contract Auditor is Superuser {
+contract Auditable is Superuserable {
     
     string public constant ROLE_AUDITOR = "auditor";
     
