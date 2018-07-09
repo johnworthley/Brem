@@ -12,7 +12,12 @@ contract BREMFactory {
         projects.push(address(0));
     }
     
-    // TODO: Creating event
+    event BREMICOCreated(
+        address indexed creator,
+        address indexed icoAddress,
+        address indexed tokenAddress,
+        string name
+    );
     
     function createBREMICO(
         string _name, 
@@ -34,5 +39,6 @@ contract BREMFactory {
         icoAddress = address(ico);
         projects.push(icoAddress);
         indexes[_name] = projects.length - 1;
+        emit BREMICOCreated(msg.sender, icoAddress, tokenAddress, _name);
     }
 }
