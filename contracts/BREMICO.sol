@@ -50,6 +50,9 @@ contract BREMICO {
     
     // ICO description
     string public description;
+    
+    // ICO documentation hashes
+    bytes32[] public docHashes;
 
     /**
     * Event for token purchase logging
@@ -71,7 +74,7 @@ contract BREMICO {
     * @param _token Address of the token being sold
     */
     constructor(uint256 _rate, address _wallet, BREMToken _token,
-        string _description) public {
+        string _description, bytes32[] _docHashes) public {
         require(_rate > 0);
         require(_wallet != address(0));
         require(_token != address(0));
@@ -80,6 +83,7 @@ contract BREMICO {
         wallet = _wallet;
         token = _token;
         description = _description;
+        docHashes = _docHashes;
     }
 
     // -----------------------------------------

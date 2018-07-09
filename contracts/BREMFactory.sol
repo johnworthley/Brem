@@ -18,7 +18,8 @@ contract BREMFactory {
         string _name, 
         string _symbol,
         uint256 _rate,
-        string _description
+        string _description,
+        bytes32[] _docHashes
     ) 
     public
     returns (address tokenAddress, address icoAddress)
@@ -29,7 +30,7 @@ contract BREMFactory {
         BREMToken token = new BREMToken(_name, _symbol);
         tokenAddress = address(token);
         
-        BREMICO ico = new BREMICO(_rate, msg.sender, token, _description);
+        BREMICO ico = new BREMICO(_rate, msg.sender, token, _description, _docHashes);
         icoAddress = address(ico);
         projects.push(icoAddress);
         indexes[_name] = projects.length - 1;
