@@ -19,10 +19,11 @@ contract BREMFactory {
         string name
     );
     
-    function createBREMICO(
+    function createBREMICO( 
         string _name, 
         string _symbol,
         uint256 _rate,
+        uint256 _totalStages,
         string _description,
         bytes32[] _docHashes
     ) 
@@ -35,7 +36,8 @@ contract BREMFactory {
         BREMToken token = new BREMToken(_name, _symbol);
         tokenAddress = address(token);
         
-        BREMICO ico = new BREMICO(_rate, msg.sender, token, _description, _docHashes);
+        BREMICO ico = new BREMICO(_rate, msg.sender, token, _totalStages,
+            _description, _docHashes);
         icoAddress = address(ico);
         projects.push(icoAddress);
         indexes[_name] = projects.length - 1;

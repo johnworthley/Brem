@@ -191,4 +191,17 @@ contract Auditor is Superuser {
     function removeAuditor(address _auditor) public onlySuperuser {
         removeRole(_auditor, ROLE_AUDITOR);
     }
+    
+    modifier onlyAuditor() {
+        checkRole(msg.sender, ROLE_AUDITOR);
+        _;
+    }
+    
+    function isAuditor(address _addr)
+        public
+        view
+    returns (bool) 
+    {
+        return hasRole(_addr, ROLE_AUDITOR);
+    }
 }
