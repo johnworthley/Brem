@@ -1,6 +1,7 @@
 pragma solidity ^0.4.24;
 
 import "./BREMToken.sol";
+import "./Userable.sol";
 
 /**
  * @title SafeERC20
@@ -68,6 +69,9 @@ contract BREMICO {
     // ICO current stage
     uint256 currentStage;
     
+    // Auditors contract instance
+    Auditable audit;
+    
     // All stages
     mapping(uint256 => Stage) stages;
 
@@ -90,11 +94,21 @@ contract BREMICO {
     * @param _wallet Address where collected funds will be forwarded to
     * @param _token Address of the token being sold
     */
-    constructor(uint256 _rate, address _wallet, BREMToken _token,
-        uint256 _totalStages, string _description, bytes32[] _docHashes) public {
+    constructor(
+        uint256 _rate, 
+        address _wallet, 
+        BREMToken _token,
+        uint256 _totalStages, 
+        string _description, 
+        bytes32[] _docHashes,
+        Auditable _auditAddress
+    ) 
+        public 
+    {
         require(_rate > 0);
         require(_wallet != address(0));
         require(_token != address(0));
+        require(_auditAddress != address(0));
         
         rate = _rate;
         wallet = _wallet;
@@ -102,6 +116,7 @@ contract BREMICO {
         totalStages = _totalStages;
         description = _description;
         docHashes = _docHashes;
+        audit = Auditable(_auditAddress);
         
         // Fill templates for each stage
         for (uint256 i = 0; i < _totalStages; i++) {
