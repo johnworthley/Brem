@@ -12,10 +12,13 @@ contract BREMFactory {
         projects.push(address(0));
     }
     
+    // TODO: Creating event
+    
     function createBREMICO(
         string _name, 
         string _symbol,
-        uint256 _rate
+        uint256 _rate,
+        string _description
     ) 
     public
     returns (address tokenAddress, address icoAddress)
@@ -26,7 +29,7 @@ contract BREMFactory {
         BREMToken token = new BREMToken(_name, _symbol);
         tokenAddress = address(token);
         
-        BREMICO ico = new BREMICO(_rate, msg.sender, token);
+        BREMICO ico = new BREMICO(_rate, msg.sender, token, _description);
         icoAddress = address(ico);
         projects.push(icoAddress);
         indexes[_name] = projects.length - 1;

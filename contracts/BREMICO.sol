@@ -47,6 +47,9 @@ contract BREMICO {
 
     // Amount of wei raised
     uint256 public weiRaised;
+    
+    // ICO description
+    string public description;
 
     /**
     * Event for token purchase logging
@@ -67,7 +70,8 @@ contract BREMICO {
     * @param _wallet Address where collected funds will be forwarded to
     * @param _token Address of the token being sold
     */
-    constructor(uint256 _rate, address _wallet, BREMToken _token) public {
+    constructor(uint256 _rate, address _wallet, BREMToken _token,
+        string _description) public {
         require(_rate > 0);
         require(_wallet != address(0));
         require(_token != address(0));
@@ -75,6 +79,7 @@ contract BREMICO {
         rate = _rate;
         wallet = _wallet;
         token = _token;
+        description = _description;
     }
 
     // -----------------------------------------
