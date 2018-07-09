@@ -271,7 +271,7 @@ contract MintableToken is StandardToken, Ownable {
   }
 }
 
-contract BREM is MintableToken {
+contract BREMToken is MintableToken {
 
   string public name;
 
