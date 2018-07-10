@@ -77,6 +77,18 @@ contract BREMICO {
     
     // All stages
     mapping(uint256 => Stage) stages;
+    
+    // ICO opening time
+    uint256 openingTime;
+    
+    // ICO closing time
+    uint256 closingTime;
+    
+    modifier onlyWhileOpen {
+        // solium-disable-next-line security/no-block-members
+        require(block.timestamp >= openingTime && block.timestamp <= closingTime);
+        _;
+    }
 
     /**
     * Event for token purchase logging
@@ -102,6 +114,8 @@ contract BREMICO {
         uint256 _rate, 
         address _wallet, 
         BREMToken _token,
+        uint256 _openingTime,
+        uint256 _closingTime,
         uint256 _totalStages, 
         string _description, 
         bytes32[] _docHashes,
@@ -113,11 +127,15 @@ contract BREMICO {
         require(_wallet != address(0));
         require(_token != address(0));
         require(_auditAddress != address(0));
+        require(_openingTime >= block.timestamp);
+        require(_closingTime >= block.timestamp);
         
         cap = _cap;
         rate = _rate;
         wallet = _wallet;
         token = _token;
+        openingTime = _openingTime;
+        closingTime = _closingTime;
         totalStages = _totalStages;
         description = _description;
         docHashes = _docHashes;
@@ -144,7 +162,11 @@ contract BREMICO {
     * @dev low level token purchase ***DO NOT OVERRIDE***
     * @param _beneficiary Address performing the token purchase
     */
-    function buyTokens(address _beneficiary) public payable {
+    function buyTokens(address _beneficiary) 
+        public 
+        payable 
+        onlyWhileOpen
+    {
     
         uint256 weiAmount = msg.value;
         _preValidatePurchase(_beneficiary, weiAmount);
@@ -275,5 +297,14 @@ contract BREMICO {
         internal view returns (uint256)
     {
         return _weiAmount.mul(rate);
+    }
+    
+    /**
+    * @dev Checks whether the period in which the crowdsale is open has already elapsed.
+    * @return Whether crowdsale period has elapsed
+    */
+    function hasClosed() public view returns (bool) {
+        // solium-disable-next-line security/no-block-members
+        return block.timestamp > closingTime;
     }
 }
