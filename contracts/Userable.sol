@@ -211,3 +211,26 @@ contract Auditable is Superuserable {
         return hasRole(_addr, ROLE_AUDITOR);
     }
 }
+
+contract Developerable is Auditable {
+    
+    string public constant ROLE_DEVELOPER = "developer";
+    
+    function addDeveloper() public {
+        require(msg.sender != address(0));
+        addRole(msg.sender, ROLE_DEVELOPER);
+    }
+    
+    modifier onlyDeveloper() {
+        checkRole(msg.sender, ROLE_DEVELOPER);
+        _;
+    }
+    
+    function isDeveloper(address _addr) 
+        public
+        view
+    returns (bool)
+    {
+        return hasRole(_addr, ROLE_DEVELOPER);
+    }
+}

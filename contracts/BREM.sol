@@ -3,7 +3,7 @@ pragma solidity ^0.4.24;
 import "./BREMFactory.sol";
 import "./Userable.sol";
 
-contract BREM is Auditable, BREMFactory {
+contract BREM is Developerable, BREMFactory {
     
     function createBREMICO( 
         string _name, 
@@ -15,6 +15,7 @@ contract BREM is Auditable, BREMFactory {
         bytes32[] _docHashes
     ) 
     public
+    onlyDeveloper
     returns (address tokenAddress, address icoAddress)
     {
         require(bytes(_name).length > 0 && bytes(_symbol).length > 0);
