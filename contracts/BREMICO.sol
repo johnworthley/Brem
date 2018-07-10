@@ -49,11 +49,14 @@ contract BREMICO {
     // Amount of wei raised
     uint256 public weiRaised;
     
+    // Value in wei that need owner
+    uint256 cap;
+    
     // ICO description
     string public description;
     
     // ICO documentation hashes
-    bytes32[] public docHashes;
+    bytes32[] public docHashes; // TODO: change to SWARM directory
     
     // Structure represents ICO stage
     struct Stage {
@@ -95,6 +98,7 @@ contract BREMICO {
     * @param _token Address of the token being sold
     */
     constructor(
+        uint256 _cap,
         uint256 _rate, 
         address _wallet, 
         BREMToken _token,
@@ -110,6 +114,7 @@ contract BREMICO {
         require(_token != address(0));
         require(_auditAddress != address(0));
         
+        cap = _cap;
         rate = _rate;
         wallet = _wallet;
         token = _token;
@@ -160,8 +165,30 @@ contract BREMICO {
     
         // _updatePurchasingState(_beneficiary, weiAmount);
     
-        // _forwardFunds();
         // _postValidatePurchase(_beneficiary, weiAmount);
+    }
+    
+    function approveLevel(uint256 _lvl) public {
+        require(audit.isAuditor(msg.sender));
+        require(_lvl == currentStage);
+        require(!stages[_lvl].verified[msg.sender]);
+        
+        stages[_lvl].verified[msg.sender] = true;
+        stages[_lvl].verificationAmount++;
+    }
+    
+    function withdraw() public payable {
+        require(msg.sender == wallet);
+        require(stages[currentStage].verificationAmount >= audit.verificationMinAmount());
+        require(!stages[currentStage].forwarded || currentStage == totalStages); // TODO: check statement`
+        
+        stages[currentStage].forwarded = true;
+        if (currentStage < totalStages) {
+            currentStage++;
+            wallet.transfer(cap / totalStages);
+        } else {
+            wallet.transfer(address(this).balance);
+        }
     }
 
   // -----------------------------------------
@@ -249,11 +276,4 @@ contract BREMICO {
     {
         return _weiAmount.mul(rate);
     }
-
-//   /**
-//   * @dev Determines how ETH is stored/forwarded on purchases.
-//   */
-//   function _forwardFunds() internal {
-//     wallet.transfer(msg.value);
-//   }
 }

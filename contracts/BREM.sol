@@ -9,6 +9,7 @@ contract BREM is Auditable, BREMFactory {
         string _name, 
         string _symbol,
         uint256 _rate,
+        uint256 _cap,
         uint256 _totalStages,
         string _description,
         bytes32[] _docHashes
@@ -22,7 +23,7 @@ contract BREM is Auditable, BREMFactory {
         BREMToken token = new BREMToken(_name, _symbol);
         tokenAddress = address(token);
         
-        BREMICO ico = new BREMICO(_rate, msg.sender, token, _totalStages,
+        BREMICO ico = new BREMICO(_cap, _rate, msg.sender, token, _totalStages,
             _description, _docHashes, this);
         icoAddress = address(ico);
         projects.push(icoAddress);

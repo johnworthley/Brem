@@ -183,6 +183,12 @@ contract Auditable is Superuserable {
     
     string public constant ROLE_AUDITOR = "auditor";
     
+    uint256 public verificationMinAmount;
+    
+    function setVerificationMinAmount(uint256 _min) public onlySuperuser {
+        verificationMinAmount = _min;
+    }
+    
     function addAuditor(address _newAuditor) public onlySuperuser {
         require(_newAuditor != address(0));
         addRole(_newAuditor, ROLE_AUDITOR);
