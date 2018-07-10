@@ -123,6 +123,7 @@ contract BREMICO {
     ) 
         public 
     {
+        require(_cap > 0);
         require(_rate > 0);
         require(_wallet != address(0));
         require(_token != address(0));
@@ -202,15 +203,32 @@ contract BREMICO {
     function withdraw() public payable {
         require(msg.sender == wallet);
         require(stages[currentStage].verificationAmount >= audit.verificationMinAmount());
-        require(!stages[currentStage].forwarded || currentStage == totalStages); // TODO: check statement`
+        require(!stages[currentStage].forwarded || currentStage == totalStages); // TODO: check statement
         
         stages[currentStage].forwarded = true;
         if (currentStage < totalStages) {
             currentStage++;
-            wallet.transfer(cap / totalStages);
+            wallet.transfer(cap / totalStages); // TODO: Safe
         } else {
             wallet.transfer(address(this).balance);
         }
+    }
+    
+    /**
+    * @dev Checks whether the period in which the crowdsale is open has already elapsed.
+    * @return Whether crowdsale period has elapsed
+    */
+    function hasClosed() public view returns (bool) {
+        // solium-disable-next-line security/no-block-members
+        return block.timestamp > closingTime;
+    }
+    
+    /**
+    * @dev Checks whether the cap has been reached.
+    * @return Whether the cap was reached
+    */
+    function capReached() public view returns (bool) {
+        return weiRaised >= cap;
     }
 
   // -----------------------------------------
@@ -297,14 +315,5 @@ contract BREMICO {
         internal view returns (uint256)
     {
         return _weiAmount.mul(rate);
-    }
-    
-    /**
-    * @dev Checks whether the period in which the crowdsale is open has already elapsed.
-    * @return Whether crowdsale period has elapsed
-    */
-    function hasClosed() public view returns (bool) {
-        // solium-disable-next-line security/no-block-members
-        return block.timestamp > closingTime;
     }
 }
