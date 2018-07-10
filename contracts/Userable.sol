@@ -234,3 +234,47 @@ contract Developerable is Auditable {
         return hasRole(_addr, ROLE_DEVELOPER);
     }
 }
+
+contract Userable is Developerable {
+    
+    struct User {
+        string name;
+    }
+    
+    mapping(address => User) users;
+    
+    modifier onlyValidName(string _name) {
+        require(bytes(_name).length > 0);
+        _;
+    }
+    
+    modifier onlyExistingUser() {
+        require(bytes(users[msg.sender].name).length > 0);
+        _;
+    }
+    
+    function signUp(string _name) 
+        public 
+        onlyValidName(_name)
+    returns (string)
+    {
+        if (bytes(users[msg.sender].name).length == 0) {
+            users[msg.sender].name = _name;
+        }
+        
+        if (!isSuperuser(msg.sender) && !isAuditor(msg.sender)) {
+            addDeveloper();
+        }
+        
+        return users[msg.sender].name;
+    }
+    
+    function login()
+        view
+        public
+        onlyExistingUser
+    returns (string)
+    {
+        return users[msg.sender].name;
+    }
+}
