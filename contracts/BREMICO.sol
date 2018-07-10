@@ -146,6 +146,8 @@ contract BREMICO {
         for (uint256 i = 0; i < _totalStages; i++) {
             stages[i].level = i;
         }
+        
+        stages[0].forwarded = true;
     }
 
     // -----------------------------------------
@@ -188,11 +190,13 @@ contract BREMICO {
     
         // _updatePurchasingState(_beneficiary, weiAmount);
     
-        // _postValidatePurchase(_beneficiary, weiAmount);
+        _postValidatePurchase();
     }
     
     function approveLevel(uint256 _lvl) public {
         require(audit.isAuditor(msg.sender));
+        require(_lvl > 0);
+        require(capReached() && hasClosed());
         require(_lvl == currentStage);
         require(!stages[_lvl].verified[msg.sender]);
         
@@ -202,6 +206,8 @@ contract BREMICO {
     
     function withdraw() public payable {
         require(msg.sender == wallet);
+        require(currentStage > 0);
+        require(capReached() && hasClosed());
         require(stages[currentStage].verificationAmount >= audit.verificationMinAmount());
         require(!stages[currentStage].forwarded || currentStage == totalStages); // TODO: check statement
         
@@ -250,19 +256,21 @@ contract BREMICO {
         require(_weiAmount != 0);
     }
 
-//   /**
-//   * @dev Validation of an executed purchase. Observe state and use revert statements to undo rollback when valid conditions are not met.
-//   * @param _beneficiary Address performing the token purchase
-//   * @param _weiAmount Value in wei involved in the purchase
-//   */
-//   function _postValidatePurchase(
-//     address _beneficiary,
-//     uint256 _weiAmount
-//   )
-//     internal
-//   {
-//     // optional override
-//   }
+    /**
+    * @dev Validation of an executed purchase. Observe state and use revert statements to undo rollback when valid conditions are not met.
+    * @param _beneficiary Address performing the token purchase
+    * @param _weiAmount Value in wei involved in the purchase
+    */
+    function _postValidatePurchase(
+    )
+        internal
+        onlyWhileOpen
+    {
+        require(currentStage == 0);
+        if (capReached()) {
+            currentStage = 1;
+        }
+    }
 
     /**
     * @dev Source of tokens. Override this method to modify the way in which the crowdsale ultimately gets and sends its tokens.
