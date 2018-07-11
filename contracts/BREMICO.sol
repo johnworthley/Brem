@@ -58,25 +58,8 @@ contract BREMICO {
     // ICO documentation hashes
     bytes32[] public docHashes; // TODO: change to SWARM directory
     
-    // Structure represents ICO stage
-    struct Stage {
-        uint256 level;
-        bool forwarded;
-        mapping(address => bool) verified;
-        uint256 verificationAmount;
-    }
-    
-    // ICO stages amount
-    uint256 totalStages;
-    
-    // ICO current stage
-    uint256 currentStage;
-    
     // Auditors contract instance
     Auditable audit;
-    
-    // All stages
-    mapping(uint256 => Stage) stages;
     
     // ICO opening time
     uint256 openingTime;
@@ -116,7 +99,6 @@ contract BREMICO {
         BREMToken _token,
         uint256 _openingTime,
         uint256 _closingTime,
-        uint256 _totalStages, 
         string _description, 
         bytes32[] _docHashes,
         Auditable _auditAddress
@@ -137,17 +119,9 @@ contract BREMICO {
         token = _token;
         openingTime = _openingTime;
         closingTime = _closingTime;
-        totalStages = _totalStages;
         description = _description;
         docHashes = _docHashes;
         audit = Auditable(_auditAddress);
-        
-        // Fill templates for each stage
-        for (uint256 i = 0; i < _totalStages; i++) {
-            stages[i].level = i;
-        }
-        
-        stages[0].forwarded = true;
     }
 
     // -----------------------------------------
@@ -190,34 +164,14 @@ contract BREMICO {
     
         // _updatePurchasingState(_beneficiary, weiAmount);
     
-        _postValidatePurchase();
-    }
-    
-    function approveLevel(uint256 _lvl) public {
-        require(audit.isAuditor(msg.sender));
-        require(_lvl > 0);
-        require(capReached() && hasClosed());
-        require(_lvl == currentStage);
-        require(!stages[_lvl].verified[msg.sender]);
-        
-        stages[_lvl].verified[msg.sender] = true;
-        stages[_lvl].verificationAmount++;
+        // _postValidatePurchase();
     }
     
     function withdraw() public payable {
         require(msg.sender == wallet);
-        require(currentStage > 0);
         require(capReached() && hasClosed());
-        require(stages[currentStage].verificationAmount >= audit.verificationMinAmount());
-        require(!stages[currentStage].forwarded || currentStage == totalStages); // TODO: check statement
         
-        stages[currentStage].forwarded = true;
-        if (currentStage < totalStages) {
-            currentStage++;
-            wallet.transfer(cap / totalStages); // TODO: Safe
-        } else {
-            wallet.transfer(address(this).balance);
-        }
+        wallet.transfer(address(this).balance);
     }
     
     /**
@@ -256,19 +210,15 @@ contract BREMICO {
         require(_weiAmount != 0);
     }
 
-    /**
-    * @dev Validation of an executed purchase. Observe state and use revert statements to undo rollback when valid conditions are not met.
-    */
-    function _postValidatePurchase(
-    )
-        internal
-        onlyWhileOpen
-    {
-        require(currentStage == 0);
-        if (capReached()) {
-            currentStage = 1;
-        }
-    }
+    // /**
+    // * @dev Validation of an executed purchase. Observe state and use revert statements to undo rollback when valid conditions are not met.
+    // */
+    // function _postValidatePurchase(
+    // )
+    //     internal
+    //     onlyWhileOpen
+    // {
+    // }
 
     /**
     * @dev Source of tokens. Override this method to modify the way in which the crowdsale ultimately gets and sends its tokens.

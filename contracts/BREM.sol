@@ -12,7 +12,6 @@ contract BREM is Userable, BREMFactory {
         uint256 _cap,
         uint256 _openingTime,
         uint256 _closingTime,
-        uint256 _totalStages,
         string _description,
         bytes32[] _docHashes
     ) 
@@ -26,18 +25,19 @@ contract BREM is Userable, BREMFactory {
         BREMToken token = new BREMToken(_name, _symbol);
         tokenAddress = address(token);
         
-        icoAddress = new BREMICO(
+        BREMICO ico = new BREMICO(
             _cap, 
             _rate,
             msg.sender,
             token,
             _openingTime,
             _closingTime,
-            _totalStages,
             _description, 
             _docHashes, 
             this
         );
+        icoAddress = address(ico);
+        
         projects.push(icoAddress);
         indexes[_name] = projects.length - 1;
         emit BREMICOCreated(msg.sender, icoAddress, tokenAddress, _name);
