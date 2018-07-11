@@ -61,6 +61,15 @@ contract BREMICO {
     // Auditors contract instance
     Auditable audit;
     
+    // Developer's withdraw request
+    struct WithdrawRequst {
+        uint256 value;
+        uint256 confirmAmount;
+        mapping(address => bool) confirmed;
+    }
+    
+    WithdrawRequst request;
+    
     // ICO opening time
     uint256 openingTime;
     
@@ -167,11 +176,30 @@ contract BREMICO {
         // _postValidatePurchase();
     }
     
-    function withdraw() public payable {
+    function withdraw(uint256 _value) public payable {
         require(msg.sender == wallet);
         require(capReached() && hasClosed());
+        require(_value > 0 && _value <= address(this).balance);
+        require(request.value == 0);
         
-        wallet.transfer(address(this).balance);
+        request = WithdrawRequst(0, 0);
+    }
+    
+    // Auditors confirm withdraw
+    function confirmWithdraw() public {
+        require(audit.isAuditor(msg.sender));
+        require(request.value > 0);
+        require(!request.confirmed[msg.sender]);
+        require(capReached() && hasClosed());
+        
+        request.confirmed[msg.sender] = true;
+        request.confirmAmount++;
+        
+        if (request.confirmAmount == audit.verificationMinAmount()) {
+            uint256 _value = request.value;
+            request = WithdrawRequst(0, 0);
+            wallet.transfer(_value);
+        }
     }
     
     /**
