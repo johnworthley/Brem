@@ -20,8 +20,13 @@ contract BREM is Userable, BREMFactory, BRMToken {
     onlyDeveloper
     returns (address tokenAddress, address icoAddress)
     {
+        require(balanceOf(msg.sender) >= icoCreationPrice);
         require(bytes(_name).length > 0 && bytes(_symbol).length > 0);
         require(indexes[_name] == 0);
+        
+        require(approve(msg.sender, icoCreationPrice));
+        require(transferFrom(msg.sender, address(this), icoCreationPrice));
+        
         
         BREMToken token = new BREMToken(_name, _symbol);
         tokenAddress = address(token);

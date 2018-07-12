@@ -18,4 +18,6 @@ contract BREMFactory {
         address indexed tokenAddress,
         string name
     );
+    
+    uint256 public icoCreationPrice = 10000;
 }
