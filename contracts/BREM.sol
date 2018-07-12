@@ -2,8 +2,9 @@ pragma solidity ^0.4.24;
 
 import "./BREMFactory.sol";
 import "./Userable.sol";
+import "./BRMToken.sol";
 
-contract BREM is Userable, BREMFactory {
+contract BREM is Userable, BREMFactory, BRMToken {
     
     function createBREMICO( 
         string _name, 
