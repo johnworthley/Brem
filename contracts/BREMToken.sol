@@ -271,17 +271,32 @@ contract MintableToken is StandardToken, Ownable {
   }
 }
 
-contract BREMToken is MintableToken {
+contract BurnableToken is MintableToken {
+    
+    event Burn(address indexed burned, uint256 value);
+    
+    function burnForRefund(address _burner, uint256 _value) onlyOwner public {
+        require(_value <= balances[_burner]);
+        
+        balances[_burner] = balances[_burner].sub(_value);
+        totalSupply = totalSupply.sub(_value);
+        emit Burn(_burner, _value);
+        emit Transfer(_burner, address(0), _value);
+    } 
+    
+}
 
-  string public name;
+contract BREMToken is BurnableToken {
 
-  string public symbol;
+    string public name;
 
-  uint8 public constant decimals = 18;
+    string public symbol;
+
+    uint8 public constant decimals = 18;
   
-  constructor(string _name, string _symbol) public {
-      name = _name;
-      symbol = _symbol;
-  }
+    constructor(string _name, string _symbol) public {
+        name = _name;
+        symbol = _symbol;
+    }
 
 }

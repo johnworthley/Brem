@@ -76,6 +76,10 @@ contract BREMICO {
     // ICO closing time
     uint256 closingTime;
     
+    // Token sale payment registry
+    mapping(address => uint256) public balances; // TODO: Check tokens
+    mapping(address => uint256) public balancesInToken;
+    
     modifier onlyWhileOpen {
         // solium-disable-next-line security/no-block-members
         require(block.timestamp >= openingTime && block.timestamp <= closingTime);
@@ -171,7 +175,7 @@ contract BREMICO {
             tokens
         );
     
-        // _updatePurchasingState(_beneficiary, weiAmount);
+        _updatePurchasingState(_beneficiary, weiAmount);
     
         // _postValidatePurchase();
     }
@@ -202,6 +206,17 @@ contract BREMICO {
         }
     }
     
+    function refund() public {
+        require(hasClosed() && !capReached());
+        require(balances[msg.sender] > 0);
+        
+        uint256 _value = balances[msg.sender];
+        balances[msg.sender] = 0;
+        token.burnForRefund(msg.sender, _value);
+        weiRaised = weiRaised.sub(_value);
+        msg.sender.transfer(_value);
+    }
+    
     /**
     * @dev Checks whether the period in which the crowdsale is open has already elapsed.
     * @return Whether crowdsale period has elapsed
@@ -218,6 +233,8 @@ contract BREMICO {
     function capReached() public view returns (bool) {
         return weiRaised >= cap;
     }
+    
+    // TODO: stop mint new toknes after ICO closing
 
   // -----------------------------------------
   // Internal interface (extensible)
@@ -276,19 +293,20 @@ contract BREMICO {
         _deliverTokens(_beneficiary, _tokenAmount);
     }
 
-//   /**
-//   * @dev Override for extensions that require an internal state to check for validity (current user contributions, etc.)
-//   * @param _beneficiary Address receiving the tokens
-//   * @param _weiAmount Value in wei involved in the purchase
-//   */
-//   function _updatePurchasingState(
-//     address _beneficiary,
-//     uint256 _weiAmount
-//   )
-//     internal
-//   {
-//     // optional override
-//   }
+    /**
+    * @dev Override for extensions that require an internal state to check for validity (current user contributions, etc.)
+    * @param _beneficiary Address receiving the tokens
+    * @param _weiAmount Value in wei involved in the purchase
+    */
+    function _updatePurchasingState(
+        address _beneficiary,
+        uint256 _weiAmount
+    )
+        internal
+    {
+        balances[_beneficiary] += _weiAmount;
+        balancesInToken[_beneficiary] += _getTokenAmount(_weiAmount);
+    }
 
     /**
     * @dev Override to extend the way in which ether is converted to tokens.
