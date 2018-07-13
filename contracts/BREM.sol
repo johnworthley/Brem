@@ -49,4 +49,13 @@ contract BREM is Userable, BREMFactory, BRMToken {
         emit BREMICOCreated(msg.sender, icoAddress, tokenAddress, _name);
     }
     
+    // Withdraw collected fies
+    function withdrawFees(uint256 _value) 
+        public 
+        onlySuperuser
+     {
+        require(address(this).balance >= _value && _value > 0);
+        msg.sender.transfer(_value);
+    } 
+    
 }

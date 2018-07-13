@@ -80,6 +80,9 @@ contract BREMICO {
     mapping(address => uint256) public balances; // TODO: Check tokens
     mapping(address => uint256) public balancesInToken;
     
+    // Withdraw fee percent
+    uint256 public constant withdrawFeePercent = 1;
+    
     modifier onlyWhileOpen {
         // solium-disable-next-line security/no-block-members
         require(block.timestamp >= openingTime && block.timestamp <= closingTime);
@@ -202,7 +205,10 @@ contract BREMICO {
         if (request.confirmAmount == audit.verificationMinAmount()) {
             uint256 _value = request.value;
             request = WithdrawRequst(0, 0);
-            wallet.transfer(_value);
+            uint256 _feeValue = _value.div(100).mul(withdrawFeePercent);
+            uint256 _trasferValue = _value.sub(_feeValue);
+            token.owner().transfer(_feeValue);
+            wallet.transfer(_trasferValue);
         }
     }
     
