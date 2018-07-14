@@ -4,7 +4,13 @@ import "./BREMFactory.sol";
 import "./Userable.sol";
 import "./BRMToken.sol";
 
-contract BREM is Userable, BREMFactory, BRMToken {
+contract BREM is Userable, BREMFactory {
+
+    BRMToken public BRM;
+
+    constructor(BRMToken _brm) public {
+        BRM = _brm;
+    }    
     
     function createBREMICO( 
         string _name, 
@@ -20,12 +26,12 @@ contract BREM is Userable, BREMFactory, BRMToken {
     onlyDeveloper
     returns (address tokenAddress, address icoAddress)
     {
-        require(balanceOf(msg.sender) >= icoCreationPrice);
+        require(BRM.balanceOf(msg.sender) >= icoCreationPrice);
         require(bytes(_name).length > 0 && bytes(_symbol).length > 0);
         require(indexes[_name] == 0);
         
-        require(approve(msg.sender, icoCreationPrice));
-        require(transferFrom(msg.sender, address(this), icoCreationPrice));
+        require(BRM.approve(msg.sender, icoCreationPrice));
+        require(BRM.transferFrom(msg.sender, address(this), icoCreationPrice));
         
         
         BREMToken token = new BREMToken(_name, _symbol);
