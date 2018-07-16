@@ -11,7 +11,7 @@ contract('BREM', function(accounts) {
         this.brem = await BREM.new(this.brm.address);
     });
 
-    // it('Check superuser address', async function() {
-    //     console.log(accounts);
-    // });
+    it('Check superuser address', async function() {
+        console.log(accounts);
+    });
 });
