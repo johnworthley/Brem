@@ -8,8 +8,8 @@ contract BREM is Userable, BREMFactory {
 
     BRMToken public BRM;
 
-    constructor(BRMToken _brm) public {
-        BRM = _brm;
+    constructor(address _brmAddress) public {
+        BRM = BRMToken(_brmAddress);
     }    
     
     function createBREMICO( 
