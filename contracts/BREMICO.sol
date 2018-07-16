@@ -61,6 +61,15 @@ contract BREMICO {
     // Auditors contract instance
     Auditable audit;
     
+    // Current ICO auditors
+    mapping(address => bool) auditors;
+    
+    // Current ICO auditors amount
+    uint256 public auditorsAmount;
+    
+    // Is superuser selected all current ICO auditors
+    bool auditSelected;
+    
     // Developer's withdraw request
     struct WithdrawRequst {
         uint256 value;
@@ -69,9 +78,6 @@ contract BREMICO {
     }
     
     WithdrawRequst request;
-    
-    // ICO opening time
-    uint256 openingTime;
     
     // ICO closing time
     uint256 closingTime;
@@ -85,7 +91,7 @@ contract BREMICO {
     
     modifier onlyWhileOpen {
         // solium-disable-next-line security/no-block-members
-        require(block.timestamp >= openingTime && block.timestamp <= closingTime);
+        require(auditSelected && block.timestamp <= closingTime);
         _;
     }
 
@@ -113,7 +119,6 @@ contract BREMICO {
         uint256 _rate, 
         address _wallet, 
         BREMToken _token,
-        uint256 _openingTime,
         uint256 _closingTime,
         string _description, 
         bytes32[] _docHashes,
@@ -126,14 +131,12 @@ contract BREMICO {
         require(_wallet != address(0));
         require(_token != address(0));
         require(_auditAddress != address(0));
-        require(_openingTime >= block.timestamp);
         require(_closingTime >= block.timestamp);
         
         cap = _cap;
         rate = _rate;
         wallet = _wallet;
         token = _token;
-        openingTime = _openingTime;
         closingTime = _closingTime;
         description = _description;
         docHashes = _docHashes;
@@ -183,8 +186,28 @@ contract BREMICO {
         // _postValidatePurchase();
     }
     
+    function addAuditor(address _auditor) public {
+        require(block.timestamp <= closingTime);
+        require(!auditSelected);
+        require(audit.isSuperuser(msg.sender));
+        require(audit.isAuditor(_auditor));
+        
+        auditors[_auditor] = true;
+        auditorsAmount++;
+    }
+    
+    function finishAuditorSelection() public {
+        require(block.timestamp <= closingTime);
+        require(!auditSelected);
+        require(audit.isSuperuser(msg.sender));
+        require(auditorsAmount > 0);
+        
+        auditSelected = true;
+    }
+    
     function withdraw(uint256 _value) public payable {
         require(msg.sender == wallet);
+        require(auditSelected);
         require(capReached() && hasClosed());
         require(_value > 0 && _value <= address(this).balance);
         require(request.value == 0);
@@ -197,7 +220,9 @@ contract BREMICO {
         require(audit.isAuditor(msg.sender));
         require(request.value > 0);
         require(!request.confirmed[msg.sender]);
+        require(auditSelected);
         require(capReached() && hasClosed());
+        require(auditors[msg.sender]);
         
         request.confirmed[msg.sender] = true;
         request.confirmAmount++;
