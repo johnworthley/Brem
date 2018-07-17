@@ -227,7 +227,7 @@ contract BREMICO {
         request.confirmed[msg.sender] = true;
         request.confirmAmount++;
         
-        if (request.confirmAmount == audit.verificationMinAmount()) {
+        if (request.confirmAmount == auditorsAmount) {
             uint256 _value = request.value;
             request = WithdrawRequst(0, 0);
             uint256 _feeValue = _value.div(100).mul(withdrawFeePercent);
@@ -242,8 +242,9 @@ contract BREMICO {
         require(balances[msg.sender] > 0);
         
         uint256 _value = balances[msg.sender];
+        uint256 _tokenAmount = balancesInToken[msg.sender];
         balances[msg.sender] = 0;
-        token.burnForRefund(msg.sender, _value);
+        token.burnForRefund(msg.sender, _tokenAmount);
         weiRaised = weiRaised.sub(_value);
         msg.sender.transfer(_value);
     }
@@ -264,8 +265,6 @@ contract BREMICO {
     function capReached() public view returns (bool) {
         return weiRaised >= cap;
     }
-    
-    // TODO: stop mint new toknes after ICO closing
 
   // -----------------------------------------
   // Internal interface (extensible)
