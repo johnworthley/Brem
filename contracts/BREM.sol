@@ -46,7 +46,8 @@ contract BREM is Userable, BREMFactory {
             this
         );
         icoAddress = address(ico);
-        
+        token.transferOwnership(icoAddress);
+
         projects.push(icoAddress);
         indexes[_name] = projects.length - 1;
         emit BREMICOCreated(msg.sender, icoAddress, tokenAddress, _name);
