@@ -50,7 +50,7 @@ contract BREMICO {
     uint256 public weiRaised;
     
     // Value in wei that need owner
-    uint256 cap;
+    uint256  public cap;
     
     // ICO description
     string public description;
@@ -68,7 +68,7 @@ contract BREMICO {
     uint256 public auditorsAmount;
     
     // Is superuser selected all current ICO auditors
-    bool auditSelected;
+    bool public auditSelected;
     
     // Developer's withdraw request
     struct WithdrawRequst {
@@ -77,10 +77,10 @@ contract BREMICO {
         mapping(address => bool) confirmed;
     }
     
-    WithdrawRequst request;
+    WithdrawRequst public request;
     
     // ICO closing time
-    uint256 closingTime;
+    uint256 public closingTime;
     
     // Token sale payment registry
     mapping(address => uint256) public balances; // TODO: Check tokens
@@ -88,6 +88,9 @@ contract BREMICO {
     
     // Withdraw fee percent
     uint256 public constant withdrawFeePercent = 1;
+
+    // Brem contract address
+    address public brem;
     
     modifier onlyWhileOpen {
         // solium-disable-next-line security/no-block-members
@@ -115,6 +118,7 @@ contract BREMICO {
     * @param _token Address of the token being sold
     */
     constructor(
+        address _brem,
         uint256 _cap,
         uint256 _rate, 
         address _wallet, 
@@ -126,6 +130,7 @@ contract BREMICO {
     ) 
         public 
     {
+        require(_brem != address(0));
         require(_cap > 0);
         require(_rate > 0);
         require(_wallet != address(0));
@@ -133,6 +138,7 @@ contract BREMICO {
         require(_auditAddress != address(0));
         require(_closingTime >= block.timestamp);
         
+        brem = _brem;
         cap = _cap;
         rate = _rate;
         wallet = _wallet;
@@ -213,7 +219,7 @@ contract BREMICO {
         require(_value > 0 && _value <= address(this).balance);
         require(request.value == 0);
         
-        request = WithdrawRequst(0, 0);
+        request = WithdrawRequst(_value, 0);
     }
     
     // Auditors confirm withdraw
@@ -233,7 +239,7 @@ contract BREMICO {
             request = WithdrawRequst(0, 0);
             uint256 _feeValue = _value.div(100).mul(withdrawFeePercent);
             uint256 _trasferValue = _value.sub(_feeValue);
-            token.owner().transfer(_feeValue);
+            brem.transfer(_feeValue);
             wallet.transfer(_trasferValue);
         }
     }

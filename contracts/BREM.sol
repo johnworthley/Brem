@@ -36,6 +36,7 @@ contract BREM is Userable, BREMFactory {
         tokenAddress = address(token);
         
         BREMICO ico = new BREMICO(
+            address(this),
             _cap, 
             _rate,
             msg.sender,
