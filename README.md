@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="240" height ="240"  alt="Brem" src = "./assets/Brem.eps">
+  <img width="240" height ="240"  alt="Brem" src = "./assets/Brem.svg">
 </p>
 
 # Brem
