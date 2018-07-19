@@ -16,7 +16,6 @@ of real estate objects (placing objects on the platform), and the real estate ag
 
 # Smart contracts
 
-# Token issuance process walkthrough
 
 # Created by 
 <p align="center">
