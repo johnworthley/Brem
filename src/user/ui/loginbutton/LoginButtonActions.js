@@ -1,4 +1,4 @@
-import AuthenticationContract from '../../../../build/contracts/Authentication.json'
+import AuthenticationContract from '../../../../build/contracts/BREM.json'
 import { browserHistory } from 'react-router'
 import store from '../../../store'
 
@@ -40,8 +40,9 @@ export function loginUser() {
           authenticationInstance.login({from: coinbase})
           .then(function(result) {
             // If no error, login user.
+            console.log(result)
             var userName = web3.toUtf8(result)
-
+            console.log(userName);
             dispatch(userLoggedIn({"name": userName}))
 
             // Used a manual redirect here as opposed to a wrapper.

@@ -1,4 +1,4 @@
-import AuthenticationContract from '../../../../build/contracts/Authentication.json'
+import BREMContract from '../../../../build/contracts/BREM.json'
 import { loginUser } from '../loginbutton/LoginButtonActions'
 import store from '../../../store'
 
@@ -12,7 +12,8 @@ export function signUpUser(name) {
 
     return function(dispatch) {
       // Using truffle-contract we create the authentication object.
-      const authentication = contract(AuthenticationContract)
+      const authentication = contract(BREMContract)
+      console.log(BREMContract)
       authentication.setProvider(web3.currentProvider)
 
       // Declaring this for later so we can chain functions on Authentication.
@@ -20,6 +21,7 @@ export function signUpUser(name) {
 
       // Get current ethereum wallet.
       web3.eth.getCoinbase((error, coinbase) => {
+        console.log(coinbase);
         // Log errors, if any.
         if (error) {
           console.error(error);
@@ -29,9 +31,10 @@ export function signUpUser(name) {
           authenticationInstance = instance
 
           // Attempt to sign up user.
-          authenticationInstance.signup(name, {from: coinbase})
+          authenticationInstance.signUp(name, {from: coinbase})
           .then(function(result) {
             // If no error, login user.
+            console.lod(result);
             return dispatch(loginUser())
           })
           .catch(function(result) {
