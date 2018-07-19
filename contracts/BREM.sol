@@ -29,7 +29,6 @@ contract BREM is Userable, BREMFactory {
         require(bytes(_name).length > 0 && bytes(_symbol).length > 0);
         require(indexes[_name] == 0);
         
-        require(BRM.approve(msg.sender, icoCreationPrice));
         require(BRM.transferFrom(msg.sender, address(this), icoCreationPrice));
         
         

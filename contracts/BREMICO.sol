@@ -306,7 +306,7 @@ contract BREMICO {
     )
         internal
     {
-        token.safeTransfer(_beneficiary, _tokenAmount);
+        token.mint(_beneficiary, _tokenAmount);
     }
 
     /**
