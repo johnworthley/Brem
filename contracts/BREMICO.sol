@@ -191,6 +191,7 @@ contract BREMICO {
         require(!auditSelected);
         require(audit.isSuperuser(msg.sender));
         require(audit.isAuditor(_auditor));
+        require(!auditors[_auditor]);
         
         auditors[_auditor] = true;
         auditorsAmount++;
