@@ -13,9 +13,6 @@ class ProfileForm extends Component {
             BREMInstance: null,
             name: this.props.name,
             address: null,
-            isDeveloper: false,
-            isAuditor: false,
-            isSuperuser: false
         }
 
         this.init();
@@ -36,28 +33,16 @@ class ProfileForm extends Component {
                     this.setState({address: coinbase});
                     instance.isDeveloper(coinbase).then((res) => {
                         if (res) {
-                            this.setState({
-                                isDeveloper: true,
-                                isAuditor: false,
-                                isSuperuser: false
-                            })
+                            this.setState({ role: 'developer' })
                         }
                     })
                     instance.isAuditor(coinbase).then((res) => {
                         if (res) {
-                            this.setState({
-                                isAuditor: true,
-                                isDeveloper: false,
-                                isSuperuser: false
-                            })
+                            this.setState({ role: 'auditor' })
                         }
                     })
                     instance.isSuperuser(coinbase).then((res) => {
-                        this.setState({
-                            isSuperuser: true,
-                            isDeveloper: false,
-                            isAuditor: false
-                        })
+                        this.setState({ role: 'superuser'})
                     })
                 })
             })
@@ -66,30 +51,40 @@ class ProfileForm extends Component {
         }
     }
 
-//   handleSubmit(event) {
-//     event.preventDefault()
+  handleSubmit(event) {
+    event.preventDefault()
 
-//     if (this.state.name.length < 2)
-//     {
-//       return alert('Please fill in your name.')
-//     }
+    if (this.state.name.length < 2)
+    {
+      return alert('Please fill in your name.')
+    }
 
-//     this.props.onProfileFormSubmit(this.state.name)
-//   }
+    this.props.onProfileFormSubmit(this.state.name)
+  }
 
     render() {
 
-        
+        const SuperuserForm = <h1>Superuser</h1>
 
-    return(
-      <form className="pure-form pure-form-stacked" onSubmit={this.handleSubmit.bind(this)}>
-        <fieldset>
-          <label htmlFor="name">Username: {this.state.name}</label>
-          <label htmlFor="address">Address: {this.state.address}</label>
+        const AuditorForm = <h1>Auditor</h1>
 
-          <button type="submit" className="pure-button pure-button-primary">Update</button>
-        </fieldset>
-      </form>
+        const DeveloperForm = <h1>Developer</h1>
+
+        return(
+            <div>
+            <form className="pure-form pure-form-stacked" onSubmit={this.handleSubmit.bind(this)}>
+                <fieldset>
+                    <label htmlFor="name">Username: {this.state.name}</label>
+                    <label htmlFor="address">Address: {this.state.address}</label>
+
+                    <button type="submit" className="pure-button pure-button-primary">Update</button>
+                </fieldset>
+            </form>
+
+            { this.state && this.state.role &&
+                <h1>TODO: Switch by account type</h1>
+            }
+            </div>
     )
   }
 }
