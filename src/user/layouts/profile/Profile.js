@@ -7,8 +7,7 @@ class Profile extends Component {
       <main className="container">
         <div className="pure-g">
           <div className="pure-u-1-1">
-            <h1>Profile</h1>
-            <p>Edit your account details here.</p>
+            <h1>Account</h1>
             <ProfileFormContainer />
           </div>
         </div>
