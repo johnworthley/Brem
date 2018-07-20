@@ -29,7 +29,7 @@ export function loginUser() {
       // Get current ethereum wallet.
       web3.eth.getCoinbase((error, coinbase) => {
         // Log errors, if any.
-        if (error) {
+        if (error) { 
           console.error(error);
         }
 
@@ -39,10 +39,11 @@ export function loginUser() {
           // Attempt to login user.
           authenticationInstance.login({from: coinbase})
           .then(function(result) {
+            
             // If no error, login user.
-            console.log(result)
-            var userName = web3.toUtf8(result)
-            console.log(userName);
+            
+            var userName = result;
+        
             dispatch(userLoggedIn({"name": userName}))
 
             // Used a manual redirect here as opposed to a wrapper.
