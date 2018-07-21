@@ -1,6 +1,6 @@
 import { connect } from 'react-redux'
 import ProfileForm from './ProfileForm'
-import { mintBRMTokens } from './ProfileFormActions'
+import { mintBRMTokens, createNewBREMICO } from './ProfileFormActions'
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -11,9 +11,14 @@ const mapStateToProps = (state, ownProps) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     onMintFormSubmit: (to, amount) => {
-      event.preventDefault();
+      event.preventDefault()
 
       dispatch(mintBRMTokens(to, amount))
+    },
+    onCreateBREMICOFormSubmit: (name, symbol, rate, cap, closingTime, description) => {
+        event.preventDefault()
+
+        dispatch(createNewBREMICO(name, symbol, rate, cap, closingTime, description))
     }
   }
 }

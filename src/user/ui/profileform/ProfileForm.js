@@ -80,6 +80,62 @@ handleMint(event) {
     }
 }
 
+// Developer form
+handleICONameChange(e) {
+    this.setState({ icoName: e.target.value })
+}
+
+handleICOTokenSymbolChange(e) {
+    this.setState({ icoSymbol: e.target.value })
+}
+
+handleICORateChange(e) {
+    this.setState({ icoRate: e.target.value })
+}
+
+handleICOCapChange(e) {
+    this.setState({ icoCap: e.target.value })
+}
+
+handleICOClosingTimeChange(e) {
+    let date = new Date(e.target.value);
+    this.setState({ icoClosingTime: date.getTime() })
+}
+
+handleICODescriptionChange(e) {
+    this.setState({ icoDescription: e.target.value })
+}
+
+handleCreteBREMICO(e) {
+    e.preventDefault()
+
+    const name = this.state.icoName;
+    if (name == null || name.length === 0) {
+        return alert('BREM ICO name cannot be empty')
+    }
+
+    const symbol = this.state.icoSymbol;
+    if (symbol == null || symbol.length !== 3) {
+        return alert('BREM ICO Token symbol length must be 3')
+    }
+
+    const rate = this.state.icoRate;
+    if (rate == null || rate <= 0) {
+        return alert('BREM ICO rate must be more than 0');
+    }
+
+    const cap = this.state.icoCap;
+
+    const closingTime = this.state.icoClosingTime;
+
+    const description = this.state.icoDescription;
+    if (description == null || description.length === 0) {
+        return alert('BREM ICO description');
+    }
+
+    this.props.onCreateBREMICOFormSubmit(name, symbol, rate, cap, closingTime, description)
+}
+
 render() {
 
     const SuperuserForm = <div>
@@ -100,7 +156,25 @@ render() {
 
     const AuditorForm = <h1>Auditor</h1>
 
-    const DeveloperForm = <h1>Developer</h1>
+    const DeveloperForm = <div>
+            <h3>Developer</h3>
+
+            <h4> BREM </h4>
+            <form className="pure-form pure-form-ctacked" onSubmit={this.handleCreteBREMICO.bind(this)}>
+                <fieldset>
+                    <legend>Create BREM ICO</legend>
+                    <p><input id="name" type="text" onChange={this.handleICONameChange.bind(this)} placeholder="BREM ICO name"/></p>
+                    <p><input id="symbol" type="text" onChange={this.handleICOTokenSymbolChange.bind(this)} placeholder="BREM ICO Token Symbol"/></p>
+                    <p><input id="rate" type="number" onChange={this.handleICORateChange.bind(this)} placeholder="BREM ICO rate"/></p>
+                    <p><input id="cap" type="number" onChange={this.handleICOCapChange.bind(this)} placeholder="BREM ICO cap"/></p>
+                    <p><input id="closingTime" type="datetime-local" onChange={this.handleICOClosingTimeChange.bind(this)} placeholder="BREM ICO Closing Time"/></p>
+                    <p><textarea id="description" rows="5" cols="70" onChange={this.handleICODescriptionChange.bind(this)} placeholder="BREM ICO Description" wrap="soft"/></p>
+                    <p><label>Selection and deploying docs to SWARM will be later...</label></p>
+
+                    <button type="submit" className="pure-button pure-button-primary">Create new BREM ICO</button>
+                </fieldset>
+            </form>
+        </div>
 
     return(
         <div>
