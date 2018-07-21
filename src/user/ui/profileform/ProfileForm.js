@@ -53,50 +53,79 @@ init() {
     }
 }
 
-  handleSubmit(event) {
+handleMintAddressChange(event) {
+    this.setState({ mintAddress: event.target.value })
+}
+
+handleMintAmountChange(event) {
+    this.setState({ mintAmount: event.target.value })
+}
+
+handleMint(event) {
     event.preventDefault()
 
-    if (this.state.name.length < 2)
-    {
-      return alert('Please fill in your name.')
+    const web3 = store.getState().web3.web3Instance;
+    if (typeof web3 !== 'undefined') {
+        const recieverAddress = this.state.mintAddress;
+        if(!web3.utils.isAddress(recieverAddress)) {
+            return alert(recieverAddress + " is not Ethereum address");
+        }
+
+        const mintAmount = this.state.mintAmount;
+        if (mintAmount <= 0) {
+            return alert("Mint amount must be bigger than 0");
+        }
+
+        this.props.onMintFormSubmit(recieverAddress, mintAmount)
     }
+}
 
-    this.props.onProfileFormSubmit(this.state.name)
-  }
+render() {
 
-    render() {
+    const SuperuserForm = <div>
+            <h3>Superuser</h3>
 
-        const SuperuserForm = <h1>Superuser</h1>
-
-        const AuditorForm = <h1>Auditor</h1>
-
-        const DeveloperForm = <h1>Developer</h1>
-
-        return(
-            <div>
-            <form className="pure-form pure-form-stacked" onSubmit={this.handleSubmit.bind(this)}>
+            <h4>BRM Token</h4>
+            <form className="pure-form pure-form-ctacked" onSubmit={this.handleMint.bind(this)}>
                 <fieldset>
-                    <label htmlFor="name">Username: {this.state.name}</label>
-                    <label htmlFor="address">Address: {this.state.address}</label>
+                    <legend>Mint BRM tokens</legend>
+                    <input id="mintAddress" type="text" onChange={this.handleMintAddressChange.bind(this)} placeholder="Address"/>
+                    <input id="mintValue" type="number" onChange={this.handleMintAmountChange.bind(this)} placeholder="Amount"/>
 
-                    <button type="submit" className="pure-button pure-button-primary">Update</button>
+                    <button type="submit" className="pure-button pure-button-primary">Mint</button>
+                    <span className="pure-form-message">To simplify the MVP, only manual BRM mint is available</span>
                 </fieldset>
             </form>
-            
-            { this.state && this.state.role && this.state.role === 'superuser' &&
-                SuperuserForm
-            }
+        </div>
 
-            { this.state && this.state.role && this.state.role === 'developer' &&
-                DeveloperForm
-            }
+    const AuditorForm = <h1>Auditor</h1>
 
-            { this.state && this.state.role && this.state.role === 'auditor' &&
-                AuditorForm
-            }
-            </div>
-    )
-  }
+    const DeveloperForm = <h1>Developer</h1>
+
+    return(
+        <div>
+        <form className="pure-form pure-form-stacked">
+            <fieldset>
+                <label htmlFor="name">Username: {this.state.name}</label>
+                <label htmlFor="address">Address: {this.state.address}</label>
+            </fieldset>
+        </form>
+        
+        { this.state && this.state.role && this.state.role === 'superuser' &&
+            SuperuserForm
+        }
+
+        { this.state && this.state.role && this.state.role === 'developer' &&
+            DeveloperForm
+        }
+
+        { this.state && this.state.role && this.state.role === 'auditor' &&
+            AuditorForm
+        }
+
+        </div>
+)
+}
 }
 
 export default ProfileForm

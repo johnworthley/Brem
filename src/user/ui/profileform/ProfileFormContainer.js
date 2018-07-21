@@ -1,6 +1,6 @@
 import { connect } from 'react-redux'
 import ProfileForm from './ProfileForm'
-import { updateUser } from './ProfileFormActions'
+import { mintBRMTokens } from './ProfileFormActions'
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -10,10 +10,10 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    onProfileFormSubmit: (name) => {
+    onMintFormSubmit: (to, amount) => {
       event.preventDefault();
 
-      dispatch(updateUser(name))
+      dispatch(mintBRMTokens(to, amount))
     }
   }
 }
