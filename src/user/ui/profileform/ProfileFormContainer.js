@@ -1,31 +1,40 @@
-import { connect } from 'react-redux'
-import ProfileForm from './ProfileForm'
-import { mintBRMTokens, createNewBREMICO } from './ProfileFormActions'
+import { connect } from "react-redux";
+import ProfileForm from "./ProfileForm";
+import { mintBRMTokens, createNewBREMICO } from "./ProfileFormActions";
 
 const mapStateToProps = (state, ownProps) => {
   return {
     name: state.user.data.name
-  }
-}
+  };
+};
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {
     onMintFormSubmit: (to, amount) => {
-      event.preventDefault()
+      event.preventDefault();
 
-      dispatch(mintBRMTokens(to, amount))
+      dispatch(mintBRMTokens(to, amount));
     },
-    onCreateBREMICOFormSubmit: (name, symbol, rate, cap, closingTime, description) => {
-        event.preventDefault()
+    onCreateBREMICOFormSubmit: (
+      name,
+      symbol,
+      rate,
+      cap,
+      closingTime,
+      description
+    ) => {
+      event.preventDefault();
 
-        dispatch(createNewBREMICO(name, symbol, rate, cap, closingTime, description))
+      dispatch(
+        createNewBREMICO(name, symbol, rate, cap, closingTime, description)
+      );
     }
-  }
-}
+  };
+};
 
 const ProfileFormContainer = connect(
   mapStateToProps,
   mapDispatchToProps
-)(ProfileForm)
+)(ProfileForm);
 
-export default ProfileFormContainer
+export default ProfileFormContainer;

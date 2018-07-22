@@ -1,17 +1,15 @@
 import React, { Component } from "react";
 
-class Home extends Component {
+class Marketplace extends Component {
   render() {
     return (
       <main className="container">
         <div className="pure-g">
-          <div className="pure-u-1-1">
-            <h1>BREM info...</h1>
-          </div>
+          <div className="pure-u-1-1" />
         </div>
       </main>
     );
   }
 }
 
-export default Home;
+export default Marketplace;
