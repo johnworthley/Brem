@@ -76,6 +76,7 @@ export function createNewBREMICO(name, symbol, rate, cap, closingTime, descripti
 
                                 bremInstance.createBREMICO(name, symbol, rate, cap, closingTime, description, [], {from: coinbase})
                                 .then((res) => {
+                                    // TODO: Sync with tokens approve
                                     console.log(res);
                                 })
                                 .catch((err) => {
