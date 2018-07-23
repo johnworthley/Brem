@@ -9,24 +9,27 @@ contract BREMFactory {
     
     mapping(uint256 => address) projects;
     
-    function getProject(uint256 index) 
+    function getProject(uint256 _index) 
         public 
         view 
         returns(address)
     {
-        require(index < projectsAmount);
-        return projects[index];
+        require(_index < projectsAmount);
+        return projects[_index];
     }
     
     mapping(string => uint256) indexes;
     
-    function getProjectByName(string projectName)
+    function getProjectByName(string _projectName)
         public
         view
         returns(address) 
     {
-        // TODO: Finish
-        return 0;    
+        require(bytes(_projectName).length > 0);
+        uint256 index = indexes[_projectName];
+        require(projects[index] != address(0));
+        
+        return projects[index];    
     }
     
     event BREMICOCreated(

@@ -1,67 +1,43 @@
 pragma solidity ^0.4.24;
 
-import "./BREMFactory.sol";
-import "./Userable.sol";
-import "./BRMToken.sol";
+import "./BREMToken.sol";
+import "./BREMICO.sol";
 
-contract BREM is Userable, BREMFactory {
-
-    BRMToken public BRM;
-
-    constructor(address _brmAddress) public {
-        BRM = BRMToken(_brmAddress);
-    }    
+contract BREMFactory {
     
-    function createBREMICO( 
-        string _name, 
-        string _symbol,
-        uint256 _rate,
-        uint256 _cap,
-        uint256 _closingTime,
-        string _description,
-        bytes32[] _docHashes
-    ) 
-    public
-    onlyDeveloper
-    returns (address tokenAddress, address icoAddress)
+    uint256 public projectsAmount;
+    
+    mapping(uint256 => address) projects;
+    
+    function getProject(uint256 _index) 
+        public 
+        view 
+        returns(address)
     {
-        require(BRM.balanceOf(msg.sender) >= icoCreationPrice);
-        require(bytes(_name).length > 0 && bytes(_symbol).length > 0);
-        require(indexes[_name] == 0);
-        
-        require(BRM.transferFrom(msg.sender, address(this), icoCreationPrice));
-        
-        
-        BREMToken token = new BREMToken(_name, _symbol);
-        tokenAddress = address(token);
-        
-        BREMICO ico = new BREMICO(
-            address(this),
-            _cap, 
-            _rate,
-            msg.sender,
-            token,
-            _closingTime,
-            _description, 
-            _docHashes, 
-            this
-        );
-        icoAddress = address(ico);
-        token.transferOwnership(icoAddress);
-
-        projects[projectsAmount] = icoAddress;
-        indexes[_name] = projectsAmount;
-        projectsAmount++;
-        emit BREMICOCreated(msg.sender, icoAddress, tokenAddress, _name);
+        require(_index < projectsAmount);
+        return projects[_index];
     }
     
-    // Withdraw collected fies
-    function withdrawFees(uint256 _value) 
-        public 
-        onlySuperuser
-     {
-        require(address(this).balance >= _value && _value > 0);
-        msg.sender.transfer(_value);
-    } 
+    mapping(string => uint256) indexes;
     
+    function getProjectByName(string _projectName)
+        public
+        view
+        returns(address) 
+    {
+        require(bytes(_projectName).length > 0);
+        uint256 index = indexes[_projectName];
+        require(projects[index] != address(0));
+        
+        return projects[index];    
+    }
+    
+    event BREMICOCreated(
+        address indexed creator,
+        address indexed icoAddress,
+        address indexed tokenAddress,
+        string name
+    );
+    
+    uint256 public icoCreationPrice = 10000;
 }
