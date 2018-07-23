@@ -5,11 +5,28 @@ import "./BREMICO.sol";
 
 contract BREMFactory {
     
-    address[] public projects;
+    uint256 public projectsAmount;
+    
+    mapping(uint256 => address) projects;
+    
+    function getProject(uint256 index) 
+        public 
+        view 
+        returns(address)
+    {
+        require(index < projectsAmount);
+        return projects[index];
+    }
+    
     mapping(string => uint256) indexes;
     
-    constructor() public {
-        projects.push(address(0));
+    function getProjectByName(string projectName)
+        public
+        view
+        returns(address) 
+    {
+        // TODO: Finish
+        return 0;    
     }
     
     event BREMICOCreated(
