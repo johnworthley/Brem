@@ -12,6 +12,7 @@ import getWeb3 from "./util/web3/getWeb3";
 // Layouts
 import App from "./App";
 import Home from "./layouts/home/Home";
+import Marketplace from "./layouts/marketplace/Marketplace";
 import Dashboard from "./layouts/dashboard/Dashboard";
 import SignUp from "./user/layouts/signup/SignUp";
 import Profile from "./user/layouts/profile/Profile";
@@ -36,6 +37,7 @@ ReactDOM.render(
     <Router history={history}>
       <Route path="/" component={App}>
         <IndexRoute component={Home} />
+        <Route path="marketplace" component={Marketplace} />
         <Route path="dashboard" component={UserIsAuthenticated(Dashboard)} />
         <Route path="signup" component={UserIsNotAuthenticated(SignUp)} />
         <Route path="profile" component={UserIsAuthenticated(Profile)} />
