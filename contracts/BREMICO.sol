@@ -36,6 +36,9 @@ contract BREMICO {
 
     // The token being sold
     BREMToken public token;
+    
+    // ICO name (equals to token's name)
+    string public name;
 
     // Address where funds are collected
     address public wallet;
@@ -119,6 +122,7 @@ contract BREMICO {
     */
     constructor(
         address _brem,
+        string _name,
         uint256 _cap,
         uint256 _rate, 
         address _wallet, 
@@ -131,6 +135,7 @@ contract BREMICO {
         public 
     {
         require(_brem != address(0));
+        require(bytes(_name).length > 0);
         require(_cap > 0);
         require(_rate > 0);
         require(_wallet != address(0));
@@ -138,6 +143,7 @@ contract BREMICO {
         require(_auditAddress != address(0));
         require(_closingTime >= block.timestamp);
         
+        name = _name;
         brem = _brem;
         cap = _cap;
         rate = _rate;
