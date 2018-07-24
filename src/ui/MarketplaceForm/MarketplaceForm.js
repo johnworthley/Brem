@@ -1,12 +1,15 @@
 import React, { Component } from "react";
 import store from "../../store";
 import BREMContract from "../../../build/contracts/BREM.json";
+import BremItem from "../BremItem/BremItem";
 
 const contract = require("truffle-contract");
 
 class MarketplaceForm extends Component {
   constructor(props) {
     super(props);
+
+    this.BremList.bind(this);
 
     const web3 = store.getState().web3.web3Instance;
 
@@ -24,11 +27,32 @@ class MarketplaceForm extends Component {
     }
   }
 
+  BremList() {
+    const amount = this.state.amount;
+    if (amount === 0) {
+      return (
+        <div>
+          <h3>Brem ICOs not created yet...</h3>
+        </div>
+      );
+    }
+
+    const indexes = Array.from(
+      Array(amount),
+      (val, index) => amount - index - 1
+    );
+    //Make list item components using indexes as keys
+    const bremItems = indexes.map(index => (
+      <BremItem key={index.toString()} value={index} />
+    ));
+    return <span>{bremItems}</span>;
+  }
+
   render() {
     return (
       <div>
-        <span> This is Marketplace form</span>
-        {this.state && this.state.amount && <label>TODO: BREM ICO list </label>}
+        <h2> This is Marketplace form</h2>
+        {this.state && this.state.amount !== null && this.BremList()}
       </div>
     );
   }
