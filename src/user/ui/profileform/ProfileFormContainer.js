@@ -1,6 +1,10 @@
 import { connect } from "react-redux";
 import ProfileForm from "./ProfileForm";
-import { mintBRMTokens, createNewBREMICO } from "./ProfileFormActions";
+import {
+  mintBRMTokens,
+  createNewBREMICO,
+  addNewAuditor
+} from "./ProfileFormActions";
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -28,6 +32,11 @@ const mapDispatchToProps = dispatch => {
       dispatch(
         createNewBREMICO(name, symbol, rate, cap, closingTime, description)
       );
+    },
+    onAddNewAuditorSubmit: address => {
+      event.preventDefault();
+
+      dispatch(addNewAuditor(address));
     }
   };
 };

@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import store from "../../../store";
 import BREMContract from "../../../../build/contracts/BREM.json";
+import BremPublicationFormContainer from "../bremPublicationForm/BremPublicationFormContainer";
 
 const contract = require("truffle-contract");
 
@@ -13,6 +14,8 @@ class ProfileForm extends Component {
       name: this.props.name,
       address: null
     };
+
+    this.BremList.bind(this);
 
     this.init();
   }
@@ -45,6 +48,10 @@ class ProfileForm extends Component {
               this.setState({ role: "superuser" });
             }
           });
+
+          instance.projectsAmount().then(projectsAmount => {
+            this.setState({ icoAmount: projectsAmount });
+          });
         });
       });
     } else {
@@ -52,6 +59,7 @@ class ProfileForm extends Component {
     }
   }
 
+  // Superuser
   handleMintAddressChange(event) {
     this.setState({ mintAddress: event.target.value });
   }
@@ -77,6 +85,48 @@ class ProfileForm extends Component {
 
       this.props.onMintFormSubmit(recieverAddress, mintAmount);
     }
+  }
+
+  handleNewAuditorChange(e) {
+    this.setState({ newAuditorAddress: e.target.value });
+  }
+
+  handleAddNewAuditor(e) {
+    e.preventDefault();
+
+    const web3 = store.getState().web3.web3Instance;
+    if (typeof web3 !== "undefined" && web3 !== null) {
+      const address = this.state.newAuditorAddress;
+      if (!web3.utils.isAddress(address)) {
+        return alert(address + " is not Ethereum address");
+      }
+
+      this.props.onAddNewAuditorSubmit(address);
+    } else {
+      console.error("Web3 is not initialized.");
+    }
+  }
+
+  // Superuser's project for publication
+
+  BremList() {
+    const amount = this.state.icoAmount;
+    if (amount === 0) {
+      return (
+        <div>
+          <h3>Brem ICOs not created yet...</h3>
+        </div>
+      );
+    }
+
+    const indexes = Array.from(
+      Array(amount),
+      (val, index) => amount - index - 1
+    );
+    const bremItems = indexes.map(index => (
+      <BremPublicationFormContainer key={index.toString()} value={index} />
+    ));
+    return <span>{bremItems}</span>;
   }
 
   // Developer form
@@ -175,6 +225,29 @@ class ProfileForm extends Component {
             </span>
           </fieldset>
         </form>
+
+        <h4>Auditors Managing</h4>
+        <form
+          className="pure-form pure-form-ctacked"
+          onSubmit={this.handleAddNewAuditor.bind(this)}
+        >
+          <fieldset>
+            <legend>Add auditor</legend>
+            <input
+              id="newAuditorAddress"
+              type="text"
+              onChange={this.handleNewAuditorChange.bind(this)}
+              placeholder="New auditor address"
+            />
+
+            <button type="submit" className="pure-button pure-button-primary">
+              Add
+            </button>
+          </fieldset>
+        </form>
+
+        <h4>Projects for publication</h4>
+        {this.state && this.state.icoAmount !== null && this.BremList()}
       </div>
     );
 

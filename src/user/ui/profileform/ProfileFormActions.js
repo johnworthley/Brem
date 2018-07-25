@@ -124,3 +124,37 @@ export function createNewBREMICO(
     console.error("Web3 is not initialized.");
   }
 }
+
+export function addNewAuditor(address) {
+  let web3 = store.getState().web3.web3Instance;
+
+  if (typeof web3 !== "undefined") {
+    return function() {
+      const brem = contract(BREMContract);
+      brem.setProvider(web3.currentProvider);
+
+      web3.eth.getCoinbase((err, coinbase) => {
+        if (err) {
+          console.error(err);
+          return;
+        }
+
+        brem.deployed().then(bremInstance => {
+          // Check for existing of auditor
+          bremInstance.isAuditor(address).then(res => {
+            if (res) {
+              alert(address + " is already auditor");
+              return;
+            }
+
+            bremInstance.addAuditor(address, { from: coinbase }).then(txRes => {
+              return alert("Success. TX: " + txRes.tx);
+            });
+          });
+        });
+      });
+    };
+  } else {
+    console.error("Web3 is not initialized.");
+  }
+}
