@@ -81,24 +81,29 @@ export function createNewBREMICO(
                 const factoryPrice = res;
                 // Approve BRM token spend to BREM contract address
                 brmTokenInstance
-                  .approve(factoryPrice, brem.address, { from: coinbase })
+                  .approve(brem.address, factoryPrice, { from: coinbase })
                   .then(res => {
                     console.log(res);
-
+                    console.log(name);
+                    console.log(symbol);
+                    console.log(rate);
+                    console.log(cap);
+                    console.log(closingTime.toString());
+                    console.log(description);
                     bremInstance
                       .createBREMICO(
                         name,
                         symbol,
                         rate,
                         cap,
-                        closingTime,
+                        closingTime.toString(),
                         description,
                         [],
                         { from: coinbase }
                       )
                       .then(res => {
-                        // TODO: Sync with tokens approve
                         console.log(res);
+                        return alert(res.tx);
                       })
                       .catch(err => {
                         console.error(err);
