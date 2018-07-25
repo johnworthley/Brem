@@ -24,14 +24,18 @@ class BremItem extends Component {
           const ico = contract(ICOContract);
           ico.setProvider(web3.currentProvider);
           ico.at(this.state.address).then(icoInstance => {
-            this.setState({ contract: icoInstance });
-
             icoInstance.name().then(name => {
               this.setState({ name: name });
             });
 
             icoInstance.description().then(descr => {
               this.setState({ descr: descr });
+            });
+
+            icoInstance.wallet().then(developer => {
+              bremInstance.login({ from: developer }).then(username => {
+                this.setState({ user: username });
+              });
             });
           });
         });
@@ -44,11 +48,18 @@ class BremItem extends Component {
   render() {
     return (
       <div>
-        {this.state &&
-          this.state.name && <label>Project: {this.state.name}</label>}
-        <br />
-        {this.state &&
-          this.state.descr && <label> Description: {this.state.descr}</label>}
+        <form>
+          <fieldset>
+            {this.state &&
+              this.state.name && <legend>{this.state.name}</legend>}
+            {this.state &&
+              this.state.descr && <label> {this.state.descr}</label>}
+            {this.state &&
+              this.state.name && (
+                <span className="pure-form-message">by {this.state.user} </span>
+              )}
+          </fieldset>
+        </form>
       </div>
     );
   }
