@@ -155,6 +155,8 @@ class ProfileForm extends Component {
     this.setState({ icoDescription: e.target.value });
   }
 
+  // TODO: Directory selection handler
+
   handleCreteBREMICO(e) {
     e.preventDefault();
 
@@ -182,6 +184,7 @@ class ProfileForm extends Component {
       return alert("BREM ICO description");
     }
 
+    // TODO: add folder to params
     this.props.onCreateBREMICOFormSubmit(
       name,
       symbol,
@@ -319,7 +322,7 @@ class ProfileForm extends Component {
                 Selection and deploying docs to SWARM will be later...
               </label>
             </p>
-
+            {/* TODO: Button to select directory */}
             <button type="submit" className="pure-button pure-button-primary">
               Create new BREM ICO
             </button>

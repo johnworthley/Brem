@@ -76,6 +76,8 @@ export function createNewBREMICO(
             brem.deployed().then(function(instance) {
               bremInstance = instance;
 
+              // TODO: Upload to IPFS
+
               // Get ICO creation price
               bremInstance.icoCreationPrice({ from: coinbase }).then(res => {
                 const factoryPrice = res;
