@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { browserHistory } from "react-router";
 import store from "../../store";
 import BREMContract from "../../../build/contracts/BREM.json";
 import ICOContract from "../../../build/contracts/BREMICO.json";
@@ -24,18 +25,24 @@ class BremItem extends Component {
           const ico = contract(ICOContract);
           ico.setProvider(web3.currentProvider);
           ico.at(this.state.address).then(icoInstance => {
-            icoInstance.name().then(name => {
-              this.setState({ name: name });
-            });
+            icoInstance.auditSelected().then(res => {
+              this.setState({ selected: res });
 
-            icoInstance.description().then(descr => {
-              this.setState({ descr: descr });
-            });
+              if (res) {
+                icoInstance.name().then(name => {
+                  this.setState({ name: name });
+                });
 
-            icoInstance.wallet().then(developer => {
-              bremInstance.login({ from: developer }).then(username => {
-                this.setState({ user: username });
-              });
+                icoInstance.description().then(descr => {
+                  this.setState({ descr: descr });
+                });
+
+                icoInstance.wallet().then(developer => {
+                  bremInstance.login({ from: developer }).then(username => {
+                    this.setState({ user: username });
+                  });
+                });
+              }
             });
           });
         });
@@ -45,21 +52,34 @@ class BremItem extends Component {
     }
   }
 
+  handleOpenICOForm(e) {
+    browserHistory.push({
+      pathname: "/ico/" + this.state.address
+    });
+  }
+
   render() {
     return (
       <div>
-        <form>
-          <fieldset>
-            {this.state &&
-              this.state.name && <legend>{this.state.name}</legend>}
-            {this.state &&
-              this.state.descr && <label> {this.state.descr}</label>}
-            {this.state &&
-              this.state.name && (
-                <span className="pure-form-message">by {this.state.user} </span>
-              )}
-          </fieldset>
-        </form>
+        {this.state &&
+          this.state.selected !== null &&
+          this.state.selected &&
+          this.state.name !== null &&
+          this.state.descr !== null &&
+          this.state.user !== null && (
+            <fieldset>
+              <legend>{this.state.name}</legend>
+              <label> {this.state.descr}</label>
+              <span className="pure-form-message">by {this.state.user} </span>
+              <button
+                type="button"
+                className="pure-button pure-button-primary"
+                onClick={this.handleOpenICOForm.bind(this)}
+              >
+                Open ICO Form
+              </button>
+            </fieldset>
+          )}
       </div>
     );
   }

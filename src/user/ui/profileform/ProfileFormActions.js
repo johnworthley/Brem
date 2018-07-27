@@ -79,17 +79,11 @@ export function createNewBREMICO(
               // Get ICO creation price
               bremInstance.icoCreationPrice({ from: coinbase }).then(res => {
                 const factoryPrice = res;
+
                 // Approve BRM token spend to BREM contract address
                 brmTokenInstance
                   .approve(brem.address, factoryPrice, { from: coinbase })
                   .then(res => {
-                    console.log(res);
-                    console.log(name);
-                    console.log(symbol);
-                    console.log(rate);
-                    console.log(cap);
-                    console.log(closingTime.toString());
-                    console.log(description);
                     bremInstance
                       .createBREMICO(
                         name,
