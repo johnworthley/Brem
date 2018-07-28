@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import store from "../../../store";
+import { browserHistory } from "react-router";
 import BREMContract from "../../../../build/contracts/BREM.json";
 import ICOContract from "../../../../build/contracts/BREMICO.json";
 
@@ -84,6 +85,12 @@ class BremPublicationForm extends Component {
     }
   }
 
+  handleOpenICOPage(e) {
+    browserHistory.push({
+      pathname: "/ico/" + this.state.icoAddress
+    });
+  }
+
   render() {
     return (
       <div>
@@ -128,6 +135,15 @@ class BremPublicationForm extends Component {
               >
                 Publish project
               </button>
+
+              <p>
+                <button
+                  className="pure-button pure-button-primary"
+                  onClick={this.handleOpenICOPage.bind(this)}
+                >
+                  Open ICO Page
+                </button>
+              </p>
             </fieldset>
           )}
       </div>
