@@ -24,3 +24,19 @@ func addDeveloper(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, nil)
 }
+
+func addAuditor(c *gin.Context) {
+	var auditor data.Auditor
+	err := c.BindJSON(&auditor)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+	err = auditor.AddAuditor()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+
+	c.JSON(http.StatusCreated, nil)
+}

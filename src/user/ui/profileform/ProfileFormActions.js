@@ -1,6 +1,7 @@
 import BRMTokenContract from "../../../../build/contracts/BRMToken.json";
 import BREMContract from "../../../../build/contracts/BREM.json";
 import store from "../../../store";
+import axios from "axios";
 
 const contract = require("truffle-contract");
 
@@ -149,6 +150,17 @@ export function addNewAuditor(address) {
             }
 
             bremInstance.addAuditor(address, { from: coinbase }).then(txRes => {
+              const auditor = {
+                address: address
+              };
+              axios
+                .post("http://127.0.0.1:8080/audit", auditor)
+                .then(res => {
+                  console.log(res);
+                })
+                .catch(err => {
+                  console.error(err);
+                });
               return alert("Success. TX: " + txRes.tx);
             });
           });

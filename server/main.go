@@ -23,4 +23,5 @@ func main() {
 
 func initAPI() {
 	router.POST("/dev", addDeveloper)
+	router.POST("/audit", addAuditor)
 }

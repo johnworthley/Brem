@@ -7,7 +7,7 @@ import (
 // Developer represents developer structure
 type Developer struct {
 	ID      int
-	Address string `json:"address"`
+	Address string `json:"address" binding:"required"`
 }
 
 // Create insert new developer address to db
