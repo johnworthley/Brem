@@ -1,0 +1,6 @@
+-- DROP TABLE developer CASCADE;
+
+CREATE TABLE developer (
+  id      SERIAL PRIMARY KEY,
+  address VARCHAR(42) UNIQUE NOT NULL
+)
