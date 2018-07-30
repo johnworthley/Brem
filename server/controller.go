@@ -25,6 +25,7 @@ func addDeveloper(c *gin.Context) {
 	c.JSON(http.StatusCreated, nil)
 }
 
+// Add new auditor to db
 func addAuditor(c *gin.Context) {
 	var auditor data.Auditor
 	err := c.BindJSON(&auditor)
@@ -39,4 +40,50 @@ func addAuditor(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, nil)
+}
+
+// Get all BREM auditors
+func getAllAuditors(c *gin.Context) {
+	auditors, err := data.GetAllAuditors()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+	c.JSON(http.StatusOK, auditors)
+}
+
+func addICO(c *gin.Context) {
+	var developer data.Developer
+	err := c.BindJSON(&developer)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+	var ico data.ICO
+	err = c.BindJSON(&ico)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+	err = developer.GetDeveloper()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+	ico.Developer = developer
+	err = ico.AddICO()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+	c.JSON(http.StatusCreated, nil)
+}
+
+func getCreatedICOs (c *gin.Context) {
+	icos, err := data.GetCreatedICOs()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+	c.JSON(http.StatusOK, icos)
 }
