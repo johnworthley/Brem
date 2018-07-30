@@ -25,12 +25,21 @@ const mapDispatchToProps = dispatch => {
       rate,
       cap,
       closingTime,
-      description
+      description,
+      files
     ) => {
       event.preventDefault();
 
       dispatch(
-        createNewBREMICO(name, symbol, rate, cap, closingTime, description)
+        createNewBREMICO(
+          name,
+          symbol,
+          rate,
+          cap,
+          closingTime,
+          description,
+          files
+        )
       );
     },
     onAddNewAuditorSubmit: address => {

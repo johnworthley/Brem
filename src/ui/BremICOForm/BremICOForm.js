@@ -54,6 +54,10 @@ class BremICOForm extends Component {
         icoInstance.cap().then(cap => {
           this.setState({ cap: cap.toNumber() });
         });
+
+        icoInstance.docHash().then(docHash => {
+          this.setState({ docHash: docHash });
+        });
       });
     } else {
       console.error("Web3 is not initialized.");
@@ -91,6 +95,12 @@ class BremICOForm extends Component {
         <p>Wallet: {this.state.wallet}</p>
         <p>Token address: {this.state.tokenAddress}</p>
         <p>Rate: {this.state.rate}</p>
+        <p>
+          Docs:{" "}
+          <a href={`https://ipfs.infura.io/ipfs/${this.state.docHash}`}>
+            ipfs.infura.io/ipfs/{this.state.docHash}
+          </a>
+        </p>
         {this.state &&
           this.state.weiRaised !== null &&
           this.state.cap !== null && (

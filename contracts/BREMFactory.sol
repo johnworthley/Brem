@@ -3,7 +3,7 @@ pragma solidity ^0.4.24;
 import "./BREMToken.sol";
 import "./BREMICO.sol";
 
-contract BREMFactory {
+contract BREMFactory is Userable{
     
     uint256 public projectsAmount;
     
@@ -39,5 +39,25 @@ contract BREMFactory {
         string name
     );
     
-    uint256 public icoCreationPrice = 10000;
+    uint256 public icoCreationPrice;
+
+    function setIcoCreationPrice(uint256 _icoCreationPrice)
+        public 
+        onlySuperuser
+    {
+        require(_icoCreationPrice != icoCreationPrice);
+        icoCreationPrice = _icoCreationPrice;
+    }
+
+    uint256 public withdrawFeePercent;
+
+    function setWithdrawFeePercent(uint256 _withdrawFeePercent)
+        public
+        onlySuperuser
+    {
+        require(_withdrawFeePercent != withdrawFeePercent);
+        require(_withdrawFeePercent >= 0 && _withdrawFeePercent <=100);
+
+        withdrawFeePercent = _withdrawFeePercent;
+    }
 }

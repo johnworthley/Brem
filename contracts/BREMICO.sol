@@ -59,7 +59,7 @@ contract BREMICO {
     string public description;
     
     // ICO documentation hashes
-    bytes32[] public docHashes; // TODO: change to SWARM directory
+    bytes32 public docHash; // TODO: change to SWARM directory
     
     // Auditors contract instance
     Auditable audit;
@@ -90,7 +90,7 @@ contract BREMICO {
     mapping(address => uint256) public balancesInToken;
     
     // Withdraw fee percent
-    uint256 public constant withdrawFeePercent = 1;
+    uint256 public withdrawFeePercent;
 
     // Brem contract address
     address public brem;
@@ -129,8 +129,9 @@ contract BREMICO {
         BREMToken _token,
         uint256 _closingTime,
         string _description, 
-        bytes32[] _docHashes,
-        Auditable _auditAddress
+        bytes32 _docHash,
+        Auditable _auditAddress,
+        uint256 _withdrawFeePercent
     ) 
         public 
     {
@@ -142,6 +143,7 @@ contract BREMICO {
         require(_token != address(0));
         require(_auditAddress != address(0));
         require(_closingTime >= block.timestamp);
+        require(_withdrawFeePercent >= 0 && _withdrawFeePercent <= 100);
         
         name = _name;
         brem = _brem;
@@ -151,8 +153,9 @@ contract BREMICO {
         token = _token;
         closingTime = _closingTime;
         description = _description;
-        docHashes = _docHashes;
+        docHash = _docHash;
         audit = Auditable(_auditAddress);
+        withdrawFeePercent = _withdrawFeePercent;
     }
 
     // -----------------------------------------

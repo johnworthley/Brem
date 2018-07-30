@@ -4,12 +4,20 @@ import "./BREMFactory.sol";
 import "./Userable.sol";
 import "./BRMToken.sol";
 
-contract BREM is Userable, BREMFactory {
+contract BREM is BREMFactory {
 
     BRMToken public BRM;
 
-    constructor(address _brmAddress) public {
+    constructor(
+        address _brmAddress,
+        uint256 _icoCreationPrice,
+        uint256 _withdrawFeePercent
+    ) 
+    public 
+    {
         BRM = BRMToken(_brmAddress);
+        icoCreationPrice = _icoCreationPrice;
+        withdrawFeePercent = _withdrawFeePercent;
     }    
     
     function createBREMICO( 
@@ -19,7 +27,7 @@ contract BREM is Userable, BREMFactory {
         uint256 _cap,
         uint256 _closingTime,
         string _description,
-        bytes32[] _docHashes
+        bytes32 _docHash
     ) 
     public
     onlyDeveloper
@@ -44,8 +52,9 @@ contract BREM is Userable, BREMFactory {
             token,
             _closingTime,
             _description, 
-            _docHashes, 
-            this
+            _docHash, 
+            this,
+            withdrawFeePercent
         );
         icoAddress = address(ico);
         token.transferOwnership(icoAddress);
