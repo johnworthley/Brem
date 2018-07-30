@@ -3,6 +3,8 @@ import BREMContract from "../../../../build/contracts/BREM.json";
 import store from "../../../store";
 import axios from "axios";
 
+import ipfs from "../../../ipfs";
+
 const contract = require("truffle-contract");
 
 export function mintBRMTokens(reciever, amount) {
@@ -49,7 +51,8 @@ export function createNewBREMICO(
   rate,
   cap,
   closingTime,
-  description
+  description,
+  files
 ) {
   let web3 = store.getState().web3.web3Instance;
 
@@ -62,7 +65,7 @@ export function createNewBREMICO(
       const brmToken = contract(BRMTokenContract);
       brmToken.setProvider(web3.currentProvider);
 
-      var bremInstance, brmTokenInstance;
+      var bremInstance, brmTokenInstance, docHash;
 
       web3.eth.getCoinbase((error, coinbase) => {
         if (error) {
@@ -77,43 +80,49 @@ export function createNewBREMICO(
             brem.deployed().then(function(instance) {
               bremInstance = instance;
 
-              // TODO: Upload to IPFS
+              ipfs.files.add(files, (error, result) => {
+                if (error) {
+                  console.log(error);
+                  return;
+                }
+                docHash = result[result.length - 1].hash;
 
-              // Get ICO creation price
-              bremInstance.icoCreationPrice({ from: coinbase }).then(res => {
-                const factoryPrice = res;
+                // Get ICO creation price
+                bremInstance.icoCreationPrice({ from: coinbase }).then(res => {
+                  const factoryPrice = res;
 
-                // Approve BRM token spend to BREM contract address
-                brmTokenInstance
-                  .approve(brem.address, factoryPrice, { from: coinbase })
-                  .then(res => {
-                    bremInstance
-                      .createBREMICO(
-                        name,
-                        symbol,
-                        rate,
-                        cap,
-                        closingTime.toString(),
-                        description,
-                        [],
-                        { from: coinbase }
-                      )
-                      .then(res => {
-                        console.log(res);
-                        return alert(res.tx);
-                      })
-                      .catch(err => {
-                        console.error(err);
-                        // Reject approving of transfering of tokens
-                        brmTokenInstance
-                          .decreaseApproval(brem.address, factoryPrice, {
-                            from: coinbase
-                          })
-                          .then(res => {
-                            console.log(res);
-                          });
-                      });
-                  });
+                  // Approve BRM token spend to BREM contract address
+                  brmTokenInstance
+                    .approve(brem.address, factoryPrice, { from: coinbase })
+                    .then(res => {
+                      bremInstance
+                        .createBREMICO(
+                          name,
+                          symbol,
+                          rate,
+                          cap,
+                          closingTime.toString(),
+                          description,
+                          docHash,
+                          { from: coinbase }
+                        )
+                        .then(res => {
+                          console.log(res);
+                          return alert(res.tx);
+                        })
+                        .catch(err => {
+                          console.error(err);
+                          // Reject approving of transfering of tokens
+                          brmTokenInstance
+                            .decreaseApproval(brem.address, factoryPrice, {
+                              from: coinbase
+                            })
+                            .then(res => {
+                              console.log(res);
+                            });
+                        });
+                    });
+                });
               });
             });
           })

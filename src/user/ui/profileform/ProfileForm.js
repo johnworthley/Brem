@@ -155,7 +155,34 @@ class ProfileForm extends Component {
     this.setState({ icoDescription: e.target.value });
   }
 
-  // TODO: Directory selection handler
+  handleICOFilesChange(e) {
+    e.preventDefault();
+
+    this.setState({ icoFiles: [] });
+    for (let i = 0; i < e.target.files.length; i++) {
+      let filePath = e.target.files[i].webkitRelativePath;
+
+      let reader = new window.FileReader();
+      reader.readAsArrayBuffer(e.target.files[i]);
+
+      reader.onloadend = () => {
+        this.setState({
+          icoFiles: [
+            ...this.state.icoFiles,
+            {
+              path: filePath,
+              content: Buffer(reader.result)
+            }
+          ]
+        });
+      };
+    }
+  }
+  _addDirectory(node) {
+    if (node) {
+      node.webkitdirectory = true;
+    }
+  }
 
   handleCreteBREMICO(e) {
     e.preventDefault();
@@ -184,14 +211,15 @@ class ProfileForm extends Component {
       return alert("BREM ICO description");
     }
 
-    // TODO: add folder to params
+    const files = this.state.icoFiles;
     this.props.onCreateBREMICOFormSubmit(
       name,
       symbol,
       rate,
       cap,
       closingTime,
-      description
+      description,
+      files
     );
   }
 
@@ -322,7 +350,13 @@ class ProfileForm extends Component {
                 Selection and deploying docs to SWARM will be later...
               </label>
             </p>
-            {/* TODO: Button to select directory */}
+            <p>
+              <input
+                type="file"
+                onChange={this.handleICOFilesChange.bind(this)}
+                ref={node => this._addDirectory(node)}
+              />
+            </p>
             <button type="submit" className="pure-button pure-button-primary">
               Create new BREM ICO
             </button>
