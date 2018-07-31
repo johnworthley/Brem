@@ -23,9 +23,11 @@ func (dev *Developer) Create() (err error) {
 	return
 }
 
+// GetDeveloper select developer's id from by address
 func (dev *Developer) GetDeveloper() (err error) {
-	statement := "SELECT * FROM developers WHERE address = $1"
+	statement := "SELECT id FROM developers WHERE address = $1"
 	row, err := db.Query(statement, dev.Address)
+	row.Next()
 	if err != nil {
 		log.Println(err)
 		return

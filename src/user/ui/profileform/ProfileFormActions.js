@@ -81,11 +81,11 @@ export function createNewBREMICO(
               bremInstance = instance;
 
               ipfs.files.add(files, (error, result) => {
-                if (error) {
-                  console.log(error);
-                  return;
-                }
-                docHash = result[result.length - 1].hash;
+                // if (error) {
+                //   console.log(error);
+                //   return;
+                // }
+                // docHash = result[result.length - 1].hash;
 
                 // Get ICO creation price
                 bremInstance.icoCreationPrice({ from: coinbase }).then(res => {
@@ -103,12 +103,29 @@ export function createNewBREMICO(
                           cap,
                           closingTime.toString(),
                           description,
-                          docHash,
+                          // docHash,
+                          "123",
                           { from: coinbase }
                         )
                         .then(res => {
-                          console.log(res);
-                          return alert(res.tx);
+                          const ico = {
+                            address: res.logs[0].args.icoAddress,
+                            developer: {
+                              address: coinbase
+                            }
+                          };
+                          axios
+                            .post("http://127.0.0.1:8080/ico", ico)
+                            .then(res => console.log(res))
+                            .catch(err => console.log(err));
+                          return alert(
+                            "TX: " +
+                              res.tx +
+                              " ICO: " +
+                              res.logs[0].args.icoAddress +
+                              " Token: " +
+                              res.logs[0].args.tokenAddress
+                          );
                         })
                         .catch(err => {
                           console.error(err);

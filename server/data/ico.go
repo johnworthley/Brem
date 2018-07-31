@@ -4,8 +4,8 @@ import "log"
 
 type ICO struct {
 	ID 			int
-	Address 	string		`json:"ico_address" binding:"required"`
-	Developer 	Developer
+	Address 	string		`json:"address" binding:"required"`
+	Developer 	Developer	`json:"developer"`
 	Status		string
 }
 
@@ -22,7 +22,7 @@ func (ico *ICO) AddICO() (err error) {
 }
 
 func GetCreatedICOs() (icos []ICO, err error)  {
-	rows, err := db.Query("SELECT * FROM ico WHERE status = $1")
+	rows, err := db.Query("SELECT * FROM ico WHERE status = $1", "created")
 	if err != nil {
 		log.Println(err)
 		return

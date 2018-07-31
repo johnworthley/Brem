@@ -52,25 +52,19 @@ func getAllAuditors(c *gin.Context) {
 	c.JSON(http.StatusOK, auditors)
 }
 
+// Add new ICO
 func addICO(c *gin.Context) {
-	var developer data.Developer
-	err := c.BindJSON(&developer)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, err)
-		return
-	}
 	var ico data.ICO
-	err = c.BindJSON(&ico)
+	err := c.BindJSON(&ico)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, err)
 		return
 	}
-	err = developer.GetDeveloper()
+	err = ico.Developer.GetDeveloper()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
-	ico.Developer = developer
 	err = ico.AddICO()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)

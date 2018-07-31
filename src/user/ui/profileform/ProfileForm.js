@@ -211,6 +211,7 @@ class ProfileForm extends Component {
       };
     }
   }
+
   _addDirectory(node) {
     if (node) {
       node.webkitdirectory = true;
