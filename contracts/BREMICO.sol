@@ -59,7 +59,7 @@ contract BREMICO {
     string public description;
     
     // ICO documentation hashes
-    bytes32 public docHash; // TODO: change to SWARM directory
+    bytes32 public docHash;
     
     // Auditors contract instance
     Auditable audit;
