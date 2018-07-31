@@ -15,7 +15,7 @@ func (dev *Developer) Create() (err error) {
 	statement := "INSERT INTO developers (address) VALUES ($1) RETURNING id"
 	stmt, err := db.Prepare(statement)
 	if err != nil {
-		log.Fatalln(err)
+		log.Println(err)
 		return
 	}
 	defer stmt.Close()
