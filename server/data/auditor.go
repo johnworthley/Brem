@@ -25,7 +25,7 @@ func (auditor *Auditor) AddAuditor() (err error) {
 func GetAllAuditors() (auditors []Auditor, err error) {
 	rows, err := db.Query("SELECT * FROM auditors")
 	if err != nil {
-		log.Fatalln(err)
+		log.Println(err)
 		return
 	}
 	for rows.Next() {

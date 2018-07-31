@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import store from "../../../store";
+import axios from "axios";
 import BREMContract from "../../../../build/contracts/BREM.json";
 import BremPublicationFormContainer from "../bremPublicationForm/BremPublicationFormContainer";
 
@@ -15,6 +16,7 @@ class ProfileForm extends Component {
       address: null
     };
 
+    this.AuditorsList.bind(this);
     this.BremList.bind(this);
 
     this.init();
@@ -46,6 +48,22 @@ class ProfileForm extends Component {
           instance.isSuperuser(coinbase).then(res => {
             if (res) {
               this.setState({ role: "superuser" });
+              // Get all auditors' addresses
+              axios
+                .get("http://127.0.0.1:8080/audit")
+                .then(res => {
+                  this.setState({ auditors: res.data });
+                })
+                .catch(err => {
+                  console.error(err);
+                });
+              // Get all new ico's
+              axios
+                .get("http://127.0.0.1:8080/ico/created")
+                .then(res => {
+                  console.log(res);
+                })
+                .catch(err => console.error(err));
             }
           });
 
@@ -105,6 +123,21 @@ class ProfileForm extends Component {
     } else {
       console.error("Web3 is not initialized.");
     }
+  }
+
+  AuditorsList() {
+    const amount = this.state.auditors.length;
+    if (amount === 0) {
+      return (
+        <div>
+          <p>Auditors didn't added</p>
+        </div>
+      );
+    }
+
+    return this.state.auditors.map(auditor => (
+      <p key={auditor.address}>{auditor.address}</p>
+    ));
   }
 
   // Superuser's project for publication
@@ -258,6 +291,8 @@ class ProfileForm extends Component {
         </form>
 
         <h4>Auditors Managing</h4>
+        <h5>All BREM auditos</h5>
+        {this.state && this.state.auditors && this.AuditorsList()}
         <form
           className="pure-form pure-form-ctacked"
           onSubmit={this.handleAddNewAuditor.bind(this)}
