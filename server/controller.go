@@ -73,6 +73,27 @@ func addICO(c *gin.Context) {
 	c.JSON(http.StatusCreated, nil)
 }
 
+// Get current developer's ICOs
+func getDevelopersICOs(c *gin.Context) {
+	var developer data.Developer
+	developer.Address = c.Query("address")
+	if len(developer.Address) == 0 {
+		c.JSON(http.StatusBadRequest, nil)
+		return
+	}
+	err := developer.GetDeveloper()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+	icos, err := developer.GetICOs()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+	c.JSON(http.StatusOK, icos)
+}
+
 func getCreatedICOs (c *gin.Context) {
 	icos, err := data.GetCreatedICOs()
 	if err != nil {

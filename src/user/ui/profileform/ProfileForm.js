@@ -38,6 +38,15 @@ class ProfileForm extends Component {
           instance.isDeveloper(coinbase).then(res => {
             if (res) {
               this.setState({ role: "developer" });
+              // Get developer's ICOs
+              axios
+                .get("http://127.0.0.1:8080/ico/dev", {
+                  params: {
+                    address: coinbase
+                  }
+                })
+                .then(res => this.setState({ devICOs: res.data }))
+                .catch(err => console.log(err));
             }
           });
           instance.isAuditor(coinbase).then(res => {
