@@ -59,6 +59,12 @@ export function publishProject(contractAddress) {
 
       ico.at(contractAddress).then(instance => {
         instance.finishAuditorSelection({ from: coinbase }).then(txRes => {
+          axios
+            .put("http://127.0.0.1:8080/ico/open", {
+              address: contractAddress
+            })
+            .then(res => console.log(res))
+            .catch(err => console.error(err));
           return alert("Success! TX: " + txRes.tx);
         });
       });

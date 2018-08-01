@@ -91,3 +91,16 @@ func (ico *ICO) GetICOAuditors() (auditors []Auditor, err error) {
 	}
 	return
 }
+
+// PublishICO change ICO status to "opened"
+func (ico *ICO) PublishICO() (err error) {
+	statement := "UPDATE ico SET status = $1 WHERE address = $2"
+	stmt, err := db.Prepare(statement)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	defer stmt.Close()
+	_, err = stmt.Exec("opened", ico.Address)
+	return
+}

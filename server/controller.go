@@ -159,3 +159,19 @@ func getICOAuditors(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, auditors)
 }
+
+// Change ICO status to opened
+func publishICO(c *gin.Context) {
+	var ico data.ICO
+	err := c.BindJSON(&ico)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+	err = ico.PublishICO()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+	c.JSON(http.StatusOK, nil)
+}
