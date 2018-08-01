@@ -94,6 +94,7 @@ func getDevelopersICOs(c *gin.Context) {
 	c.JSON(http.StatusOK, icos)
 }
 
+// Returns all ICO's with status created
 func getCreatedICOs (c *gin.Context) {
 	icos, err := data.GetCreatedICOs()
 	if err != nil {
@@ -101,4 +102,60 @@ func getCreatedICOs (c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, icos)
+}
+
+// Add auditor to ICO
+func addAuditorToICO(c *gin.Context) {
+	type Request struct {
+		ICO 	data.ICO		`json:"ico"`
+		Auditor data.Auditor	`json:"auditor"`
+	}
+	var req Request
+	err := c.BindJSON(&req)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+	ico := req.ICO
+	err = ico.GetICO()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+	auditor := req.Auditor
+	err = auditor.GetAuditor()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+	err = ico.AddAuditorToICO(auditor)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+	c.JSON(http.StatusOK, nil)
+}
+
+// Get current ICO auditors
+func getICOAuditors(c *gin.Context) {
+	var ico data.ICO
+	ico.Address = c.Query("address")
+	if len(ico.Address) == 0 {
+		c.JSON(http.StatusBadRequest, nil)
+		return
+	}
+	err := ico.GetICO()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+	auditors, err := ico.GetICOAuditors()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+	if auditors == nil {
+		auditors = make([]data.Auditor, 0)
+	}
+	c.JSON(http.StatusOK, auditors)
 }

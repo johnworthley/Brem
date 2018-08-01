@@ -1,6 +1,9 @@
 package data
 
-import "log"
+import (
+	"log"
+	"errors"
+)
 
 // Auditor structure represents brem ico auditor
 type Auditor struct {
@@ -18,6 +21,21 @@ func (auditor *Auditor) AddAuditor() (err error) {
 	}
 	defer stmt.Close()
 	err = stmt.QueryRow(auditor.Address).Scan(&auditor.ID)
+	return
+}
+
+// GetAuditors returns auditor by address
+func (auditor *Auditor) GetAuditor() (err error) {
+	row, err := db.Query("SELECT * FROM auditors WHERE address = $1", auditor.Address)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	exists := row.Next()
+	if !exists {
+		return errors.New("ICO doesn't exists")
+	}
+	err = row.Scan(&auditor.ID, &auditor.Address)
 	return
 }
 

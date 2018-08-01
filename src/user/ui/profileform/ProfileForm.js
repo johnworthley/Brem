@@ -68,11 +68,11 @@ class ProfileForm extends Component {
                 .catch(err => {
                   console.error(err);
                 });
-              // Get all new ico's
+              // Get all new icos
               axios
                 .get("http://127.0.0.1:8080/ico/created")
                 .then(res => {
-                  console.log(res);
+                  this.setState({ createdICOs: res.data });
                 })
                 .catch(err => console.error(err));
             }
@@ -141,7 +141,7 @@ class ProfileForm extends Component {
     if (amount === 0) {
       return (
         <div>
-          <p>Auditors didn't added</p>
+          <p>Auditors didn't add</p>
         </div>
       );
     }
@@ -154,7 +154,7 @@ class ProfileForm extends Component {
   // Superuser's project for publication
 
   BremList() {
-    const amount = this.state.icoAmount;
+    const amount = this.state.createdICOs.length;
     if (amount === 0) {
       return (
         <div>
@@ -163,14 +163,12 @@ class ProfileForm extends Component {
       );
     }
 
-    const indexes = Array.from(
-      Array(amount),
-      (val, index) => amount - index - 1
-    );
-    const bremItems = indexes.map(index => (
-      <BremPublicationFormContainer key={index.toString()} value={index} />
+    return this.state.createdICOs.map(ico => (
+      <BremPublicationFormContainer
+        key={ico.address.toString()}
+        value={ico.address}
+      />
     ));
-    return <span>{bremItems}</span>;
   }
 
   // Developer form
@@ -339,7 +337,7 @@ class ProfileForm extends Component {
         </form>
 
         <h4>Projects for publication</h4>
-        {this.state && this.state.icoAmount !== null && this.BremList()}
+        {this.state && this.state.createdICOs && this.BremList()}
       </div>
     );
 

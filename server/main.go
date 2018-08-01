@@ -26,6 +26,8 @@ func initAPI() {
 	router.GET("/audit", getAllAuditors)
 	router.POST("/audit", addAuditor)
 	router.GET("/ico/dev", getDevelopersICOs)
+	router.GET("/ico/audit", getICOAuditors)
 	router.GET("/ico/created", getCreatedICOs)
 	router.POST("/ico", addICO)
+	router.POST("/ico/audit", addAuditorToICO)
 }
