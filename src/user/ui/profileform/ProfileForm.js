@@ -3,6 +3,7 @@ import store from "../../../store";
 import axios from "axios";
 import BREMContract from "../../../../build/contracts/BREM.json";
 import BremPublicationFormContainer from "../bremPublicationForm/BremPublicationFormContainer";
+import BremDevFormContainer from "../bremDevForm/BremDevFormContainer";
 
 const contract = require("truffle-contract");
 
@@ -18,6 +19,7 @@ class ProfileForm extends Component {
 
     this.AuditorsList.bind(this);
     this.BremList.bind(this);
+    this.DevBremList.bind(this);
 
     this.init();
   }
@@ -266,6 +268,20 @@ class ProfileForm extends Component {
     );
   }
 
+  DevBremList() {
+    const amount = this.state.devICOs;
+    if (amount === 0) {
+      return (
+        <div>
+          <p>You didn't create ICOs</p>
+        </div>
+      );
+    }
+    return this.state.devICOs.map(ico => (
+      <BremDevFormContainer key={ico.address} value={ico.address} />
+    ));
+  }
+
   render() {
     const SuperuserForm = (
       <div>
@@ -407,6 +423,9 @@ class ProfileForm extends Component {
             </button>
           </fieldset>
         </form>
+
+        <h4>My ICOs</h4>
+        {this.state && this.state.devICOs && this.DevBremList()}
       </div>
     );
 
