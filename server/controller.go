@@ -94,6 +94,27 @@ func getDevelopersICOs(c *gin.Context) {
 	c.JSON(http.StatusOK, icos)
 }
 
+// Get current auditor's ICO's
+func getAuditorICOs(c *gin.Context) {
+	var auditor data.Auditor
+	auditor.Address = c.Query("address")
+	if len(auditor.Address) == 0 {
+		c.JSON(http.StatusBadRequest, nil)
+		return
+	}
+	err := auditor.GetAuditor()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+	icos, err := auditor.GetICOs()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+	c.JSON(http.StatusOK, icos)
+}
+
 // Returns all ICO's with status created
 func getCreatedICOs (c *gin.Context) {
 	icos, err := data.GetCreatedICOs()

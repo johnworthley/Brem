@@ -3,6 +3,7 @@ import store from "../../../store";
 import axios from "axios";
 import BREMContract from "../../../../build/contracts/BREM.json";
 import BremPublicationFormContainer from "../bremPublicationForm/BremPublicationFormContainer";
+import BremAuditFormContainer from "../bremAuditForm/BremAuditFormContrainer";
 import BremDevFormContainer from "../bremDevForm/BremDevFormContainer";
 
 const contract = require("truffle-contract");
@@ -19,6 +20,7 @@ class ProfileForm extends Component {
 
     this.AuditorsList.bind(this);
     this.BremList.bind(this);
+    this.AuditorICOList.bind(this);
     this.DevBremList.bind(this);
 
     this.init();
@@ -40,6 +42,7 @@ class ProfileForm extends Component {
           instance.isDeveloper(coinbase).then(res => {
             if (res) {
               this.setState({ role: "developer" });
+
               // Get developer's ICOs
               axios
                 .get("http://127.0.0.1:8080/ico/dev", {
@@ -54,6 +57,18 @@ class ProfileForm extends Component {
           instance.isAuditor(coinbase).then(res => {
             if (res) {
               this.setState({ role: "auditor" });
+
+              // Get current auditor ICOs
+              axios
+                .get("http://127.0.0.1:8080/audit/ico", {
+                  params: {
+                    address: coinbase
+                  }
+                })
+                .then(res => {
+                  this.setState({ auditorICOs: res.data });
+                })
+                .catch(err => console.log(err));
             }
           });
           instance.isSuperuser(coinbase).then(res => {
@@ -168,6 +183,22 @@ class ProfileForm extends Component {
         key={ico.address.toString()}
         value={ico.address}
       />
+    ));
+  }
+
+  // Auditor form
+  AuditorICOList() {
+    const amount = this.state.auditorICOs.length;
+    if (amount === 0) {
+      return (
+        <div>
+          <h3>You don't have ICOs</h3>
+        </div>
+      );
+    }
+
+    return this.state.auditorICOs.map(ico => (
+      <BremAuditFormContainer key={ico.address} value={ico.address} />
     ));
   }
 
@@ -341,7 +372,14 @@ class ProfileForm extends Component {
       </div>
     );
 
-    const AuditorForm = <h1>Auditor</h1>;
+    const AuditorForm = (
+      <div>
+        <h3>Auditor</h3>
+
+        <h4>My ICOs</h4>
+        {this.state && this.state.auditorICOs && this.AuditorICOList()}
+      </div>
+    );
 
     const DeveloperForm = (
       <div>

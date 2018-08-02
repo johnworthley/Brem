@@ -3,7 +3,7 @@ package data
 import (
 	"log"
 	"errors"
-)
+	)
 
 // Auditor structure represents brem ico auditor
 type Auditor struct {
@@ -26,7 +26,7 @@ func (auditor *Auditor) AddAuditor() (err error) {
 
 // GetAuditors returns auditor by address
 func (auditor *Auditor) GetAuditor() (err error) {
-	row, err := db.Query("SELECT * FROM auditors WHERE address = $1", auditor.Address)
+	row, err := db.Query("SELECT * FROM auditors WHERE LOWER(address) = LOWER($1)", auditor.Address)
 	if err != nil {
 		log.Println(err)
 		return
@@ -54,6 +54,26 @@ func GetAllAuditors() (auditors []Auditor, err error) {
 			return
 		}
 		auditors = append(auditors, auditor)
+	}
+	return
+}
+
+// GetICOs returns current auditor ICOs
+func (auditor *Auditor) GetICOs() (icos []ICO, err error) {
+	rows, err := db.Query("SELECT * FROM ico WHERE id = " +
+		"(SELECT icoID FROM icoAuditors WHERE auditorID = $1)", auditor.ID)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	for rows.Next() {
+		var ico ICO
+		err = rows.Scan(&ico.ID, &ico.Address, &ico.Developer.ID, &ico.Status)
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		icos = append(icos, ico)
 	}
 	return
 }
