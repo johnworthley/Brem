@@ -15,6 +15,7 @@ contract BREM is BREMFactory {
     ) 
     public 
     {
+        require(_withdrawFeePercent >= 0 && _withdrawFeePercent <=100);
         BRM = BRMToken(_brmAddress);
         icoCreationPrice = _icoCreationPrice;
         withdrawFeePercent = _withdrawFeePercent;
@@ -73,5 +74,6 @@ contract BREM is BREMFactory {
         require(address(this).balance >= _value && _value > 0);
         msg.sender.transfer(_value);
     } 
-    
+
+    function () external payable {}    
 }
