@@ -1,7 +1,10 @@
 import React, { Component } from "react";
 import store from "../../../store";
+import axios from "axios";
 import BREMContract from "../../../../build/contracts/BREM.json";
 import BremPublicationFormContainer from "../bremPublicationForm/BremPublicationFormContainer";
+import BremAuditFormContainer from "../bremAuditForm/BremAuditFormContrainer";
+import BremDevFormContainer from "../bremDevForm/BremDevFormContainer";
 
 const contract = require("truffle-contract");
 
@@ -15,7 +18,10 @@ class ProfileForm extends Component {
       address: null
     };
 
+    this.AuditorsList.bind(this);
     this.BremList.bind(this);
+    this.AuditorICOList.bind(this);
+    this.DevBremList.bind(this);
 
     this.init();
   }
@@ -36,16 +42,54 @@ class ProfileForm extends Component {
           instance.isDeveloper(coinbase).then(res => {
             if (res) {
               this.setState({ role: "developer" });
+
+              // Get developer's ICOs
+              axios
+                .get("http://127.0.0.1:8080/ico/dev", {
+                  params: {
+                    address: coinbase
+                  }
+                })
+                .then(res => this.setState({ devICOs: res.data }))
+                .catch(err => console.log(err));
             }
           });
           instance.isAuditor(coinbase).then(res => {
             if (res) {
               this.setState({ role: "auditor" });
+
+              // Get current auditor ICOs
+              axios
+                .get("http://127.0.0.1:8080/audit/ico", {
+                  params: {
+                    address: coinbase
+                  }
+                })
+                .then(res => {
+                  this.setState({ auditorICOs: res.data });
+                })
+                .catch(err => console.log(err));
             }
           });
           instance.isSuperuser(coinbase).then(res => {
             if (res) {
               this.setState({ role: "superuser" });
+              // Get all auditors' addresses
+              axios
+                .get("http://127.0.0.1:8080/audit")
+                .then(res => {
+                  this.setState({ auditors: res.data });
+                })
+                .catch(err => {
+                  console.error(err);
+                });
+              // Get all new icos
+              axios
+                .get("http://127.0.0.1:8080/ico/created")
+                .then(res => {
+                  this.setState({ createdICOs: res.data });
+                })
+                .catch(err => console.error(err));
             }
           });
 
@@ -107,10 +151,25 @@ class ProfileForm extends Component {
     }
   }
 
+  AuditorsList() {
+    const amount = this.state.auditors.length;
+    if (amount === 0) {
+      return (
+        <div>
+          <p>Auditors didn't add</p>
+        </div>
+      );
+    }
+
+    return this.state.auditors.map(auditor => (
+      <p key={auditor.address}>{auditor.address}</p>
+    ));
+  }
+
   // Superuser's project for publication
 
   BremList() {
-    const amount = this.state.icoAmount;
+    const amount = this.state.createdICOs.length;
     if (amount === 0) {
       return (
         <div>
@@ -119,14 +178,28 @@ class ProfileForm extends Component {
       );
     }
 
-    const indexes = Array.from(
-      Array(amount),
-      (val, index) => amount - index - 1
-    );
-    const bremItems = indexes.map(index => (
-      <BremPublicationFormContainer key={index.toString()} value={index} />
+    return this.state.createdICOs.map(ico => (
+      <BremPublicationFormContainer
+        key={ico.address.toString()}
+        value={ico.address}
+      />
     ));
-    return <span>{bremItems}</span>;
+  }
+
+  // Auditor form
+  AuditorICOList() {
+    const amount = this.state.auditorICOs.length;
+    if (amount === 0) {
+      return (
+        <div>
+          <h3>You don't have ICOs</h3>
+        </div>
+      );
+    }
+
+    return this.state.auditorICOs.map(ico => (
+      <BremAuditFormContainer key={ico.address} value={ico.address} />
+    ));
   }
 
   // Developer form
@@ -178,6 +251,7 @@ class ProfileForm extends Component {
       };
     }
   }
+
   _addDirectory(node) {
     if (node) {
       node.webkitdirectory = true;
@@ -223,6 +297,20 @@ class ProfileForm extends Component {
     );
   }
 
+  DevBremList() {
+    const amount = this.state.devICOs;
+    if (amount === 0) {
+      return (
+        <div>
+          <p>You didn't create ICOs</p>
+        </div>
+      );
+    }
+    return this.state.devICOs.map(ico => (
+      <BremDevFormContainer key={ico.address} value={ico.address} />
+    ));
+  }
+
   render() {
     const SuperuserForm = (
       <div>
@@ -258,6 +346,8 @@ class ProfileForm extends Component {
         </form>
 
         <h4>Auditors Managing</h4>
+        <h5>All BREM auditos</h5>
+        {this.state && this.state.auditors && this.AuditorsList()}
         <form
           className="pure-form pure-form-ctacked"
           onSubmit={this.handleAddNewAuditor.bind(this)}
@@ -278,11 +368,18 @@ class ProfileForm extends Component {
         </form>
 
         <h4>Projects for publication</h4>
-        {this.state && this.state.icoAmount !== null && this.BremList()}
+        {this.state && this.state.createdICOs && this.BremList()}
       </div>
     );
 
-    const AuditorForm = <h1>Auditor</h1>;
+    const AuditorForm = (
+      <div>
+        <h3>Auditor</h3>
+
+        <h4>My ICOs</h4>
+        {this.state && this.state.auditorICOs && this.AuditorICOList()}
+      </div>
+    );
 
     const DeveloperForm = (
       <div>
@@ -362,6 +459,9 @@ class ProfileForm extends Component {
             </button>
           </fieldset>
         </form>
+
+        <h4>My ICOs</h4>
+        {this.state && this.state.devICOs && this.DevBremList()}
       </div>
     );
 

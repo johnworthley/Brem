@@ -1,6 +1,7 @@
 import BRMTokenContract from "../../../../build/contracts/BRMToken.json";
 import BREMContract from "../../../../build/contracts/BREM.json";
 import store from "../../../store";
+import axios from "axios";
 
 import ipfs from "../../../ipfs";
 
@@ -106,8 +107,24 @@ export function createNewBREMICO(
                           { from: coinbase }
                         )
                         .then(res => {
-                          console.log(res);
-                          return alert(res.tx);
+                          const ico = {
+                            address: res.logs[0].args.icoAddress,
+                            developer: {
+                              address: coinbase
+                            }
+                          };
+                          axios
+                            .post("http://127.0.0.1:8080/ico", ico)
+                            .then(res => console.log(res))
+                            .catch(err => console.log(err));
+                          return alert(
+                            "TX: " +
+                              res.tx +
+                              " ICO: " +
+                              res.logs[0].args.icoAddress +
+                              " Token: " +
+                              res.logs[0].args.tokenAddress
+                          );
                         })
                         .catch(err => {
                           console.error(err);
@@ -158,6 +175,17 @@ export function addNewAuditor(address) {
             }
 
             bremInstance.addAuditor(address, { from: coinbase }).then(txRes => {
+              const auditor = {
+                address: address
+              };
+              axios
+                .post("http://127.0.0.1:8080/audit", auditor)
+                .then(res => {
+                  console.log(res);
+                })
+                .catch(err => {
+                  console.error(err);
+                });
               return alert("Success. TX: " + txRes.tx);
             });
           });

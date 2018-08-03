@@ -1,6 +1,7 @@
 import BREMContract from "../../../../build/contracts/BREM.json";
 import { loginUser } from "../loginbutton/LoginButtonActions";
 import store from "../../../store";
+import axios from "axios";
 
 const contract = require("truffle-contract");
 
@@ -32,8 +33,26 @@ export function signUpUser(name) {
           authenticationInstance
             .signUp(name, { from: coinbase })
             .then(function(result) {
+              authenticationInstance.isSuperuser(coinbase).then(res => {
+                if (!res) {
+                  authenticationInstance.isAuditor(coinbase).then(res => {
+                    if (!res) {
+                      const developer = {
+                        address: coinbase
+                      };
+                      axios
+                        .post("http://127.0.0.1:8080/dev", developer)
+                        .then(res => {
+                          console.log(res);
+                        })
+                        .catch(err => {
+                          console.error(err);
+                        });
+                    }
+                  });
+                }
+              });
               // If no error, login user.
-
               return dispatch(loginUser());
             })
             .catch(function(result) {

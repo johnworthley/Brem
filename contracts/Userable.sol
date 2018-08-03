@@ -188,9 +188,9 @@ contract Auditable is Superuserable {
         addRole(_newAuditor, ROLE_AUDITOR);
     }
     
-    function removeAuditor(address _auditor) public onlySuperuser {
-        removeRole(_auditor, ROLE_AUDITOR);
-    }
+    // function removeAuditor(address _auditor) public onlySuperuser {
+    //     removeRole(_auditor, ROLE_AUDITOR);
+    // }
     
     modifier onlyAuditor() {
         checkRole(msg.sender, ROLE_AUDITOR);

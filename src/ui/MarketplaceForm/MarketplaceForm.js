@@ -1,34 +1,52 @@
 import React, { Component } from "react";
-import store from "../../store";
-import BREMContract from "../../../build/contracts/BREM.json";
+import axios from "axios";
 import BremItem from "../BremItem/BremItem";
-
-const contract = require("truffle-contract");
 
 class MarketplaceForm extends Component {
   constructor(props) {
     super(props);
 
+    this.state = {
+      status: props.value
+    };
+
     this.BremList.bind(this);
+    this.init();
+  }
 
-    const web3 = store.getState().web3.web3Instance;
-
-    if (typeof web3 !== "undefined" && web3 !== null) {
-      const brem = contract(BREMContract);
-      brem.setProvider(web3.currentProvider);
-      brem.deployed().then(instance => {
-        // Get projects amount
-        instance.projectsAmount().then(projectsAmount => {
-          this.setState({ amount: projectsAmount.toNumber() });
-        });
-      });
-    } else {
-      console.error("Web3 is not initialized.");
+  init() {
+    switch (this.state.status) {
+      case "opened":
+        axios
+          .get("http://127.0.0.1:8080/ico/opened")
+          .then(res => {
+            this.setState({ icos: res.data });
+          })
+          .catch(err => console.error(err));
+        break;
+      case "success":
+        axios
+          .get("http://127.0.0.1:8080/ico/success")
+          .then(res => this.setState({ icos: res.data }));
+        break;
+      case "failed":
+        axios
+          .get("http://127.0.0.1:8080/ico/failed")
+          .then(res => this.setState({ icos: res.data }));
+        break;
+      case "withdrawn":
+        axios
+          .get("http://127.0.0.1:8080/ico/withdrawn")
+          .then(res => this.setState({ icos: res.data }));
+        break;
+      default:
+        this.setState({ invalidStaus: true });
+        break;
     }
   }
 
   BremList() {
-    const amount = this.state.amount;
+    const amount = this.state.icos.length;
     if (amount === 0) {
       return (
         <div>
@@ -37,24 +55,13 @@ class MarketplaceForm extends Component {
       );
     }
 
-    const indexes = Array.from(
-      Array(amount),
-      (val, index) => amount - index - 1
-    );
-    //Make list item components using indexes as keys
-    const bremItems = indexes.map(index => (
-      <BremItem key={index.toString()} value={index} />
+    return this.state.icos.map(ico => (
+      <BremItem key={ico.address} value={ico.address} />
     ));
-    return <span>{bremItems}</span>;
   }
 
   render() {
-    return (
-      <div>
-        <h2> This is Marketplace form</h2>
-        {this.state && this.state.amount !== null && this.BremList()}
-      </div>
-    );
+    return <div>{this.state && this.state.icos && this.BremList()}</div>;
   }
 }
 
