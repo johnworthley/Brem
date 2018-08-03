@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import axios from "axios";
 import store from "../../store";
 import BREMContract from "../../../build/contracts/BREM.json";
 import BremItem from "../BremItem/BremItem";
@@ -19,6 +20,30 @@ class MarketplaceForm extends Component {
     const web3 = store.getState().web3.web3Instance;
 
     if (typeof web3 !== "undefined" && web3 !== null) {
+      switch (this.state.status) {
+        case "opened":
+          axios
+            .get("http://127.0.0.1:8080/ico/opened")
+            .then(res => this.setState({ icos: res.data }));
+          break;
+        case "success":
+          axios
+            .get("http://127.0.0.1:8080/ico/success")
+            .then(res => this.setState({ icos: res.data }));
+          break;
+        case "failed":
+          axios
+            .get("http://127.0.0.1:8080/ico/failed")
+            .then(res => this.setState({ icos: res.data }));
+          break;
+        case "withdrawn":
+          axios
+            .get("http://127.0.0.1:8080/ico/withdrawn")
+            .then(res => this.setState({ icos: res.data }));
+          break;
+        default:
+          this.setState({ invalidStaus: true });
+      }
       const brem = contract(BREMContract);
       brem.setProvider(web3.currentProvider);
       brem.deployed().then(instance => {
