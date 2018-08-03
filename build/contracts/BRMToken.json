@@ -392,14 +392,14 @@
     "absolutePath": "/C/Users/Solidity/Documents/HashLab/GENERAL/Brem/contracts/BRMToken.sol",
     "exportedSymbols": {
       "BRMToken": [
-        1824
+        1838
       ]
     },
-    "id": 1825,
+    "id": 1839,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 1811,
+        "id": 1825,
         "literals": [
           "solidity",
           "^",
@@ -412,10 +412,10 @@
       {
         "absolutePath": "/C/Users/Solidity/Documents/HashLab/GENERAL/Brem/contracts/BREMToken.sol",
         "file": "./BREMToken.sol",
-        "id": 1812,
+        "id": 1826,
         "nodeType": "ImportDirective",
-        "scope": 1825,
-        "sourceUnit": 1810,
+        "scope": 1839,
+        "sourceUnit": 1824,
         "src": "28:25:4",
         "symbolAliases": [],
         "unitAlias": ""
@@ -426,51 +426,51 @@
             "arguments": null,
             "baseName": {
               "contractScope": null,
-              "id": 1813,
+              "id": 1827,
               "name": "MintableToken",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 1725,
+              "referencedDeclaration": 1739,
               "src": "78:13:4",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_MintableToken_$1725",
+                "typeIdentifier": "t_contract$_MintableToken_$1739",
                 "typeString": "contract MintableToken"
               }
             },
-            "id": 1814,
+            "id": 1828,
             "nodeType": "InheritanceSpecifier",
             "src": "78:13:4"
           }
         ],
         "contractDependencies": [
-          1147,
-          1174,
-          1214,
-          1392,
-          1634,
-          1725
+          1161,
+          1188,
+          1228,
+          1406,
+          1648,
+          1739
         ],
         "contractKind": "contract",
         "documentation": null,
         "fullyImplemented": true,
-        "id": 1824,
+        "id": 1838,
         "linearizedBaseContracts": [
-          1824,
-          1725,
-          1147,
-          1634,
-          1392,
-          1214,
-          1174
+          1838,
+          1739,
+          1161,
+          1648,
+          1406,
+          1228,
+          1188
         ],
         "name": "BRMToken",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "constant": true,
-            "id": 1817,
+            "id": 1831,
             "name": "name",
             "nodeType": "VariableDeclaration",
-            "scope": 1824,
+            "scope": 1838,
             "src": "105:35:4",
             "stateVariable": true,
             "storageLocation": "default",
@@ -479,7 +479,7 @@
               "typeString": "string"
             },
             "typeName": {
-              "id": 1815,
+              "id": 1829,
               "name": "string",
               "nodeType": "ElementaryTypeName",
               "src": "105:6:4",
@@ -491,7 +491,7 @@
             "value": {
               "argumentTypes": null,
               "hexValue": "42524d",
-              "id": 1816,
+              "id": 1830,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
@@ -510,10 +510,10 @@
           },
           {
             "constant": true,
-            "id": 1820,
+            "id": 1834,
             "name": "symbol",
             "nodeType": "VariableDeclaration",
-            "scope": 1824,
+            "scope": 1838,
             "src": "153:37:4",
             "stateVariable": true,
             "storageLocation": "default",
@@ -522,7 +522,7 @@
               "typeString": "string"
             },
             "typeName": {
-              "id": 1818,
+              "id": 1832,
               "name": "string",
               "nodeType": "ElementaryTypeName",
               "src": "153:6:4",
@@ -534,7 +534,7 @@
             "value": {
               "argumentTypes": null,
               "hexValue": "42524d",
-              "id": 1819,
+              "id": 1833,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
@@ -553,10 +553,10 @@
           },
           {
             "constant": true,
-            "id": 1823,
+            "id": 1837,
             "name": "decimals",
             "nodeType": "VariableDeclaration",
-            "scope": 1824,
+            "scope": 1838,
             "src": "203:35:4",
             "stateVariable": true,
             "storageLocation": "default",
@@ -565,7 +565,7 @@
               "typeString": "uint8"
             },
             "typeName": {
-              "id": 1821,
+              "id": 1835,
               "name": "uint8",
               "nodeType": "ElementaryTypeName",
               "src": "203:5:4",
@@ -577,7 +577,7 @@
             "value": {
               "argumentTypes": null,
               "hexValue": "3138",
-              "id": 1822,
+              "id": 1836,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
@@ -595,7 +595,7 @@
             "visibility": "public"
           }
         ],
-        "scope": 1825,
+        "scope": 1839,
         "src": "57:191:4"
       }
     ],
@@ -605,14 +605,14 @@
     "absolutePath": "/C/Users/Solidity/Documents/HashLab/GENERAL/Brem/contracts/BRMToken.sol",
     "exportedSymbols": {
       "BRMToken": [
-        1824
+        1838
       ]
     },
-    "id": 1825,
+    "id": 1839,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 1811,
+        "id": 1825,
         "literals": [
           "solidity",
           "^",
@@ -625,10 +625,10 @@
       {
         "absolutePath": "/C/Users/Solidity/Documents/HashLab/GENERAL/Brem/contracts/BREMToken.sol",
         "file": "./BREMToken.sol",
-        "id": 1812,
+        "id": 1826,
         "nodeType": "ImportDirective",
-        "scope": 1825,
-        "sourceUnit": 1810,
+        "scope": 1839,
+        "sourceUnit": 1824,
         "src": "28:25:4",
         "symbolAliases": [],
         "unitAlias": ""
@@ -639,51 +639,51 @@
             "arguments": null,
             "baseName": {
               "contractScope": null,
-              "id": 1813,
+              "id": 1827,
               "name": "MintableToken",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 1725,
+              "referencedDeclaration": 1739,
               "src": "78:13:4",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_MintableToken_$1725",
+                "typeIdentifier": "t_contract$_MintableToken_$1739",
                 "typeString": "contract MintableToken"
               }
             },
-            "id": 1814,
+            "id": 1828,
             "nodeType": "InheritanceSpecifier",
             "src": "78:13:4"
           }
         ],
         "contractDependencies": [
-          1147,
-          1174,
-          1214,
-          1392,
-          1634,
-          1725
+          1161,
+          1188,
+          1228,
+          1406,
+          1648,
+          1739
         ],
         "contractKind": "contract",
         "documentation": null,
         "fullyImplemented": true,
-        "id": 1824,
+        "id": 1838,
         "linearizedBaseContracts": [
-          1824,
-          1725,
-          1147,
-          1634,
-          1392,
-          1214,
-          1174
+          1838,
+          1739,
+          1161,
+          1648,
+          1406,
+          1228,
+          1188
         ],
         "name": "BRMToken",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "constant": true,
-            "id": 1817,
+            "id": 1831,
             "name": "name",
             "nodeType": "VariableDeclaration",
-            "scope": 1824,
+            "scope": 1838,
             "src": "105:35:4",
             "stateVariable": true,
             "storageLocation": "default",
@@ -692,7 +692,7 @@
               "typeString": "string"
             },
             "typeName": {
-              "id": 1815,
+              "id": 1829,
               "name": "string",
               "nodeType": "ElementaryTypeName",
               "src": "105:6:4",
@@ -704,7 +704,7 @@
             "value": {
               "argumentTypes": null,
               "hexValue": "42524d",
-              "id": 1816,
+              "id": 1830,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
@@ -723,10 +723,10 @@
           },
           {
             "constant": true,
-            "id": 1820,
+            "id": 1834,
             "name": "symbol",
             "nodeType": "VariableDeclaration",
-            "scope": 1824,
+            "scope": 1838,
             "src": "153:37:4",
             "stateVariable": true,
             "storageLocation": "default",
@@ -735,7 +735,7 @@
               "typeString": "string"
             },
             "typeName": {
-              "id": 1818,
+              "id": 1832,
               "name": "string",
               "nodeType": "ElementaryTypeName",
               "src": "153:6:4",
@@ -747,7 +747,7 @@
             "value": {
               "argumentTypes": null,
               "hexValue": "42524d",
-              "id": 1819,
+              "id": 1833,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
@@ -766,10 +766,10 @@
           },
           {
             "constant": true,
-            "id": 1823,
+            "id": 1837,
             "name": "decimals",
             "nodeType": "VariableDeclaration",
-            "scope": 1824,
+            "scope": 1838,
             "src": "203:35:4",
             "stateVariable": true,
             "storageLocation": "default",
@@ -778,7 +778,7 @@
               "typeString": "uint8"
             },
             "typeName": {
-              "id": 1821,
+              "id": 1835,
               "name": "uint8",
               "nodeType": "ElementaryTypeName",
               "src": "203:5:4",
@@ -790,7 +790,7 @@
             "value": {
               "argumentTypes": null,
               "hexValue": "3138",
-              "id": 1822,
+              "id": 1836,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
@@ -808,7 +808,7 @@
             "visibility": "public"
           }
         ],
-        "scope": 1825,
+        "scope": 1839,
         "src": "57:191:4"
       }
     ],
@@ -823,10 +823,15 @@
       "events": {},
       "links": {},
       "address": "0x6f221F4Bbb7D6A134691A9919153242dE063582C",
-      "transactionHash":
-        "0x8332c79c8db02725016776d0ac74c3d945ad4f8970c52f632df07918af07c266"
+      "transactionHash": "0x8332c79c8db02725016776d0ac74c3d945ad4f8970c52f632df07918af07c266"
+    },
+    "1533313688525": {
+      "events": {},
+      "links": {},
+      "address": "0x426335c77e28df6eb071793fa5f5a621f1a7ada9",
+      "transactionHash": "0xfb057d1f3e9f1801c61b30da767d51708aabba3fee28716891fe0900aefa229a"
     }
   },
   "schemaVersion": "2.0.1",
-  "updatedAt": "2018-07-30T06:02:34.667Z"
+  "updatedAt": "2018-08-03T16:29:17.196Z"
 }
