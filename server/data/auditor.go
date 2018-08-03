@@ -3,7 +3,8 @@ package data
 import (
 	"log"
 	"errors"
-	)
+	"strings"
+)
 
 // Auditor structure represents brem ico auditor
 type Auditor struct {
@@ -20,7 +21,7 @@ func (auditor *Auditor) AddAuditor() (err error) {
 		return
 	}
 	defer stmt.Close()
-	err = stmt.QueryRow(auditor.Address).Scan(&auditor.ID)
+	err = stmt.QueryRow(strings.ToLower(auditor.Address)).Scan(&auditor.ID)
 	return
 }
 

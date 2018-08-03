@@ -49,6 +49,9 @@ func getAllAuditors(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
+	if auditors == nil {
+		auditors = make([]data.Auditor, 0)
+	}
 	c.JSON(http.StatusOK, auditors)
 }
 
@@ -91,6 +94,9 @@ func getDevelopersICOs(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
+	if icos == nil {
+		icos = make([]data.ICO, 0)
+	}
 	c.JSON(http.StatusOK, icos)
 }
 
@@ -112,6 +118,9 @@ func getAuditorICOs(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
+	if icos == nil {
+		icos = make([]data.ICO, 0)
+	}
 	c.JSON(http.StatusOK, icos)
 }
 
@@ -121,6 +130,9 @@ func getCreatedICOs (c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return
+	}
+	if icos == nil {
+		icos = make([]data.ICO, 0)
 	}
 	c.JSON(http.StatusOK, icos)
 }

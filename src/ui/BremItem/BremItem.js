@@ -11,38 +11,28 @@ class BremItem extends Component {
     super(props);
 
     this.state = {
-      index: props.value
+      address: props.value
     };
 
     const web3 = store.getState().web3.web3Instance;
     if (typeof web3 !== "undefined" && web3 !== null) {
-      const brem = contract(BREMContract);
-      brem.setProvider(web3.currentProvider);
-      brem.deployed().then(bremInstance => {
-        bremInstance.getProject(this.state.index).then(icoAddress => {
-          this.setState({ address: icoAddress });
+      const ico = contract(ICOContract);
+      ico.setProvider(web3.currentProvider);
+      ico.at(this.state.address).then(icoInstance => {
+        icoInstance.name().then(name => {
+          this.setState({ name: name });
+        });
 
-          const ico = contract(ICOContract);
-          ico.setProvider(web3.currentProvider);
-          ico.at(this.state.address).then(icoInstance => {
-            icoInstance.auditSelected().then(res => {
-              this.setState({ selected: res });
+        icoInstance.description().then(descr => {
+          this.setState({ descr: descr });
+        });
 
-              if (res) {
-                icoInstance.name().then(name => {
-                  this.setState({ name: name });
-                });
-
-                icoInstance.description().then(descr => {
-                  this.setState({ descr: descr });
-                });
-
-                icoInstance.wallet().then(developer => {
-                  bremInstance.login({ from: developer }).then(username => {
-                    this.setState({ user: username });
-                  });
-                });
-              }
+        icoInstance.wallet().then(developer => {
+          const brem = contract(BREMContract);
+          brem.setProvider(web3.currentProvider);
+          brem.deployed().then(bremInstance => {
+            bremInstance.login({ from: developer }).then(username => {
+              this.setState({ user: username });
             });
           });
         });
@@ -62,8 +52,6 @@ class BremItem extends Component {
     return (
       <div>
         {this.state &&
-          this.state.selected !== null &&
-          this.state.selected &&
           this.state.name !== null &&
           this.state.descr !== null &&
           this.state.user !== null && (
