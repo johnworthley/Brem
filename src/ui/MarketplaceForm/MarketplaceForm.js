@@ -9,6 +9,7 @@ class MarketplaceForm extends Component {
   constructor(props) {
     super(props);
 
+    console.log(props);
     this.BremList.bind(this);
 
     const web3 = store.getState().web3.web3Instance;
