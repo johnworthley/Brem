@@ -59,6 +59,82 @@ func GetCreatedICOs() (icos []ICO, err error)  {
 	return
 }
 
+// GetOpenedICOs show all ICOs with status "opened"
+func GetOpenedICOs() (icos []ICO, err error) {
+	rows, err := db.Query("SELECT * FROM ico WHERE status = $1", "opened")
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	for rows.Next() {
+		var ico ICO
+		err = rows.Scan(&ico.ID, &ico.Address, &ico.Developer.ID, &ico.Status)
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		icos = append(icos, ico)
+	}
+	return
+}
+
+// GetSuccessICOs show all ICOs with statuses "success" or "requested"
+func GetSuccessICOs() (icos []ICO, err error) {
+	rows, err := db.Query("SELECT * FROM ico WHERE status = $1 OR status = $2", "success", "requested")
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	for rows.Next() {
+		var ico ICO
+		err = rows.Scan(&ico.ID, &ico.Address, &ico.Developer.ID, &ico.Status)
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		icos = append(icos, ico)
+	}
+	return
+}
+
+// GetFailedICOs show all ICOs with status "failed"
+func GetFailedICOs() (icos []ICO, err error) {
+	rows, err := db.Query("SELECT * FROM ico WHERE status = $1", "failed")
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	for rows.Next() {
+		var ico ICO
+		err = rows.Scan(&ico.ID, &ico.Address, &ico.Developer.ID, &ico.Status)
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		icos = append(icos, ico)
+	}
+	return
+}
+
+// GetWithdrawnICOs show all ICOs with status "withdrawn"
+func GetWithdrawnICOs() (icos []ICO, err error) {
+	rows, err := db.Query("SELECT * FROM ico WHERE status = $1", "failed")
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	for rows.Next() {
+		var ico ICO
+		err = rows.Scan(&ico.ID, &ico.Address, &ico.Developer.ID, &ico.Status)
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		icos = append(icos, ico)
+	}
+	return
+}
+
 // AddAuditorToICO connect ICO id and auditor id
 func (ico *ICO) AddAuditorToICO(auditor Auditor) (err error) {
 	statement := "INSERT INTO icoAuditors (icoID, auditorID) VALUES ($1, $2)"

@@ -125,6 +125,58 @@ func getCreatedICOs (c *gin.Context) {
 	c.JSON(http.StatusOK, icos)
 }
 
+// Returns ICOs with status opened
+func getOpennedICOs (c *gin.Context) {
+	icos, err := data.GetOpenedICOs()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+	if icos == nil {
+		icos = make([]data.ICO, 0)
+	}
+	c.JSON(http.StatusOK, icos)
+}
+
+// Returns ICOs with statuses success and requested
+func getSuccessICOs(c *gin.Context) {
+	icos, err := data.GetSuccessICOs()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+	if icos == nil {
+		icos = make([]data.ICO, 0)
+	}
+	c.JSON(http.StatusOK, icos)
+}
+
+// Returns ICOs with status failed
+func getFailedICOs(c *gin.Context) {
+	icos, err := data.GetFailedICOs()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+	if icos == nil {
+		icos = make([]data.ICO, 0)
+	}
+	c.JSON(http.StatusOK, icos)
+}
+
+// Returns ICOs with status withdrawn
+func getWithdrawnICOs(c *gin.Context) {
+	icos, err := data.GetFailedICOs()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+	if icos == nil {
+		icos = make([]data.ICO, 0)
+	}
+	c.JSON(http.StatusOK, icos)
+}
+
 // Add auditor to ICO
 func addAuditorToICO(c *gin.Context) {
 	type Request struct {

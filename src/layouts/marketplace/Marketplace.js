@@ -7,12 +7,11 @@ class Marketplace extends Component {
   constructor(props) {
     super(props);
 
-    let status = this.props.location.query.status;
-    if (status === undefined) {
-      status = "opened";
-    }
     this.state = {
-      status: status,
+      status:
+        this.props.location.query.status === undefined
+          ? "opened"
+          : this.props.location.query.status,
       loaded: false
     };
 
@@ -49,10 +48,10 @@ class Marketplace extends Component {
               </Link>
               <Link
                 onClick={this.forceUpdate}
-                to="/marketplace?status=withdrawed"
+                to="/marketplace?status=withdrawn"
                 className="pure-menu-heading pure-menu-link"
               >
-                Withdrawed
+                Withdrawn
               </Link>
               <Link
                 onClick={this.forceUpdate}
@@ -65,10 +64,14 @@ class Marketplace extends Component {
             <br />
             <br />
             {this.state &&
-              this.state.loaded && (
+              this.state.loaded === true &&
+              this.state.status && (
                 <div>
                   <h1>Marketplace</h1>
-                  <MarketplaceForm value={this.state.status} />
+                  <MarketplaceForm
+                    key={this.state.status}
+                    value={this.state.status}
+                  />
                 </div>
               )}
           </div>

@@ -10,6 +10,10 @@ class MarketplaceForm extends Component {
     super(props);
 
     console.log(props);
+    this.state = {
+      status: props.value
+    };
+
     this.BremList.bind(this);
 
     const web3 = store.getState().web3.web3Instance;
