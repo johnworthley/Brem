@@ -282,6 +282,15 @@ contract BREMICO {
         return weiRaised >= cap;
     }
 
+    function isAuditor(address _auditor) public view returns (bool) {
+        return auditors[_auditor];
+    }
+    
+    function isComfirmed(address _auditor) public view returns (bool) {
+        require(auditors[_auditor]);
+        return request.confirmed[_auditor];
+    }
+    
   // -----------------------------------------
   // Internal interface (extensible)
   // -----------------------------------------
