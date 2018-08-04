@@ -28,7 +28,7 @@ contract BREM is BREMFactory {
         uint256 _cap,
         uint256 _closingTime,
         string _description,
-        bytes32 _docHash
+        string _docHash
     ) 
     public
     onlyDeveloper
