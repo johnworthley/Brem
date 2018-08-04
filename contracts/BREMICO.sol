@@ -59,7 +59,7 @@ contract BREMICO {
     string public description;
     
     // ICO documentation hashes
-    bytes32 public docHash;
+    string public docHash;
     
     // Auditors contract instance
     Auditable audit;
@@ -129,7 +129,7 @@ contract BREMICO {
         BREMToken _token,
         uint256 _closingTime,
         string _description, 
-        bytes32 _docHash,
+        string _docHash,
         Auditable _auditAddress,
         uint256 _withdrawFeePercent
     ) 
