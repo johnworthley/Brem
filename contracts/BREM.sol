@@ -37,6 +37,7 @@ contract BREM is BREMFactory {
         require(BRM.balanceOf(msg.sender) >= icoCreationPrice);
         require(bytes(_name).length > 0 && bytes(_symbol).length > 0);
         require(indexes[_name] == 0);
+        require(_cap >= 100);
         
         require(BRM.transferFrom(msg.sender, address(this), icoCreationPrice));
         

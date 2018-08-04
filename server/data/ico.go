@@ -180,3 +180,16 @@ func (ico *ICO) PublishICO() (err error) {
 	_, err = stmt.Exec("opened", ico.Address)
 	return
 }
+
+// SetWithdrawnStatus sets withdrawn status to current ICO
+func (ico *ICO) SetWithdrawnStatus() (err error) {
+	statement := "UPDATE ico SET status = $1 WHERE address = $2"
+	stmt, err := db.Prepare(statement)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	defer stmt.Close()
+	_, err = stmt.Exec("withdrawn", ico.Address)
+	return
+}
