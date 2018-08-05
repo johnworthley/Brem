@@ -198,7 +198,7 @@ class ProfileForm extends Component {
     }
 
     return this.state.auditorICOs.map(ico => (
-      <BremAuditFormContainer key={ico.address} value={ico.address} />
+      <BremAuditFormContainer key={ico} value={ico} />
     ));
   }
 
@@ -307,7 +307,7 @@ class ProfileForm extends Component {
       );
     }
     return this.state.devICOs.map(ico => (
-      <BremDevFormContainer key={ico.address} value={ico.address} />
+      <BremDevFormContainer key={ico} value={ico} />
     ));
   }
 

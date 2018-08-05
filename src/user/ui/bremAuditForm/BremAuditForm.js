@@ -11,7 +11,8 @@ class BremAuditForm extends Component {
     super(props);
 
     this.state = {
-      address: props.value
+      address: props.value.address,
+      status: props.value.status
     };
     const web3 = store.getState().web3.web3Instance;
     if (typeof web3 !== "undefined" && web3 !== null) {
@@ -38,9 +39,11 @@ class BremAuditForm extends Component {
             });
           });
         });
-
-        // TODO: ICO status
       });
+
+      if (this.state.status === "success") {
+        this.setState({ requsted: true });
+      }
     } else {
       console.error("Web3 is not initialized.");
     }
@@ -50,6 +53,12 @@ class BremAuditForm extends Component {
     browserHistory.push({
       pathname: "/ico/" + this.state.address
     });
+  }
+
+  handleApprove(e) {
+    e.preventDefault();
+
+    this.props.onApproveSubmit(this.state.address);
   }
 
   render() {
@@ -67,7 +76,15 @@ class BremAuditForm extends Component {
               <p>Address: {this.state.address}</p>
               <p>{this.state.description}</p>
               <p>Wallet: {this.state.wallet}</p>
-              {/* TODO: ICO status and approve button */}
+
+              {this.state.requsted && (
+                <button
+                  className="pure-button pure-button-primary"
+                  onClick={this.handleApprove.bind(this)}
+                >
+                  Approve
+                </button>
+              )}
 
               <p>
                 <button

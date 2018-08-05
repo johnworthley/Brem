@@ -225,7 +225,7 @@ contract BREMICO {
         require(msg.sender == wallet);
         require(auditSelected);
         require(capReached() && hasClosed());
-        require(_value > 0 && _value <= address(this).balance);
+        require(_value >= 100 && _value <= address(this).balance);
         require(request.value == 0);
         
         request = WithdrawRequst(_value, 0);
@@ -282,6 +282,19 @@ contract BREMICO {
         return weiRaised >= cap;
     }
 
+    function isAuditor(address _auditor) public view returns (bool) {
+        return auditors[_auditor];
+    }
+    
+    function isRequested() public view returns (bool) {
+        return capReached() && hasClosed() && 
+            request.value > 0 && !isWithdrawn();
+    }
+    
+    function isWithdrawn() public view returns (bool) {
+        return hasClosed() && capReached() && address(this).balance < 100;
+    }
+    
   // -----------------------------------------
   // Internal interface (extensible)
   // -----------------------------------------

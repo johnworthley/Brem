@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import store from "../../store";
+import getWeb3 from "../../util/web3/getWeb3";
 import ICOContract from "../../../build/contracts/BREMICO.json";
 import BREMTokenContract from "../../../build/contracts/BREMToken";
 
@@ -15,6 +16,16 @@ class BremICOForm extends Component {
     };
 
     const web3 = store.getState().web3.web3Instance;
+    if (typeof web3 === "undefined" || web3 === null) {
+      getWeb3
+        .then(results => {
+          console.log("Web3 initialized!");
+          this.setState({ loaded: true });
+        })
+        .catch(() => {
+          console.log("Error in web3 initialization.");
+        });
+    }
     if (typeof web3 !== "undefined" && web3 !== null) {
       const ico = contract(ICOContract);
       ico.setProvider(web3.currentProvider);
@@ -40,6 +51,12 @@ class BremICOForm extends Component {
             tokenInstance.decimals().then(tokenDecimals => {
               this.setState({ tokenDecimals: tokenDecimals });
             });
+          });
+        });
+
+        icoInstance.closingTime().then(closingTime => {
+          this.setState({
+            closingTime: new Date(closingTime.toNumber()).toString()
           });
         });
 
@@ -79,12 +96,12 @@ class BremICOForm extends Component {
   handleBuyTokens(e) {
     e.preventDefault();
 
-    const weiAmount = this.state.weiAmount;
-    if (weiAmount === null || weiAmount <= 0) {
+    const etherAmount = this.state.etherAmount;
+    if (etherAmount === null || etherAmount <= 0) {
       return alert("Error, amount in wei must be bigger than 0");
     }
 
-    this.props.onBuyTokenSubmit(this.state.address, weiAmount);
+    this.props.onBuyTokenSubmit(this.state.address, etherAmount);
   }
 
   render() {
@@ -94,6 +111,7 @@ class BremICOForm extends Component {
         <p>BREM ICO Address: {this.state.address}</p>
         <p>Wallet: {this.state.wallet}</p>
         <p>Token address: {this.state.tokenAddress}</p>
+        <p>Closing time: {this.state.closingTime}</p>
         <p>Rate: {this.state.rate}</p>
         <p>
           Docs:{" "}
@@ -123,7 +141,6 @@ class BremICOForm extends Component {
             <legend>Buy Tokens</legend>
             <input
               type="number"
-              value="0"
               min="0"
               step="0.000000000000000001"
               onChange={this.handleEtherValueCahnge.bind(this)}

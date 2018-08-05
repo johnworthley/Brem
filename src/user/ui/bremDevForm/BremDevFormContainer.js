@@ -1,5 +1,6 @@
 import { connect } from "react-redux";
 import BremDevForm from "./BremDevForm";
+import { makeWithrawRequest } from "./BremDevFormActions";
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -8,7 +9,13 @@ const mapStateToProps = (state, ownProps) => {
 };
 
 const mapDispatchToProps = dispatch => {
-  return {};
+  return {
+    onSubmitWithdrawRequest: (contractAddress, weiValue) => {
+      event.preventDefault();
+
+      dispatch(makeWithrawRequest(contractAddress, weiValue));
+    }
+  };
 };
 
 const BremDevFormContainer = connect(
