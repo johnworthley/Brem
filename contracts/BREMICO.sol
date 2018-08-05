@@ -286,6 +286,15 @@ contract BREMICO {
         return auditors[_auditor];
     }
     
+    function isRequested() public view returns (bool) {
+        return capReached() && hasClosed() && 
+            request.value > 0 && !isWithdrawn();
+    }
+    
+    function isWithdrawn() public view returns (bool) {
+        return hasClosed() && capReached() && address(this).balance < 100;
+    }
+    
   // -----------------------------------------
   // Internal interface (extensible)
   // -----------------------------------------

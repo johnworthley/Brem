@@ -396,13 +396,13 @@
   "ast": {
     "absolutePath": "/Users/artur/Development/Brem/contracts/BRMToken.sol",
     "exportedSymbols": {
-      "BRMToken": [1869]
+      "BRMToken": [1896]
     },
-    "id": 1870,
+    "id": 1897,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 1856,
+        "id": 1883,
         "literals": ["solidity", "^", "0.4", ".24"],
         "nodeType": "PragmaDirective",
         "src": "0:24:4"
@@ -410,10 +410,10 @@
       {
         "absolutePath": "/Users/artur/Development/Brem/contracts/BREMToken.sol",
         "file": "./BREMToken.sol",
-        "id": 1857,
+        "id": 1884,
         "nodeType": "ImportDirective",
-        "scope": 1870,
-        "sourceUnit": 1855,
+        "scope": 1897,
+        "sourceUnit": 1882,
         "src": "26:25:4",
         "symbolAliases": [],
         "unitAlias": ""
@@ -424,36 +424,36 @@
             "arguments": null,
             "baseName": {
               "contractScope": null,
-              "id": 1858,
+              "id": 1885,
               "name": "MintableToken",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 1770,
+              "referencedDeclaration": 1797,
               "src": "74:13:4",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_MintableToken_$1770",
+                "typeIdentifier": "t_contract$_MintableToken_$1797",
                 "typeString": "contract MintableToken"
               }
             },
-            "id": 1859,
+            "id": 1886,
             "nodeType": "InheritanceSpecifier",
             "src": "74:13:4"
           }
         ],
-        "contractDependencies": [1437, 1192, 1219, 1259, 1679, 1770],
+        "contractDependencies": [1464, 1219, 1246, 1286, 1706, 1797],
         "contractKind": "contract",
         "documentation": null,
         "fullyImplemented": true,
-        "id": 1869,
-        "linearizedBaseContracts": [1869, 1770, 1192, 1679, 1437, 1259, 1219],
+        "id": 1896,
+        "linearizedBaseContracts": [1896, 1797, 1219, 1706, 1464, 1286, 1246],
         "name": "BRMToken",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "constant": true,
-            "id": 1862,
+            "id": 1889,
             "name": "name",
             "nodeType": "VariableDeclaration",
-            "scope": 1869,
+            "scope": 1896,
             "src": "99:35:4",
             "stateVariable": true,
             "storageLocation": "default",
@@ -462,7 +462,7 @@
               "typeString": "string"
             },
             "typeName": {
-              "id": 1860,
+              "id": 1887,
               "name": "string",
               "nodeType": "ElementaryTypeName",
               "src": "99:6:4",
@@ -474,7 +474,7 @@
             "value": {
               "argumentTypes": null,
               "hexValue": "42524d",
-              "id": 1861,
+              "id": 1888,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
@@ -494,10 +494,10 @@
           },
           {
             "constant": true,
-            "id": 1865,
+            "id": 1892,
             "name": "symbol",
             "nodeType": "VariableDeclaration",
-            "scope": 1869,
+            "scope": 1896,
             "src": "145:37:4",
             "stateVariable": true,
             "storageLocation": "default",
@@ -506,7 +506,7 @@
               "typeString": "string"
             },
             "typeName": {
-              "id": 1863,
+              "id": 1890,
               "name": "string",
               "nodeType": "ElementaryTypeName",
               "src": "145:6:4",
@@ -518,7 +518,7 @@
             "value": {
               "argumentTypes": null,
               "hexValue": "42524d",
-              "id": 1864,
+              "id": 1891,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
@@ -538,10 +538,10 @@
           },
           {
             "constant": true,
-            "id": 1868,
+            "id": 1895,
             "name": "decimals",
             "nodeType": "VariableDeclaration",
-            "scope": 1869,
+            "scope": 1896,
             "src": "193:35:4",
             "stateVariable": true,
             "storageLocation": "default",
@@ -550,7 +550,7 @@
               "typeString": "uint8"
             },
             "typeName": {
-              "id": 1866,
+              "id": 1893,
               "name": "uint8",
               "nodeType": "ElementaryTypeName",
               "src": "193:5:4",
@@ -562,7 +562,7 @@
             "value": {
               "argumentTypes": null,
               "hexValue": "3138",
-              "id": 1867,
+              "id": 1894,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
@@ -580,7 +580,7 @@
             "visibility": "public"
           }
         ],
-        "scope": 1870,
+        "scope": 1897,
         "src": "53:183:4"
       }
     ],
@@ -589,13 +589,13 @@
   "legacyAST": {
     "absolutePath": "/Users/artur/Development/Brem/contracts/BRMToken.sol",
     "exportedSymbols": {
-      "BRMToken": [1869]
+      "BRMToken": [1896]
     },
-    "id": 1870,
+    "id": 1897,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 1856,
+        "id": 1883,
         "literals": ["solidity", "^", "0.4", ".24"],
         "nodeType": "PragmaDirective",
         "src": "0:24:4"
@@ -603,10 +603,10 @@
       {
         "absolutePath": "/Users/artur/Development/Brem/contracts/BREMToken.sol",
         "file": "./BREMToken.sol",
-        "id": 1857,
+        "id": 1884,
         "nodeType": "ImportDirective",
-        "scope": 1870,
-        "sourceUnit": 1855,
+        "scope": 1897,
+        "sourceUnit": 1882,
         "src": "26:25:4",
         "symbolAliases": [],
         "unitAlias": ""
@@ -617,36 +617,36 @@
             "arguments": null,
             "baseName": {
               "contractScope": null,
-              "id": 1858,
+              "id": 1885,
               "name": "MintableToken",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 1770,
+              "referencedDeclaration": 1797,
               "src": "74:13:4",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_MintableToken_$1770",
+                "typeIdentifier": "t_contract$_MintableToken_$1797",
                 "typeString": "contract MintableToken"
               }
             },
-            "id": 1859,
+            "id": 1886,
             "nodeType": "InheritanceSpecifier",
             "src": "74:13:4"
           }
         ],
-        "contractDependencies": [1437, 1192, 1219, 1259, 1679, 1770],
+        "contractDependencies": [1464, 1219, 1246, 1286, 1706, 1797],
         "contractKind": "contract",
         "documentation": null,
         "fullyImplemented": true,
-        "id": 1869,
-        "linearizedBaseContracts": [1869, 1770, 1192, 1679, 1437, 1259, 1219],
+        "id": 1896,
+        "linearizedBaseContracts": [1896, 1797, 1219, 1706, 1464, 1286, 1246],
         "name": "BRMToken",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "constant": true,
-            "id": 1862,
+            "id": 1889,
             "name": "name",
             "nodeType": "VariableDeclaration",
-            "scope": 1869,
+            "scope": 1896,
             "src": "99:35:4",
             "stateVariable": true,
             "storageLocation": "default",
@@ -655,7 +655,7 @@
               "typeString": "string"
             },
             "typeName": {
-              "id": 1860,
+              "id": 1887,
               "name": "string",
               "nodeType": "ElementaryTypeName",
               "src": "99:6:4",
@@ -667,7 +667,7 @@
             "value": {
               "argumentTypes": null,
               "hexValue": "42524d",
-              "id": 1861,
+              "id": 1888,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
@@ -687,10 +687,10 @@
           },
           {
             "constant": true,
-            "id": 1865,
+            "id": 1892,
             "name": "symbol",
             "nodeType": "VariableDeclaration",
-            "scope": 1869,
+            "scope": 1896,
             "src": "145:37:4",
             "stateVariable": true,
             "storageLocation": "default",
@@ -699,7 +699,7 @@
               "typeString": "string"
             },
             "typeName": {
-              "id": 1863,
+              "id": 1890,
               "name": "string",
               "nodeType": "ElementaryTypeName",
               "src": "145:6:4",
@@ -711,7 +711,7 @@
             "value": {
               "argumentTypes": null,
               "hexValue": "42524d",
-              "id": 1864,
+              "id": 1891,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
@@ -731,10 +731,10 @@
           },
           {
             "constant": true,
-            "id": 1868,
+            "id": 1895,
             "name": "decimals",
             "nodeType": "VariableDeclaration",
-            "scope": 1869,
+            "scope": 1896,
             "src": "193:35:4",
             "stateVariable": true,
             "storageLocation": "default",
@@ -743,7 +743,7 @@
               "typeString": "uint8"
             },
             "typeName": {
-              "id": 1866,
+              "id": 1893,
               "name": "uint8",
               "nodeType": "ElementaryTypeName",
               "src": "193:5:4",
@@ -755,7 +755,7 @@
             "value": {
               "argumentTypes": null,
               "hexValue": "3138",
-              "id": 1867,
+              "id": 1894,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
@@ -773,7 +773,7 @@
             "visibility": "public"
           }
         ],
-        "scope": 1870,
+        "scope": 1897,
         "src": "53:183:4"
       }
     ],
@@ -784,7 +784,7 @@
     "version": "0.4.24+commit.e67f0147.Emscripten.clang"
   },
   "networks": {
-    "4": {
+    "1532038103933": {
       "events": {},
       "links": {},
       "address": "0x67b95D484619370beCEab923Ef2cf42eD88bcF79",
@@ -793,5 +793,5 @@
     }
   },
   "schemaVersion": "2.0.1",
-  "updatedAt": "2018-08-04T17:48:51.482Z"
+  "updatedAt": "2018-08-05T12:19:55.997Z"
 }
