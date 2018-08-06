@@ -84,6 +84,9 @@ class BremICOForm extends Component {
           this.setState({ capReached: capReached });
         });
 
+        icoInstance.auditSelected().then(auditSelected => {
+          this.setState({ auditSelected: auditSelected });
+        });
         // TODO: Balance
         // TODO: balance of user
       });
@@ -146,6 +149,7 @@ class BremICOForm extends Component {
 
         {this.state &&
           this.state.hasClosed === false &&
+          this.state.auditSelected === true &&
           this.state.etherAmount !== undefined &&
           this.state.tokensAmount !== undefined && (
             <form

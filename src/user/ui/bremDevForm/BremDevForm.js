@@ -82,7 +82,7 @@ class BremDevForm extends Component {
               <p>{this.state.description}</p>
               <p>Status: {this.state.status}</p>
               <p>ICO balance: {this.state.balance} Wei</p>
-              {this.state.status === "opened" && (
+              {this.state.status === "success" && (
                 <form
                   className="pure-form pure-form-ctacked"
                   onSubmit={this.handleSubmitWithrawRequest.bind(this)}
