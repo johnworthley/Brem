@@ -12,7 +12,8 @@ class BremICOForm extends Component {
     this.state = {
       address: props.value,
       etherAmount: 0,
-      tokensAmount: 0
+      tokensAmount: 0,
+      userCurrentBalance: 0
     };
 
     const web3 = store.getState().web3.web3Instance;
@@ -30,65 +31,88 @@ class BremICOForm extends Component {
       const ico = contract(ICOContract);
       ico.setProvider(web3.currentProvider);
       ico.at(this.state.address).then(icoInstance => {
-        icoInstance.name().then(icoName => {
-          this.setState({ icoName: icoName });
-        });
+        web3.eth.getCoinbase((err, coinbase) => {
+          if (err) {
+            console.error(err);
+          }
 
-        icoInstance.wallet().then(wallet => {
-          this.setState({ wallet: wallet });
-        });
+          icoInstance.name().then(icoName => {
+            this.setState({ icoName: icoName });
+          });
 
-        icoInstance.token().then(tokenAddress => {
-          this.setState({ tokenAddress: tokenAddress });
+          icoInstance.wallet().then(wallet => {
+            this.setState({ wallet: wallet });
+          });
 
-          const bremToken = contract(BREMTokenContract);
-          bremToken.setProvider(web3.currentProvider);
-          bremToken.at(tokenAddress).then(tokenInstance => {
-            tokenInstance.symbol().then(tokenSymbol => {
-              this.setState({ tokenSymbol: tokenSymbol });
-            });
+          icoInstance.token().then(tokenAddress => {
+            this.setState({ tokenAddress: tokenAddress });
 
-            tokenInstance.decimals().then(tokenDecimals => {
-              this.setState({ tokenDecimals: tokenDecimals });
+            const bremToken = contract(BREMTokenContract);
+            bremToken.setProvider(web3.currentProvider);
+            bremToken.at(tokenAddress).then(tokenInstance => {
+              tokenInstance.symbol().then(tokenSymbol => {
+                this.setState({ tokenSymbol: tokenSymbol });
+              });
+
+              tokenInstance.decimals().then(tokenDecimals => {
+                this.setState({ tokenDecimals: tokenDecimals.toNumber() });
+              });
+
+              tokenInstance.balanceOf(coinbase).then(userCurrentBalance => {
+                this.setState({
+                  userCurrentBalance: userCurrentBalance.toNumber()
+                });
+              });
             });
           });
-        });
 
-        icoInstance.closingTime().then(closingTime => {
-          this.setState({
-            closingTime: new Date(closingTime.toNumber()).toString()
+          icoInstance.closingTime().then(closingTime => {
+            this.setState({
+              closingTime: new Date(closingTime.toNumber()).toString()
+            });
+          });
+
+          icoInstance.rate().then(rate => {
+            this.setState({ rate: rate.toNumber() });
+          });
+
+          web3.eth.getBalance(this.state.address).then(balance => {
+            this.setState({ balance: web3.utils.fromWei(balance, "ether") });
+          });
+
+          icoInstance.balances(coinbase).then(userBalance => {
+            this.setState({ userBalance: userBalance.toNumber() });
+          });
+
+          icoInstance.balancesInToken(coinbase).then(userTotalTokens => {
+            this.setState({ userTotalTokens: userTotalTokens.toNumber() });
+          });
+
+          icoInstance.weiRaised().then(weiRaised => {
+            this.setState({ weiRaised: weiRaised.toNumber() });
+          });
+
+          icoInstance.cap().then(cap => {
+            this.setState({ cap: cap.toNumber() });
+          });
+
+          icoInstance.docHash().then(docHash => {
+            this.setState({ docHash: docHash });
+          });
+
+          icoInstance.hasClosed().then(hasClosed => {
+            console.log(hasClosed);
+            this.setState({ hasClosed: hasClosed });
+          });
+
+          icoInstance.capReached().then(capReached => {
+            this.setState({ capReached: capReached });
+          });
+
+          icoInstance.auditSelected().then(auditSelected => {
+            this.setState({ auditSelected: auditSelected });
           });
         });
-
-        icoInstance.rate().then(rate => {
-          this.setState({ rate: rate.toNumber() });
-        });
-
-        icoInstance.weiRaised().then(weiRaised => {
-          this.setState({ weiRaised: weiRaised.toNumber() });
-        });
-
-        icoInstance.cap().then(cap => {
-          this.setState({ cap: cap.toNumber() });
-        });
-
-        icoInstance.docHash().then(docHash => {
-          this.setState({ docHash: docHash });
-        });
-
-        icoInstance.hasClosed().then(hasClosed => {
-          this.setState({ hasClosed: hasClosed });
-        });
-
-        icoInstance.capReached().then(capReached => {
-          this.setState({ capReached: capReached });
-        });
-
-        icoInstance.auditSelected().then(auditSelected => {
-          this.setState({ auditSelected: auditSelected });
-        });
-        // TODO: Balance
-        // TODO: balance of user
       });
     } else {
       console.error("Web3 is not initialized.");
@@ -115,7 +139,12 @@ class BremICOForm extends Component {
       return alert("Error, amount in wei must be bigger than 0");
     }
 
-    this.props.onBuyTokenSubmit(this.state.address, etherAmount, this);
+    this.props.onBuyTokenSubmit(
+      this.state.address,
+      this.state.tokenAddress,
+      etherAmount,
+      this
+    );
   }
 
   render() {
@@ -127,11 +156,20 @@ class BremICOForm extends Component {
         <p>Token address: {this.state.tokenAddress}</p>
         <p>Closing time: {this.state.closingTime}</p>
         <p>Rate: {this.state.rate}</p>
+        <p>Contract balance: {this.state.balance} Ether</p>
         <p>
           Docs:{" "}
           <a href={`https://ipfs.infura.io/ipfs/${this.state.docHash}`}>
             ipfs.infura.io/ipfs/{this.state.docHash}
           </a>
+        </p>
+        <p>You spend: {this.state.userBalance} Wei </p>
+        <p>
+          You bought: {this.state.userTotalTokens} {this.state.tokenSymbol}
+        </p>
+        <p>
+          Current Balance: {this.state.userCurrentBalance}{" "}
+          {this.state.tokenSymbol}
         </p>
         {this.state &&
           this.state.weiRaised !== null &&
@@ -148,10 +186,10 @@ class BremICOForm extends Component {
           )}
 
         {this.state &&
-          this.state.hasClosed === false &&
           this.state.auditSelected === true &&
           this.state.etherAmount !== undefined &&
-          this.state.tokensAmount !== undefined && (
+          this.state.tokensAmount !== undefined &&
+          this.state.hasClosed === false && (
             <form
               className="pure-form pure-form-ctacked"
               onSubmit={this.handleBuyTokens.bind(this)}

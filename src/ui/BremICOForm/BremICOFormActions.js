@@ -1,9 +1,10 @@
 import ICOContract from "../../../build/contracts/BREMICO.json";
+import BREMTokenContract from "../../../build/contracts/BREMToken";
 import store from "../../store";
 
 const contract = require("truffle-contract");
 
-export function buyTokens(contractAddress, weiAmount, form) {
+export function buyTokens(contractAddress, tokenAddress, weiAmount, form) {
   let web3 = store.getState().web3.web3Instance;
 
   // Double-check web3's status.
@@ -44,8 +45,34 @@ export function buyTokens(contractAddress, weiAmount, form) {
                   instance.weiRaised().then(weiRaised => {
                     form.setState({ weiRaised: weiRaised.toNumber() });
                   });
-                  // TODO: Set user's amount
-                  // TODO: contract balance
+                  web3.eth.getBalance(this.state.address).then(balance => {
+                    form.setState({
+                      balance: web3.utils.fromWei(balance, "ether")
+                    });
+                  });
+
+                  instance.balances(coinbase).then(userBalance => {
+                    form.setState({ userBalance: userBalance.toNumber() });
+                  });
+
+                  instance.balancesInToken(coinbase).then(userTotalTokens => {
+                    form.setState({
+                      userTotalTokens: userTotalTokens.toNumber()
+                    });
+                  });
+
+                  const bremToken = contract(BREMTokenContract);
+                  bremToken.setProvider(web3.currentProvider);
+                  bremToken.at(tokenAddress).then(tokenInstance => {
+                    tokenInstance
+                      .balanceOf(coinbase)
+                      .then(userCurrentBalance => {
+                        form.setState({
+                          userCurrentBalance: userCurrentBalance.toNumber()
+                        });
+                      });
+                  });
+
                   return alert("Success! TX: " + res.transactionHash);
                 });
             });

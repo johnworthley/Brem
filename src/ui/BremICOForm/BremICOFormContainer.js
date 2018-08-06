@@ -8,10 +8,10 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    onBuyTokenSubmit: (contractAddress, etherAmount, form) => {
+    onBuyTokenSubmit: (contractAddress, tokenAddress, etherAmount, form) => {
       event.preventDefault();
 
-      dispatch(buyTokens(contractAddress, etherAmount, form));
+      dispatch(buyTokens(contractAddress, tokenAddress, etherAmount, form));
     }
   };
 };
