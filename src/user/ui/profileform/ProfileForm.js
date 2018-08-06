@@ -221,7 +221,7 @@ class ProfileForm extends Component {
 
   handleICOClosingTimeChange(e) {
     let date = new Date(e.target.value);
-    this.setState({ icoClosingTime: date.getTime() });
+    this.setState({ icoClosingTime: ( date.getTime() / 1000 ) });
   }
 
   handleICODescriptionChange(e) {
