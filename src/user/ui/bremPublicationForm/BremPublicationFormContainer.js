@@ -10,15 +10,15 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    onAddNewAuditorSubmit: (contractAddress, auditorAddress) => {
+    onAddNewAuditorSubmit: (contractAddress, auditorAddress, form) => {
       event.preventDefault();
 
-      dispatch(addNewAuditor(contractAddress, auditorAddress));
+      dispatch(addNewAuditor(contractAddress, auditorAddress, form));
     },
-    onPublishProjectSubmit: contractAddress => {
+    onPublishProjectSubmit: (contractAddress, form) => {
       event.preventDefault();
 
-      dispatch(publishProject(contractAddress));
+      dispatch(publishProject(contractAddress, form));
     }
   };
 };

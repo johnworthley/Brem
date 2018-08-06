@@ -7,7 +7,7 @@ import ipfs from "../../../ipfs";
 
 const contract = require("truffle-contract");
 
-export function mintBRMTokens(reciever, amount) {
+export function mintBRMTokens(reciever, amount, form) {
   let web3 = store.getState().web3.web3Instance;
 
   // Double-check web3's status.
@@ -32,6 +32,8 @@ export function mintBRMTokens(reciever, amount) {
           brmTokenInstance
             .mint(reciever, amount, { from: coinbase })
             .then(function(result) {
+              form.setState({ mintAddress: "" });
+              form.setState({ mintAmount: 0 });
               return alert("Success mint! TX: " + result.tx);
             })
             .catch(function(result) {
@@ -170,7 +172,7 @@ export function createNewBREMICO(
   }
 }
 
-export function addNewAuditor(address) {
+export function addNewAuditor(address, form) {
   let web3 = store.getState().web3.web3Instance;
 
   if (typeof web3 !== "undefined") {
@@ -200,6 +202,15 @@ export function addNewAuditor(address) {
                 .post("http://127.0.0.1:8080/audit", auditor)
                 .then(res => {
                   console.log(res);
+                  form.setState({ newAuditorAddress: "" });
+                  axios
+                    .get("http://127.0.0.1:8080/audit")
+                    .then(res => {
+                      form.setState({ auditors: res.data });
+                    })
+                    .catch(err => {
+                      console.error(err);
+                    });
                 })
                 .catch(err => {
                   console.error(err);

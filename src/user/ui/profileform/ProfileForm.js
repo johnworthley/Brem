@@ -84,6 +84,9 @@ class ProfileForm extends Component {
           instance.isSuperuser(coinbase).then(res => {
             if (res) {
               this.setState({ role: "superuser" });
+              this.setState({ newAuditorAddress: "" });
+              this.setState({ mintAddress: "" });
+              this.setState({ mintAmount: 0 });
               // Get all auditors' addresses
               axios
                 .get("http://127.0.0.1:8080/audit")
@@ -137,7 +140,7 @@ class ProfileForm extends Component {
         return alert("Mint amount must be bigger than 0");
       }
 
-      this.props.onMintFormSubmit(recieverAddress, mintAmount);
+      this.props.onMintFormSubmit(recieverAddress, mintAmount, this);
     }
   }
 
@@ -155,7 +158,7 @@ class ProfileForm extends Component {
         return alert(address + " is not Ethereum address");
       }
 
-      this.props.onAddNewAuditorSubmit(address);
+      this.props.onAddNewAuditorSubmit(address, this);
     } else {
       console.error("Web3 is not initialized.");
     }
@@ -331,33 +334,42 @@ class ProfileForm extends Component {
         <h3>Superuser</h3>
 
         <h4>BRM Token</h4>
-        <form
-          className="pure-form pure-form-ctacked"
-          onSubmit={this.handleMint.bind(this)}
-        >
-          <fieldset>
-            <legend>Mint BRM tokens</legend>
-            <input
-              id="mintAddress"
-              type="text"
-              onChange={this.handleMintAddressChange.bind(this)}
-              placeholder="Address"
-            />
-            <input
-              id="mintValue"
-              type="number"
-              onChange={this.handleMintAmountChange.bind(this)}
-              placeholder="Amount"
-            />
+        {this.state &&
+          this.state.mintAddress !== undefined &&
+          this.state.mintAmount !== undefined && (
+            <form
+              className="pure-form pure-form-ctacked"
+              onSubmit={this.handleMint.bind(this)}
+            >
+              <fieldset>
+                <legend>Mint BRM tokens</legend>
+                <input
+                  id="mintAddress"
+                  type="text"
+                  value={this.state.mintAddress}
+                  onChange={this.handleMintAddressChange.bind(this)}
+                  placeholder="Address"
+                />
+                <input
+                  id="mintValue"
+                  type="number"
+                  value={this.state.mintAmount}
+                  onChange={this.handleMintAmountChange.bind(this)}
+                  placeholder="Amount"
+                />
 
-            <button type="submit" className="pure-button pure-button-primary">
-              Mint
-            </button>
-            <span className="pure-form-message">
-              To simplify the MVP, only manual BRM mint is available
-            </span>
-          </fieldset>
-        </form>
+                <button
+                  type="submit"
+                  className="pure-button pure-button-primary"
+                >
+                  Mint
+                </button>
+                <span className="pure-form-message">
+                  To simplify the MVP, only manual BRM mint is available
+                </span>
+              </fieldset>
+            </form>
+          )}
 
         <h4>Auditors Managing</h4>
         <h5>All BREM auditos</h5>
