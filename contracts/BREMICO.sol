@@ -86,7 +86,7 @@ contract BREMICO {
     uint256 public closingTime;
     
     // Token sale payment registry
-    mapping(address => uint256) public balances; // TODO: Check tokens
+    mapping(address => uint256) public balances;
     mapping(address => uint256) public balancesInToken;
     
     // Withdraw fee percent
@@ -290,6 +290,10 @@ contract BREMICO {
     function isRequested() public view returns (bool) {
         return capReached() && hasClosed() && 
             request.value > 0 && !isWithdrawn();
+    }
+    
+    function isConfirmed(address _auditor) public view returns (bool) {
+        return request.confirmed[_auditor];
     }
     
     function isWithdrawn() public view returns (bool) {
