@@ -260,6 +260,7 @@ contract BREMICO {
         uint256 _value = balances[msg.sender];
         uint256 _tokenAmount = balancesInToken[msg.sender];
         balances[msg.sender] = 0;
+        balancesInToken[msg.sender] = 0;
         token.burnForRefund(msg.sender, _tokenAmount);
         weiRaised = weiRaised.sub(_value);
         msg.sender.transfer(_value);
