@@ -193,3 +193,15 @@ func (ico *ICO) SetWithdrawnStatus() (err error) {
 	_, err = stmt.Exec("withdrawn", ico.Address)
 	return
 }
+// SetStatusICO set ICO status
+func (ico *ICO) SetStatusICO(status string) (err error) {
+	statement := "UPDATE ico SET status = $1 WHERE address = $2"
+	stmt, err := db.Prepare(statement)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	defer stmt.Close()
+	_, err = stmt.Exec(status, ico.Address)
+	return
+}
