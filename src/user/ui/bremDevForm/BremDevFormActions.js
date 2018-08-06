@@ -1,9 +1,10 @@
 import BREMICOContract from "../../../../build/contracts/BREMICO.json";
 import store from "../../../store";
+import axios from "axios";
 
 const contract = require("truffle-contract");
 
-export function makeWithrawRequest(contractAddress, weiValue) {
+export function makeWithrawRequest(contractAddress, weiValue, form) {
   let web3 = store.getState().web3.web3Instance;
 
   // Double-check web3's status.
@@ -46,6 +47,16 @@ export function makeWithrawRequest(contractAddress, weiValue) {
                     instance
                       .withdraw(weiValue, { from: coinbase })
                       .then(resTX => {
+                        axios
+                          .put("http://127.0.0.1:8080/ico/requst", {
+                            address: contractAddress
+                          })
+                          .then(res => {
+                            console.log(res);
+                            form.setState({ status: "requsted" });
+                            form.setState({ weiValue: 100 });
+                            form.setState({ requestedValue: weiValue });
+                          });
                         return alert("TX: " + resTX.tx);
                       });
                   });

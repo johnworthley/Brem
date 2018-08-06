@@ -31,6 +31,12 @@ class BremDevForm extends Component {
         web3.eth.getBalance(this.state.address).then(balance => {
           this.setState({ balance: balance });
         });
+
+        if (this.state.status === "requested") {
+          icoInstance.request().then(request => {
+            this.setState({ requestedValue: request[0].toNumber() });
+          });
+        }
       });
     } else {
       console.error("Web3 is not initialized.");
@@ -66,8 +72,11 @@ class BremDevForm extends Component {
       return alert("Error, set up withdraw value more or equal 100 Wei");
     }
 
-    this.props.onSubmitWithdrawRequest(this.state.address, this.state.weiValue);
-    this.setState({ weiValue: 100 });
+    this.props.onSubmitWithdrawRequest(
+      this.state.address,
+      this.state.weiValue,
+      this
+    );
   }
 
   render() {
@@ -105,6 +114,11 @@ class BremDevForm extends Component {
                   </fieldset>
                 </form>
               )}
+
+              {this.state.status === "requested" &&
+                this.state.requestedValue !== undefined && (
+                  <p>Requested value: {this.state.requestedValue} Wei </p>
+                )}
 
               <p>
                 <button
