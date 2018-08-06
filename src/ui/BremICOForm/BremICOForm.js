@@ -9,6 +9,16 @@ const contract = require("truffle-contract");
 class BremICOForm extends Component {
   constructor(props) {
     super(props);
+
+    getWeb3
+      .then(results => {
+        console.log("Web3 initialized!");
+        this.setState({ loaded: true });
+      })
+      .catch(() => {
+        console.log("Error in web3 initialization.");
+      });
+
     this.state = {
       address: props.value,
       etherAmount: 0,
@@ -17,16 +27,6 @@ class BremICOForm extends Component {
     };
 
     const web3 = store.getState().web3.web3Instance;
-    if (typeof web3 === "undefined" || web3 === null) {
-      getWeb3
-        .then(results => {
-          console.log("Web3 initialized!");
-          this.setState({ loaded: true });
-        })
-        .catch(() => {
-          console.log("Error in web3 initialization.");
-        });
-    }
     if (typeof web3 !== "undefined" && web3 !== null) {
       const ico = contract(ICOContract);
       ico.setProvider(web3.currentProvider);
@@ -68,7 +68,7 @@ class BremICOForm extends Component {
 
           icoInstance.closingTime().then(closingTime => {
             this.setState({
-              closingTime: new Date(closingTime.toNumber()).toString()
+              closingTime: new Date(closingTime.toNumber() * 1000).toString()
             });
           });
 
@@ -101,7 +101,6 @@ class BremICOForm extends Component {
           });
 
           icoInstance.hasClosed().then(hasClosed => {
-            console.log(hasClosed);
             this.setState({ hasClosed: hasClosed });
           });
 
@@ -143,6 +142,16 @@ class BremICOForm extends Component {
       this.state.address,
       this.state.tokenAddress,
       etherAmount,
+      this
+    );
+  }
+
+  handleRefund(e) {
+    e.preventDefault();
+
+    this.props.onRefundSubmit(
+      this.state.address,
+      this.state.tokenAddress,
       this
     );
   }
@@ -220,11 +229,33 @@ class BremICOForm extends Component {
 
         {this.state &&
           this.state.hasClosed === true &&
-          this.state.capReached === false && (
-            <form className="pure-form pure-form-ctacked">
+          this.state.capReached === false &&
+          this.state.userBalance !== undefined &&
+          this.state.tokenSymbol !== undefined && (
+            <form
+              className="pure-form pure-form-ctacked"
+              onSubmit={this.handleRefund.bind(this)}
+            >
               <fieldset>
                 <legend>Refund</legend>
-                {/* TODO: Refund */}
+                {this.state.userBalance === 0 && (
+                  <p>You haven't Ether to refund</p>
+                )}
+                {this.state.userBalance > 0 && (
+                  <div>
+                    <p>You can refund {this.state.userBalance} Wei</p>
+                    <span className="pure-form-message">
+                      Important: you {this.state.tokenSymbol} tokens balance
+                      must be equal to total bought tokens amount
+                    </span>
+                    <button
+                      type="submit"
+                      className="pure-button pure-button-primary"
+                    >
+                      Refund
+                    </button>
+                  </div>
+                )}
               </fieldset>
             </form>
           )}

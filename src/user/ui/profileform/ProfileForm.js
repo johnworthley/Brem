@@ -237,7 +237,7 @@ class ProfileForm extends Component {
     if (date < new Date(Date.now())) {
       return alert("Error, date must be bigger than now");
     }
-    if (date) this.setState({ icoClosingTime: ( date.getTime() / 1000 ) });
+    if (date) this.setState({ icoClosingTime: date.getTime() / 1000 });
   }
 
   handleICODescriptionChange(e) {
@@ -482,11 +482,6 @@ class ProfileForm extends Component {
                       placeholder="BREM ICO Description"
                       wrap="soft"
                     />
-                  </p>
-                  <p>
-                    <label>
-                      Selection and deploying docs to SWARM will be later...
-                    </label>
                   </p>
                   <p>
                     <input

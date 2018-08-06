@@ -1,6 +1,6 @@
 import { connect } from "react-redux";
 import BremICOForm from "./BremICOForm";
-import { buyTokens } from "./BremICOFormActions";
+import { buyTokens, refund } from "./BremICOFormActions";
 
 const mapStateToProps = (state, ownProps) => {
   return {};
@@ -12,6 +12,11 @@ const mapDispatchToProps = dispatch => {
       event.preventDefault();
 
       dispatch(buyTokens(contractAddress, tokenAddress, etherAmount, form));
+    },
+    onRefundSubmit: (contractAddress, tokenAddress, form) => {
+      event.preventDefault();
+
+      dispatch(refund(contractAddress, tokenAddress, form));
     }
   };
 };
