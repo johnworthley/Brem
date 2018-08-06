@@ -1,6 +1,6 @@
 import store from "../../store";
 
-export function buyTokens(contractAddress, weiAmount) {
+export function buyTokens(contractAddress, weiAmount, form) {
   let web3 = store.getState().web3.web3Instance;
 
   // Double-check web3's status.
@@ -22,6 +22,8 @@ export function buyTokens(contractAddress, weiAmount) {
               console.error(err);
               return alert("Transaction error");
             }
+            form.setState({ etherAmount: 0 });
+            form.setState({ tokensAmount: 0 });
             return alert("Success! TX: " + res.transactionHash);
           });
       });

@@ -75,6 +75,17 @@ class BremICOForm extends Component {
         icoInstance.docHash().then(docHash => {
           this.setState({ docHash: docHash });
         });
+
+        icoInstance.hasClosed().then(hasClosed => {
+          this.setState({ hasClosed: hasClosed });
+        });
+
+        icoInstance.capReached().then(capReached => {
+          this.setState({ capReached: capReached });
+        });
+
+        // TODO: Balance
+        // TODO: balance of user
       });
     } else {
       console.error("Web3 is not initialized.");
@@ -101,7 +112,7 @@ class BremICOForm extends Component {
       return alert("Error, amount in wei must be bigger than 0");
     }
 
-    this.props.onBuyTokenSubmit(this.state.address, etherAmount);
+    this.props.onBuyTokenSubmit(this.state.address, etherAmount, this);
   }
 
   render() {
@@ -133,27 +144,48 @@ class BremICOForm extends Component {
             </fieldset>
           )}
 
-        <form
-          className="pure-form pure-form-ctacked"
-          onSubmit={this.handleBuyTokens.bind(this)}
-        >
-          <fieldset>
-            <legend>Buy Tokens</legend>
-            <input
-              type="number"
-              min="0"
-              step="0.000000000000000001"
-              onChange={this.handleEtherValueCahnge.bind(this)}
-              placeholder="Amount in Ether"
-            />
-            <p>
-              You will buy: {this.state.tokensAmount} {this.state.tokenSymbol}
-            </p>
-            <button type="submit" className="pure-button pure-button-primary">
-              Buy
-            </button>
-          </fieldset>
-        </form>
+        {this.state &&
+          this.state.hasClosed === false &&
+          this.state.etherAmount !== undefined &&
+          this.state.tokensAmount !== undefined && (
+            <form
+              className="pure-form pure-form-ctacked"
+              onSubmit={this.handleBuyTokens.bind(this)}
+            >
+              <fieldset>
+                <legend>Buy Tokens</legend>
+                <input
+                  type="number"
+                  min="0"
+                  value={this.state.etherAmount}
+                  step="0.000000000000000001"
+                  onChange={this.handleEtherValueCahnge.bind(this)}
+                  placeholder="Amount in Ether"
+                />
+                <p>
+                  You will buy: {this.state.tokensAmount}
+                  {this.state.tokenSymbol}
+                </p>
+                <button
+                  type="submit"
+                  className="pure-button pure-button-primary"
+                >
+                  Buy
+                </button>
+              </fieldset>
+            </form>
+          )}
+
+        {this.state &&
+          this.state.hasClosed === true &&
+          this.state.capReached === false && (
+            <form className="pure-form pure-form-ctacked">
+              <fieldset>
+                <legend>Refund</legend>
+                {/* TODO: Refund */}
+              </fieldset>
+            </form>
+          )}
       </div>
     );
   }
