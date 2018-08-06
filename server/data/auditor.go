@@ -61,8 +61,8 @@ func GetAllAuditors() (auditors []Auditor, err error) {
 
 // GetICOs returns current auditor ICOs
 func (auditor *Auditor) GetICOs() (icos []ICO, err error) {
-	rows, err := db.Query("SELECT * FROM ico WHERE id = " +
-		"(SELECT icoID FROM icoAuditors WHERE auditorID = $1)", auditor.ID)
+	rows, err := db.Query("SELECT * FROM ico WHERE status = 'requested' AND" +
+		" id IN (SELECT icoID FROM icoAuditors WHERE auditorID = $1)", auditor.ID)
 	if err != nil {
 		log.Println(err)
 		return

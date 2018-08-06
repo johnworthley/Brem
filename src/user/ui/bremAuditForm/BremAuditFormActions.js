@@ -4,7 +4,7 @@ import axios from "axios";
 
 const contract = require("truffle-contract");
 
-export function approveWithdraw(contractAddress) {
+export function confirmWithdraw(contractAddress, form) {
   let web3 = store.getState().web3.web3Instance;
 
   // Double-check web3's status.
@@ -19,24 +19,41 @@ export function approveWithdraw(contractAddress) {
         }
 
         ico.at(contractAddress).then(instance => {
-          ico.isAuditor(coinbase).then(res => {
+          instance.isAuditor(coinbase).then(res => {
             if (!res) {
               return alert(
                 "Error, coinbase is not current ICO auditor address"
               );
             }
 
-            ico.confirmWithdraw({ from: coinbase }).then(res => {
-              // web3.eth.balance(res => {
-              //   if (res) {
-              //     axios
-              //       .post("/ico/withdrawn", {
-              //         address: contractAddress
-              //       })
-              //       .then(res => console.log(res))
-              //       .catch(err => console.log(err));
-              //   }
-              // });
+            instance.confirmWithdraw({ from: coinbase }).then(res => {
+              instance.isRequested().then(isRequested => {
+                if (!isRequested) {
+                  instance.isWithdrawn().then(isWithdrawn => {
+                    if (isWithdrawn) {
+                      axios
+                        .put("/ico/withdrawn", {
+                          address: contractAddress
+                        })
+                        .then(res => {
+                          console.log(res);
+                          form.setState({ visible: false });
+                        })
+                        .catch(err => console.error(err));
+                    } else {
+                      axios
+                        .put("/ico/success", {
+                          address: contractAddress
+                        })
+                        .then(res => {
+                          console.log(res);
+                          form.setState({ visible: false });
+                        })
+                        .catch(err => console.error(err));
+                    }
+                  });
+                }
+              });
               return alert("TX: " + res.tx);
             });
           });

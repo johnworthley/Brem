@@ -1,6 +1,6 @@
 import { connect } from "react-redux";
 import BremAuditForm from "./BremAuditForm";
-import { approveWithdraw } from "./BremAuditFormActions";
+import { confirmWithdraw } from "./BremAuditFormActions";
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -10,10 +10,10 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    onApproveSubmit: contractAddress => {
+    onConfirmSubmit: (contractAddress, form) => {
       event.preventDefault();
 
-      dispatch(approveWithdraw(contractAddress));
+      dispatch(confirmWithdraw(contractAddress, form));
     }
   };
 };

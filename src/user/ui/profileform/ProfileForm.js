@@ -211,7 +211,7 @@ class ProfileForm extends Component {
     }
 
     return this.state.auditorICOs.map(ico => (
-      <BremAuditFormContainer key={ico} value={ico} />
+      <BremAuditFormContainer key={ico.address} value={ico} />
     ));
   }
 
@@ -402,7 +402,7 @@ class ProfileForm extends Component {
       <div>
         <h3>Auditor</h3>
 
-        <h4>My ICOs</h4>
+        <h4>ICOs' withdraws requests</h4>
         {this.state && this.state.auditorICOs && this.AuditorICOList()}
       </div>
     );
