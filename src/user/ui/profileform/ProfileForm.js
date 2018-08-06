@@ -42,6 +42,16 @@ class ProfileForm extends Component {
           instance.isDeveloper(coinbase).then(res => {
             if (res) {
               this.setState({ role: "developer" });
+              this.setState({ icoName: "" });
+              this.setState({ icoSymbol: "" });
+              this.setState({ icoRate: 0 });
+              this.setState({ icoCap: 0 });
+              this.setState({ icoClosingTime: new Date(Date.now()) });
+              this.setState({ icoDescription: "" });
+
+              instance.icoCreationPrice().then(price => {
+                this.setState({ price: price.toNumber() });
+              });
 
               // Get developer's ICOs
               axios
@@ -221,7 +231,10 @@ class ProfileForm extends Component {
 
   handleICOClosingTimeChange(e) {
     let date = new Date(e.target.value);
-    this.setState({ icoClosingTime: date.getTime() });
+    if (date < new Date(Date.now())) {
+      return alert("Error, date must be bigger than now");
+    }
+    if (date) this.setState({ icoClosingTime: date.getTime() });
   }
 
   handleICODescriptionChange(e) {
@@ -293,12 +306,13 @@ class ProfileForm extends Component {
       cap,
       closingTime,
       description,
-      files
+      files,
+      this
     );
   }
 
   DevBremList() {
-    const amount = this.state.devICOs;
+    const amount = this.state.devICOs.length;
     if (amount === 0) {
       return (
         <div>
@@ -307,7 +321,7 @@ class ProfileForm extends Component {
       );
     }
     return this.state.devICOs.map(ico => (
-      <BremDevFormContainer key={ico} value={ico} />
+      <BremDevFormContainer key={ico.address} value={ico} />
     ));
   }
 
@@ -385,80 +399,103 @@ class ProfileForm extends Component {
       <div>
         <h3>Developer</h3>
 
-        <h4> BREM </h4>
-        <form
-          className="pure-form pure-form-ctacked"
-          onSubmit={this.handleCreteBREMICO.bind(this)}
-        >
-          <fieldset>
-            <legend>Create BREM ICO</legend>
-            <p>
-              <input
-                id="name"
-                type="text"
-                onChange={this.handleICONameChange.bind(this)}
-                placeholder="BREM ICO name"
-              />
-            </p>
-            <p>
-              <input
-                id="symbol"
-                type="text"
-                onChange={this.handleICOTokenSymbolChange.bind(this)}
-                placeholder="BREM ICO Token Symbol"
-              />
-            </p>
-            <p>
-              <input
-                id="rate"
-                type="number"
-                onChange={this.handleICORateChange.bind(this)}
-                placeholder="BREM ICO rate"
-              />
-            </p>
-            <p>
-              <input
-                id="cap"
-                type="number"
-                onChange={this.handleICOCapChange.bind(this)}
-                placeholder="BREM ICO cap"
-              />
-            </p>
-            <p>
-              <input
-                id="closingTime"
-                type="datetime-local"
-                onChange={this.handleICOClosingTimeChange.bind(this)}
-                placeholder="BREM ICO Closing Time"
-              />
-            </p>
-            <p>
-              <textarea
-                id="description"
-                rows="5"
-                cols="70"
-                onChange={this.handleICODescriptionChange.bind(this)}
-                placeholder="BREM ICO Description"
-                wrap="soft"
-              />
-            </p>
-            <p>
-              <label>
-                Selection and deploying docs to SWARM will be later...
-              </label>
-            </p>
-            <p>
-              <input
-                type="file"
-                onChange={this.handleICOFilesChange.bind(this)}
-                ref={node => this._addDirectory(node)}
-              />
-            </p>
-            <button type="submit" className="pure-button pure-button-primary">
-              Create new BREM ICO
-            </button>
-          </fieldset>
-        </form>
+        {this.state &&
+          this.state.icoName !== undefined &&
+          this.state.icoSymbol !== undefined &&
+          this.state.icoRate !== undefined &&
+          this.state.icoCap !== undefined &&
+          this.state.icoClosingTime !== undefined &&
+          this.state.icoDescription !== undefined &&
+          this.state.price !== undefined && (
+            <div>
+              <h4> BREM </h4>
+              <form
+                className="pure-form pure-form-ctacked"
+                onSubmit={this.handleCreteBREMICO.bind(this)}
+              >
+                <fieldset>
+                  <legend>Create BREM ICO</legend>
+                  <p>
+                    <input
+                      id="name"
+                      type="text"
+                      value={this.state.icoName}
+                      onChange={this.handleICONameChange.bind(this)}
+                      placeholder="BREM ICO name"
+                    />
+                  </p>
+                  <p>
+                    <input
+                      id="symbol"
+                      type="text"
+                      value={this.state.icoSymbol}
+                      onChange={this.handleICOTokenSymbolChange.bind(this)}
+                      placeholder="BREM ICO Token Symbol"
+                    />
+                  </p>
+                  <p>
+                    <input
+                      id="rate"
+                      type="number"
+                      value={this.state.icoRate}
+                      onChange={this.handleICORateChange.bind(this)}
+                      placeholder="BREM ICO rate"
+                    />
+                  </p>
+                  <p>
+                    <input
+                      id="cap"
+                      type="number"
+                      value={this.state.icoCap}
+                      onChange={this.handleICOCapChange.bind(this)}
+                      placeholder="BREM ICO cap"
+                    />
+                  </p>
+                  <p>
+                    <input
+                      id="closingTime"
+                      type="datetime-local"
+                      value={this.state.closingTime}
+                      onChange={this.handleICOClosingTimeChange.bind(this)}
+                      placeholder="BREM ICO Closing Time"
+                    />
+                  </p>
+                  <p>
+                    <textarea
+                      id="description"
+                      rows="5"
+                      cols="70"
+                      value={this.state.icoDescription}
+                      onChange={this.handleICODescriptionChange.bind(this)}
+                      placeholder="BREM ICO Description"
+                      wrap="soft"
+                    />
+                  </p>
+                  <p>
+                    <label>
+                      Selection and deploying docs to SWARM will be later...
+                    </label>
+                  </p>
+                  <p>
+                    <input
+                      type="file"
+                      onChange={this.handleICOFilesChange.bind(this)}
+                      ref={node => this._addDirectory(node)}
+                    />
+                  </p>
+                  <button
+                    type="submit"
+                    className="pure-button pure-button-primary"
+                  >
+                    Create new BREM ICO
+                  </button>
+                  <span className="pure-form-message">
+                    BREM ICO Creation price: {this.state.price} BRM
+                  </span>
+                </fieldset>
+              </form>
+            </div>
+          )}
 
         <h4>My ICOs</h4>
         {this.state && this.state.devICOs && this.DevBremList()}

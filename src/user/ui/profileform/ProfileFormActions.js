@@ -52,7 +52,8 @@ export function createNewBREMICO(
   cap,
   closingTime,
   description,
-  files
+  files,
+  form
 ) {
   let web3 = store.getState().web3.web3Instance;
 
@@ -116,9 +117,25 @@ export function createNewBREMICO(
                           };
                           axios
                             .post("http://127.0.0.1:8080/ico", ico)
-                            .then(res => console.log(res))
+                            .then(res => {
+                              console.log(res);
+                              axios
+                                .get("http://127.0.0.1:8080/ico/dev", {
+                                  params: {
+                                    address: coinbase
+                                  }
+                                })
+                                .then(res => {
+                                  form.setState({ devICOs: res.data });
+                                  form.setState({ icoName: "" });
+                                  form.setState({ icoSymbol: "" });
+                                  form.setState({ icoRate: 0 });
+                                  form.setState({ icoCap: 0 });
+                                  form.setState({ icoDescription: "" });
+                                });
+                            })
                             .catch(err => console.log(err));
-                          return alert(
+                          alert(
                             "TX: " +
                               res.tx +
                               " ICO: " +

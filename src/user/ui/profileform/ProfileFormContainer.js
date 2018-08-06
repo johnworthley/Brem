@@ -26,7 +26,8 @@ const mapDispatchToProps = dispatch => {
       cap,
       closingTime,
       description,
-      files
+      files,
+      form
     ) => {
       event.preventDefault();
 
@@ -38,7 +39,8 @@ const mapDispatchToProps = dispatch => {
           cap,
           closingTime,
           description,
-          files
+          files,
+          form
         )
       );
     },
