@@ -10,8 +10,6 @@ var router *gin.Engine
 func main() {
 	//go RunUpdater()
 
-	// TODO: File server
-
 	router = gin.Default()
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())

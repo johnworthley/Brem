@@ -6,7 +6,7 @@ import (
 	"../server/data"
 
 	"github.com/gin-gonic/gin"
-)
+			)
 
 // Add new developer to db
 func addDeveloper(c *gin.Context) {
@@ -178,7 +178,7 @@ func getFailedICOs(c *gin.Context) {
 
 // Returns ICOs with status withdrawn
 func getWithdrawnICOs(c *gin.Context) {
-	icos, err := data.GetFailedICOs()
+	icos, err := data.GetWithdrawnICOs()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return
