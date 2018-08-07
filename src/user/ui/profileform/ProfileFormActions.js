@@ -207,6 +207,7 @@ export function addNewAuditor(address, form) {
                     .get("http://127.0.0.1:8080/audit")
                     .then(res => {
                       form.setState({ auditors: res.data });
+                      form.setState({ newAuditorAddress: "" });
                     })
                     .catch(err => {
                       console.error(err);

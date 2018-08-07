@@ -48,7 +48,7 @@ export function makeWithrawRequest(contractAddress, weiValue, form) {
                       .withdraw(weiValue, { from: coinbase })
                       .then(resTX => {
                         axios
-                          .put("http://127.0.0.1:8080/ico/requst", {
+                          .put("http://127.0.0.1:8080/ico/request", {
                             address: contractAddress
                           })
                           .then(res => {

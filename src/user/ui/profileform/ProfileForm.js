@@ -205,7 +205,7 @@ class ProfileForm extends Component {
     if (amount === 0) {
       return (
         <div>
-          <h3>You don't have ICOs</h3>
+          <h3>You don't have ICOs to submit withdraws</h3>
         </div>
       );
     }
