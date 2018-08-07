@@ -261,6 +261,38 @@ func publishICO(c *gin.Context) {
 	c.JSON(http.StatusOK, nil)
 }
 
+// Change ICO status to success
+func setICOSucccessStatus(c *gin.Context) {
+	var ico data.ICO
+	err := c.BindJSON(&ico)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+	err = ico.SetSuccessStatus()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+	c.JSON(http.StatusOK, nil)
+}
+
+// Change ICO status to requested
+func setICORequestedStatus(c *gin.Context) {
+	var ico data.ICO
+	err := c.BindJSON(&ico)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+	err = ico.SetRequestedStatus()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+	c.JSON(http.StatusOK, nil)
+}
+
 // Change ICO status to withdrawn
 func setICOWithdrawnStatus(c *gin.Context) {
 	var ico data.ICO

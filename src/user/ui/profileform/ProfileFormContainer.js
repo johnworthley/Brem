@@ -14,10 +14,10 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    onMintFormSubmit: (to, amount) => {
+    onMintFormSubmit: (to, amount, form) => {
       event.preventDefault();
 
-      dispatch(mintBRMTokens(to, amount));
+      dispatch(mintBRMTokens(to, amount, form));
     },
     onCreateBREMICOFormSubmit: (
       name,
@@ -26,7 +26,8 @@ const mapDispatchToProps = dispatch => {
       cap,
       closingTime,
       description,
-      files
+      files,
+      form
     ) => {
       event.preventDefault();
 
@@ -38,14 +39,15 @@ const mapDispatchToProps = dispatch => {
           cap,
           closingTime,
           description,
-          files
+          files,
+          form
         )
       );
     },
-    onAddNewAuditorSubmit: address => {
+    onAddNewAuditorSubmit: (address, form) => {
       event.preventDefault();
 
-      dispatch(addNewAuditor(address));
+      dispatch(addNewAuditor(address, form));
     }
   };
 };

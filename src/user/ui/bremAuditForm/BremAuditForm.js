@@ -12,38 +12,50 @@ class BremAuditForm extends Component {
 
     this.state = {
       address: props.value.address,
-      status: props.value.status
+      status: props.value.status,
+      visible: true
     };
     const web3 = store.getState().web3.web3Instance;
     if (typeof web3 !== "undefined" && web3 !== null) {
       const ico = contract(ICOContract);
       ico.setProvider(web3.currentProvider);
-      ico.at(this.state.address).then(icoInstance => {
-        icoInstance.name().then(name => {
-          this.setState({ name: name });
-        });
+      web3.eth.getCoinbase((error, coinbase) => {
+        if (error) {
+          console.error(error);
+        }
 
-        icoInstance.description().then(description => {
-          this.setState({ description: description });
-        });
+        ico.at(this.state.address).then(icoInstance => {
+          icoInstance.request().then(request => {
+            this.setState({ requestedValue: request[0].toNumber() });
+          });
 
-        icoInstance.wallet().then(wallet => {
-          this.setState({ wallet: wallet });
+          icoInstance.isConfirmed(coinbase).then(isConfirmed => {
+            this.setState({ visible: !isConfirmed });
+            if (!isConfirmed) {
+              icoInstance.name().then(name => {
+                this.setState({ name: name });
+              });
 
-          const brem = contract(BREMContract);
-          brem.setProvider(web3.currentProvider);
+              icoInstance.description().then(description => {
+                this.setState({ description: description });
+              });
 
-          brem.deployed().then(bremInstance => {
-            bremInstance.login({ from: wallet }).then(username => {
-              this.setState({ username: username });
-            });
+              icoInstance.wallet().then(wallet => {
+                this.setState({ wallet: wallet });
+
+                const brem = contract(BREMContract);
+                brem.setProvider(web3.currentProvider);
+
+                brem.deployed().then(bremInstance => {
+                  bremInstance.login({ from: wallet }).then(username => {
+                    this.setState({ username: username });
+                  });
+                });
+              });
+            }
           });
         });
       });
-
-      if (this.state.status === "success") {
-        this.setState({ requsted: true });
-      }
     } else {
       console.error("Web3 is not initialized.");
     }
@@ -55,18 +67,20 @@ class BremAuditForm extends Component {
     });
   }
 
-  handleApprove(e) {
+  handleConfirm(e) {
     e.preventDefault();
 
-    this.props.onApproveSubmit(this.state.address);
+    this.props.onConfirmSubmit(this.state.address, this);
   }
 
   render() {
     return (
       <div>
         {this.state &&
+          this.state.visible === true &&
           this.state.name &&
           this.state.description &&
+          this.state.requestedValue &&
           this.state.username && (
             <fieldset>
               <legend>{this.state.name}</legend>
@@ -76,15 +90,14 @@ class BremAuditForm extends Component {
               <p>Address: {this.state.address}</p>
               <p>{this.state.description}</p>
               <p>Wallet: {this.state.wallet}</p>
+              <p>Requested value: {this.state.requestedValue} Wei</p>
 
-              {this.state.requsted && (
-                <button
-                  className="pure-button pure-button-primary"
-                  onClick={this.handleApprove.bind(this)}
-                >
-                  Approve
-                </button>
-              )}
+              <button
+                className="pure-button pure-button-primary"
+                onClick={this.handleConfirm.bind(this)}
+              >
+                Confirm withdraw
+              </button>
 
               <p>
                 <button

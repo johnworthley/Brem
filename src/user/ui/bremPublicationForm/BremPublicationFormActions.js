@@ -4,7 +4,7 @@ import axios from "axios";
 
 const contract = require("truffle-contract");
 
-export function addNewAuditor(contractAddress, auditorAddress) {
+export function addNewAuditor(contractAddress, auditorAddress, form) {
   let web3 = store.getState().web3.web3Instance;
 
   // Double-check web3's status.
@@ -19,7 +19,6 @@ export function addNewAuditor(contractAddress, auditorAddress) {
         }
 
         ico.at(contractAddress).then(instance => {
-          // TODO: isAuditor checking
           instance
             .addAuditor(auditorAddress, { from: coinbase })
             .then(txRes => {
@@ -33,7 +32,20 @@ export function addNewAuditor(contractAddress, auditorAddress) {
               };
               axios
                 .post("http://127.0.0.1:8080/ico/audit", data)
-                .then(res => console.log(res))
+                .then(res => {
+                  console.log(res);
+                  form.setState({ newAuditorAddress: "" });
+                  axios
+                    .get("http://127.0.0.1:8080/ico/audit", {
+                      params: {
+                        address: contractAddress
+                      }
+                    })
+                    .then(res => {
+                      form.setState({ auditors: res.data });
+                    })
+                    .catch(err => console.log(err));
+                })
                 .catch(err => console.log(err));
               return alert("Success! TX: " + txRes.tx);
             });
@@ -45,7 +57,7 @@ export function addNewAuditor(contractAddress, auditorAddress) {
   }
 }
 
-export function publishProject(contractAddress) {
+export function publishProject(contractAddress, form) {
   let web3 = store.getState().web3.web3Instance;
   // Double-check web3's status.
   if (typeof web3 !== "undefined") {
@@ -63,7 +75,10 @@ export function publishProject(contractAddress) {
             .put("http://127.0.0.1:8080/ico/open", {
               address: contractAddress
             })
-            .then(res => console.log(res))
+            .then(res => {
+              console.log(res);
+              form.setState({ visible: false });
+            })
             .catch(err => console.error(err));
           return alert("Success! TX: " + txRes.tx);
         });

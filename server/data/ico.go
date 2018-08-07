@@ -181,6 +181,32 @@ func (ico *ICO) PublishICO() (err error) {
 	return
 }
 
+// SetRequestedStatus change ICO status to "requested"
+func (ico *ICO) SetRequestedStatus() (err error) {
+	statement := "UPDATE ico SET status = $1 WHERE address = $2"
+	stmt, err := db.Prepare(statement)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	defer stmt.Close()
+	_, err = stmt.Exec("requested", ico.Address)
+	return
+}
+
+// SetSuccessStatus change ICO status to "success"
+func (ico *ICO) SetSuccessStatus() (err error) {
+	statement := "UPDATE ico SET status = $1 WHERE address = $2"
+	stmt, err := db.Prepare(statement)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	defer stmt.Close()
+	_, err = stmt.Exec("success", ico.Address)
+	return
+}
+
 // SetWithdrawnStatus sets withdrawn status to current ICO
 func (ico *ICO) SetWithdrawnStatus() (err error) {
 	statement := "UPDATE ico SET status = $1 WHERE address = $2"

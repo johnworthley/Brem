@@ -12,7 +12,9 @@ class BremPublicationForm extends Component {
     super(props);
 
     this.state = {
-      address: props.value
+      address: props.value,
+      newAuditorAddress: "",
+      visible: true
     };
 
     this.icoAuditors.bind(this);
@@ -93,7 +95,11 @@ class BremPublicationForm extends Component {
         return alert(auditorAddress + " is not Ethereum address");
       }
 
-      this.props.onAddNewAuditorSubmit(this.state.address, auditorAddress);
+      this.props.onAddNewAuditorSubmit(
+        this.state.address,
+        auditorAddress,
+        this
+      );
     } else {
       console.error("Web3 is not initialized.");
     }
@@ -103,7 +109,7 @@ class BremPublicationForm extends Component {
     e.preventDefault();
     const web3 = store.getState().web3.web3Instance;
     if (typeof web3 !== "undefined" && web3 !== null) {
-      this.props.onPublishProjectSubmit(this.state.address);
+      this.props.onPublishProjectSubmit(this.state.address, this);
     } else {
       console.error("Web3 is not initialized.");
     }
@@ -125,7 +131,8 @@ class BremPublicationForm extends Component {
           this.state.icoDescription &&
           this.state.wallet &&
           this.state.username &&
-          this.state.auditors && (
+          this.state.auditors &&
+          this.state.visible && (
             <fieldset>
               <legend>{this.state.icoName}</legend>
               <p>{this.state.icoDescription}</p>
@@ -143,6 +150,7 @@ class BremPublicationForm extends Component {
                   <legend>Add new auditor to project</legend>
                   <input
                     type="text"
+                    value={this.state.newAuditorAddress}
                     onChange={this.handleAddNewAuditorChange.bind(this)}
                     placeholder="New Auditor address"
                   />

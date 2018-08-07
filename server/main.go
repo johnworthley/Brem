@@ -8,7 +8,7 @@ import (
 var router *gin.Engine
 
 func main() {
-	go RunUpdater()
+	//go RunUpdater()
 
 	// TODO: File server
 
@@ -40,5 +40,7 @@ func initAPI() {
 	router.POST("/ico", addICO)
 	router.POST("/ico/audit", addAuditorToICO)
 	router.PUT("/ico/open", publishICO)
+	router.PUT("/ico/success", setICOSucccessStatus)
+	router.PUT("/ico/request", setICORequestedStatus)
 	router.PUT("/ico/withdrawn", setICOWithdrawnStatus)
 }

@@ -1,8 +1,8 @@
--- DROP TABLE developers CASCADE;
--- DROP TABLE auditors CASCADE;
--- DROP TABLE ico CASCADE;
--- DROP TABLE icoAuditors CASCADE;
--- DROP TABLE auditors CASCADE;
+DROP TABLE developers CASCADE;
+DROP TABLE auditors CASCADE;
+DROP TABLE ico CASCADE;
+DROP TABLE icoAuditors CASCADE;
+DROP TYPE status;
 
 CREATE TABLE developers (
   id      SERIAL PRIMARY KEY,
