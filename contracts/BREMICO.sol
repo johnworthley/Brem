@@ -231,7 +231,11 @@ contract BREMICO {
         require(_value >= 100 && _value <= address(this).balance);
         require(request.value == 0);
         
-        request = WithdrawRequst(_value, 0);
+        if (address(this).balance - _value < 100) {
+            request = WithdrawRequst(address(this).balance, 0);
+        } else {
+            request = WithdrawRequst(_value, 0);
+        }
     }
     
     // Auditors confirm withdraw
