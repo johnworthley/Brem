@@ -84,9 +84,33 @@ class ProfileForm extends Component {
           instance.isSuperuser(coinbase).then(res => {
             if (res) {
               this.setState({ role: "superuser" });
+              this.setState({ withdrawValue: 0 });
               this.setState({ newAuditorAddress: "" });
               this.setState({ mintAddress: "" });
               this.setState({ mintAmount: 0 });
+
+              // Get BREM contract balance
+              web3.eth.getBalance(instance.address).then(bremBalance => {
+                this.setState({
+                  bremBalance: web3.utils.fromWei(bremBalance, "ether")
+                });
+              });
+
+              // Get ICO creation price
+              instance.icoCreationPrice().then(icoCreationPrice => {
+                this.setState({
+                  icoCreationPrice: web3.utils.fromWei(
+                    icoCreationPrice.toNumber(),
+                    "ether"
+                  )
+                });
+              });
+              // Get withdrawFeePercent
+              instance.withdrawFeePercent().then(withdrawFeePercent => {
+                this.setState({
+                  withdrawFeePercent: withdrawFeePercent.toNumber()
+                });
+              });
               // Get all auditors' addresses
               axios
                 .get("http://127.0.0.1:8080/audit")
@@ -141,6 +165,33 @@ class ProfileForm extends Component {
       }
 
       this.props.onMintFormSubmit(recieverAddress, mintAmount, this);
+    }
+  }
+
+  handleWithdrawValueChange(event) {
+    const withdrawValue = event.target.value;
+    if (withdrawValue > this.state.bremBalance) {
+      alert(
+        "Error, withdraw value must be less than " +
+          this.state.bremBalance +
+          " Eth"
+      );
+      return;
+    }
+    this.setState({ withdrawValue: event.target.value });
+  }
+
+  handleWithdraw(event) {
+    event.preventDefault();
+
+    const web3 = store.getState().web3.web3Instance;
+    if (typeof web3 !== "undefined") {
+      const withdrawAmount = this.state.withdrawValue;
+      if (withdrawAmount <= 0 || withdrawAmount > this.state.bremBalance) {
+        return alert("Mint amount must be bigger than 0");
+      }
+
+      this.props.onWithdrawFormSubmit(withdrawAmount, this);
     }
   }
 
@@ -332,6 +383,52 @@ class ProfileForm extends Component {
     const SuperuserForm = (
       <div>
         <h3>Superuser</h3>
+
+        <h4>BREM</h4>
+        {this.state &&
+          this.state.bremBalance && (
+            <div>
+              <p>BREM balance: {this.state.bremBalance} Eth</p>
+              {this.state &&
+                this.state.bremBalance > 0 && (
+                  <form
+                    className="pure-form pure-form-ctacked"
+                    onSubmit={this.handleWithdraw.bind(this)}
+                  >
+                    <fieldset>
+                      <legend>Withdraw fees</legend>
+                      <input
+                        id="withdrawValue"
+                        type="number"
+                        step="0.000000000000000001"
+                        value={this.state.withdrawValue}
+                        onChange={this.handleWithdrawValueChange.bind(this)}
+                        placeholder="Amount in ETH"
+                      />
+                      <span> Eth </span>
+                      <p>
+                        <button
+                          type="submit"
+                          className="pure-button pure-button-primary"
+                        >
+                          Withdraw fees
+                        </button>
+                      </p>
+                    </fieldset>
+                  </form>
+                )}
+            </div>
+          )}
+
+        {this.state &&
+          this.state.icoCreationPrice !== undefined && (
+            <p>BREM ICO creation price: {this.state.icoCreationPrice} BRM</p>
+          )}
+
+        {this.state &&
+          this.state.withdrawFeePercent !== undefined && (
+            <p>BREM ICO withdraw fee: {this.state.withdrawFeePercent} %</p>
+          )}
 
         <h4>BRM Token</h4>
         {this.state &&

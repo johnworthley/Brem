@@ -226,3 +226,41 @@ export function addNewAuditor(address, form) {
     console.error("Web3 is not initialized.");
   }
 }
+
+export function withdrawFees(withdrawAmount, form) {
+  let web3 = store.getState().web3.web3Instance;
+
+  // Double-check web3's status.
+  if (typeof web3 !== "undefined") {
+    return function() {
+      const brem = contract(BREMContract);
+      brem.setProvider(web3.currentProvider);
+
+      // Get current ethereum wallet.
+      web3.eth.getCoinbase((error, coinbase) => {
+        // Log errors, if any.
+        if (error) {
+          console.error(error);
+        }
+
+        brem.deployed().then(function(instance) {
+          instance
+            .withdrawFees(web3.utils.toWei(withdrawAmount, "ether"), {
+              from: coinbase
+            })
+            .then(res => {
+              form.setState({ withdrawValue: 0 });
+              web3.eth.getBalance(instance.address).then(balance => {
+                form.setState({
+                  bremBalance: web3.utils.fromWei(balance, "ether")
+                });
+              });
+              return alert(res.tx);
+            });
+        });
+      });
+    };
+  } else {
+    console.error("Web3 is not initialized.");
+  }
+}
