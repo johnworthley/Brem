@@ -264,3 +264,44 @@ export function withdrawFees(withdrawAmount, form) {
     console.error("Web3 is not initialized.");
   }
 }
+
+export function changeICOCreationPrice(icoCreationPrice, form) {
+  let web3 = store.getState().web3.web3Instance;
+
+  // Double-check web3's status.
+  if (typeof web3 !== "undefined") {
+    return function() {
+      const brem = contract(BREMContract);
+      brem.setProvider(web3.currentProvider);
+
+      // Get current ethereum wallet.
+      web3.eth.getCoinbase((error, coinbase) => {
+        // Log errors, if any.
+        if (error) {
+          console.error(error);
+        }
+
+        brem.deployed().then(function(instance) {
+          instance
+            .setIcoCreationPrice(web3.utils.toWei(icoCreationPrice, "ether"), {
+              from: coinbase
+            })
+            .then(res => {
+              form.setState({ newICOCreationPrice: 0 });
+              instance.icoCreationPrice().then(price => {
+                form.setState({
+                  icoCreationPrice: web3.utils.fromWei(
+                    price.toNumber(),
+                    "ether"
+                  )
+                });
+              });
+              return alert(res.tx);
+            });
+        });
+      });
+    };
+  } else {
+    console.error("Web3 is not initialized.");
+  }
+}

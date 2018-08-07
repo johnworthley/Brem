@@ -4,7 +4,8 @@ import {
   mintBRMTokens,
   createNewBREMICO,
   addNewAuditor,
-  withdrawFees
+  withdrawFees,
+  changeICOCreationPrice
 } from "./ProfileFormActions";
 
 const mapStateToProps = (state, ownProps) => {
@@ -54,6 +55,11 @@ const mapDispatchToProps = dispatch => {
       event.preventDefault();
 
       dispatch(withdrawFees(value, form));
+    },
+    onChangeICOCrationPriceSubmit: (icoCreationPrice, form) => {
+      event.preventDefault();
+
+      dispatch(changeICOCreationPrice(icoCreationPrice, form));
     }
   };
 };

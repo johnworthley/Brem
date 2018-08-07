@@ -85,6 +85,7 @@ class ProfileForm extends Component {
             if (res) {
               this.setState({ role: "superuser" });
               this.setState({ withdrawValue: 0 });
+              this.setState({ newICOCreationPrice: 0 });
               this.setState({ newAuditorAddress: "" });
               this.setState({ mintAddress: "" });
               this.setState({ mintAmount: 0 });
@@ -184,15 +185,28 @@ class ProfileForm extends Component {
   handleWithdraw(event) {
     event.preventDefault();
 
-    const web3 = store.getState().web3.web3Instance;
-    if (typeof web3 !== "undefined") {
-      const withdrawAmount = this.state.withdrawValue;
-      if (withdrawAmount <= 0 || withdrawAmount > this.state.bremBalance) {
-        return alert("Mint amount must be bigger than 0");
-      }
-
-      this.props.onWithdrawFormSubmit(withdrawAmount, this);
+    const withdrawAmount = this.state.withdrawValue;
+    if (withdrawAmount <= 0 || withdrawAmount > this.state.bremBalance) {
+      return alert("Mint amount must be bigger than 0");
     }
+
+    this.props.onWithdrawFormSubmit(withdrawAmount, this);
+  }
+
+  handleCreationPriceChange(event) {
+    this.setState({ newICOCreationPrice: event.target.value });
+  }
+
+  handleChangeICOCreationPrice(event) {
+    event.preventDefault();
+
+    const creationPrice = this.state.newICOCreationPrice;
+    if (creationPrice === this.state.icoCreationPrice) {
+      this.setState({ newICOCreationPrice: 0 });
+      return;
+    }
+
+    this.props.onChangeICOCrationPriceSubmit(creationPrice, this);
   }
 
   handleNewAuditorChange(e) {
@@ -422,7 +436,38 @@ class ProfileForm extends Component {
 
         {this.state &&
           this.state.icoCreationPrice !== undefined && (
-            <p>BREM ICO creation price: {this.state.icoCreationPrice} BRM</p>
+            <div>
+              <p>BREM ICO creation price: {this.state.icoCreationPrice} BRM</p>
+              {this.state &&
+                this.state.icoCreationPrice !== undefined &&
+                this.state.newICOCreationPrice !== undefined && (
+                  <form
+                    className="pure-form pure-form-ctacked"
+                    onSubmit={this.handleChangeICOCreationPrice.bind(this)}
+                  >
+                    <fieldset>
+                      <legend>Change ICO creation price</legend>
+                      <input
+                        id="newCreatonPrice"
+                        type="number"
+                        step="0.000000000000000001"
+                        value={this.state.newICOCreationPrice}
+                        onChange={this.handleCreationPriceChange.bind(this)}
+                        placeholder="Amount in BRM"
+                      />
+                      <span> BRM </span>
+                      <p>
+                        <button
+                          type="submit"
+                          className="pure-button pure-button-primary"
+                        >
+                          Change
+                        </button>
+                      </p>
+                    </fieldset>
+                  </form>
+                )}
+            </div>
           )}
 
         {this.state &&
