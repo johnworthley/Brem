@@ -32,7 +32,7 @@ export function confirmWithdraw(contractAddress, form) {
                   instance.isWithdrawn().then(isWithdrawn => {
                     if (isWithdrawn) {
                       axios
-                        .put("/ico/withdrawn", {
+                        .put("http://127.0.0.1:8080/ico/withdrawn", {
                           address: contractAddress
                         })
                         .then(res => {
@@ -42,7 +42,7 @@ export function confirmWithdraw(contractAddress, form) {
                         .catch(err => console.error(err));
                     } else {
                       axios
-                        .put("/ico/success", {
+                        .put("http://127.0.0.1:8080/ico/success", {
                           address: contractAddress
                         })
                         .then(res => {

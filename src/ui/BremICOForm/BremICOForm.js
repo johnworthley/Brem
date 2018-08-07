@@ -117,6 +117,10 @@ class BremICOForm extends Component {
             this.setState({ auditSelected: auditSelected });
           });
 
+          icoInstance.request().then(request => {
+            this.setState({ requestedValue: request[0].toNumber() });
+          });
+
           icoInstance.isRequested().then(isRequested => {
             this.setState({ isRequested: isRequested });
           });
@@ -362,6 +366,11 @@ class BremICOForm extends Component {
         <p>Token address: {this.state.tokenAddress}</p>
         <p>Closing time: {this.state.closingTime}</p>
         <p>Rate: {this.state.rate}</p>
+        {this.state &&
+          this.state.requestedValue !== undefined &&
+          this.state.requestedValue > 0 && (
+            <p>Developer's Request: {this.state.requestedValue} Wei </p>
+          )}
         <p>Contract balance: {this.state.balance} Ether</p>
         <p>
           Docs:{" "}

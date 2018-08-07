@@ -67,6 +67,8 @@ contract BREMICO {
     // Current ICO auditors
     mapping(address => bool) auditors;
     
+    mapping(uint256 => address) auditorsList;
+    
     // Current ICO auditors amount
     uint256 public auditorsAmount;
     
@@ -209,6 +211,7 @@ contract BREMICO {
         require(!auditors[_auditor]);
         
         auditors[_auditor] = true;
+        auditorsList[auditorsAmount] = _auditor;
         auditorsAmount++;
     }
     
@@ -246,6 +249,9 @@ contract BREMICO {
         if (request.confirmAmount == auditorsAmount) {
             uint256 _value = request.value;
             request = WithdrawRequst(0, 0);
+            for (uint256 i = 0; i < auditorsAmount; i++) {
+                request.confirmed[auditorsList[i]] = false;
+            }
             uint256 _feeValue = _value.div(100).mul(withdrawFeePercent);
             uint256 _trasferValue = _value.sub(_feeValue);
             brem.transfer(_feeValue);
@@ -318,16 +324,6 @@ contract BREMICO {
         require(_beneficiary != address(0));
         require(_weiAmount != 0);
     }
-
-    // /**
-    // * @dev Validation of an executed purchase. Observe state and use revert statements to undo rollback when valid conditions are not met.
-    // */
-    // function _postValidatePurchase(
-    // )
-    //     internal
-    //     onlyWhileOpen
-    // {
-    // }
 
     /**
     * @dev Source of tokens. Override this method to modify the way in which the crowdsale ultimately gets and sends its tokens.

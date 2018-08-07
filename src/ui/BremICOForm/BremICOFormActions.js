@@ -295,6 +295,11 @@ export function makeWithrawRequest(contractAddress, weiValue, form) {
                           .then(res => {
                             console.log(res);
                             form.setState({ isRequested: true });
+                            instance.request().then(request => {
+                              form.setState({
+                                requestedValue: request[0].toNumber()
+                              });
+                            });
                           });
                         return alert("TX: " + resTX.tx);
                       });
