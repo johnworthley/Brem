@@ -4,7 +4,8 @@ import {
   buyTokens,
   refund,
   addNewAuditor,
-  publishProject
+  publishProject,
+  makeWithrawRequest
 } from "./BremICOFormActions";
 
 const mapStateToProps = (state, ownProps) => {
@@ -32,6 +33,11 @@ const mapDispatchToProps = dispatch => {
       event.preventDefault();
 
       dispatch(publishProject(contractAddress, form));
+    },
+    onSubmitWithdrawRequest: (contractAddress, weiValue, form) => {
+      event.preventDefault();
+
+      dispatch(makeWithrawRequest(contractAddress, weiValue, form));
     }
   };
 };
