@@ -81,24 +81,32 @@ class BremICOForm extends Component {
           });
 
           web3.eth.getBalance(this.state.address).then(balance => {
-            this.setState({ balanceInWei: balance });
             this.setState({ balance: web3.utils.fromWei(balance, "ether") });
           });
 
           icoInstance.balances(coinbase).then(userBalance => {
-            this.setState({ userBalance: userBalance.toNumber() });
+            this.setState({
+              userBalance: web3.utils.fromWei(userBalance.toNumber(), "ether")
+            });
           });
 
           icoInstance.balancesInToken(coinbase).then(userTotalTokens => {
-            this.setState({ userTotalTokens: userTotalTokens.toNumber() });
+            this.setState({
+              userTotalTokens: web3.utils.fromWei(
+                userTotalTokens.toNumber(),
+                "ether"
+              )
+            });
           });
 
           icoInstance.weiRaised().then(weiRaised => {
-            this.setState({ weiRaised: weiRaised.toNumber() });
+            this.setState({
+              raised: web3.utils.fromWei(weiRaised.toNumber(), "ether")
+            });
           });
 
           icoInstance.cap().then(cap => {
-            this.setState({ cap: cap.toNumber() });
+            this.setState({ cap: web3.utils.fromWei(cap.toNumber(), "ether") });
           });
 
           icoInstance.docHash().then(docHash => {
@@ -154,6 +162,13 @@ class BremICOForm extends Component {
               if (isDeveloper) {
                 this.setState({ role: "developer" });
                 this.setState({ withdrawValueInWei: 100 });
+              }
+            });
+
+            bremInstance.isAuditor(coinbase).then(isAuditor => {
+              if (isAuditor) {
+                this.setState({ role: "auditor" });
+                // TODO: Finish
               }
             });
           });
@@ -359,123 +374,134 @@ class BremICOForm extends Component {
     );
 
     return (
-      <div className="pure-u-1-1">
-        {this.state && this.state.icoName && <p>{this.state.icoName}</p>}
-        <p>BREM ICO Address: {this.state.address}</p>
-        <p>Wallet: {this.state.wallet}</p>
-        <p>Token address: {this.state.tokenAddress}</p>
-        <p>Closing time: {this.state.closingTime}</p>
-        <p>Rate: {this.state.rate}</p>
-        {this.state &&
-          this.state.requestedValue !== undefined &&
-          this.state.requestedValue > 0 && (
-            <p>Developer's Request: {this.state.requestedValue} Wei </p>
-          )}
-        <p>Contract balance: {this.state.balance} Ether</p>
-        <p>
-          Docs:{" "}
-          <a href={`https://ipfs.infura.io/ipfs/${this.state.docHash}`}>
-            ipfs.infura.io/ipfs/{this.state.docHash}
-          </a>
-        </p>
-        <p>You spend: {this.state.userBalance} Wei </p>
-        <p>
-          You bought: {this.state.userTotalTokens} {this.state.tokenSymbol}
-        </p>
-        <p>
-          Current Balance: {this.state.userCurrentBalance}{" "}
-          {this.state.tokenSymbol}
-        </p>
-        {this.state &&
-          this.state.weiRaised !== null &&
-          this.state.cap !== null && (
-            <fieldset>
-              <legend>Progress</legend>
+      <main className="container">
+        <div className="pure-u-1-1">
+          {this.state &&
+            this.state.icoName !== undefined && <h1>{this.state.icoName}</h1>}
+          <p>BREM ICO Address: {this.state.address}</p>
+          <p>Wallet: {this.state.wallet}</p>
+          <p>Token address: {this.state.tokenAddress}</p>
+          <p>Closing time: {this.state.closingTime}</p>
+          {this.state &&
+            this.state.rate !== undefined &&
+            this.state.tokenSymbol !== undefined && (
               <p>
-                <progress value={this.state.weiRaised} max={this.state.cap} />
+                Rate: {this.state.rate}
+                <span> {this.state.tokenSymbol} per Wei</span>
               </p>
-              <p>
-                Wei raised: {this.state.weiRaised} / {this.state.cap}
-              </p>
-            </fieldset>
-          )}
-
-        {this.state &&
-          this.state.auditSelected === true &&
-          this.state.etherAmount !== undefined &&
-          this.state.tokensAmount !== undefined &&
-          this.state.hasClosed === false && (
-            <form
-              className="pure-form pure-form-ctacked"
-              onSubmit={this.handleBuyTokens.bind(this)}
-            >
+            )}
+          {this.state &&
+            this.state.requestedValue !== undefined &&
+            this.state.requestedValue > 0 && (
+              <p>Developer's Request: {this.state.requestedValue} Wei </p>
+            )}
+          <p>Contract balance: {this.state.balance} Ether</p>
+          <p>
+            Docs:{" "}
+            <a href={`https://ipfs.infura.io/ipfs/${this.state.docHash}`}>
+              ipfs.infura.io/ipfs/{this.state.docHash}
+            </a>
+          </p>
+          <p>You spend: {this.state.userBalance} Wei </p>
+          <p>
+            You bought: {this.state.userTotalTokens} {this.state.tokenSymbol}
+          </p>
+          <p>
+            Current Balance: {this.state.userCurrentBalance}{" "}
+            {this.state.tokenSymbol}
+          </p>
+          {this.state &&
+            this.state.weiRaised !== null &&
+            this.state.cap !== null && (
               <fieldset>
-                <legend>Buy Tokens</legend>
-                <input
-                  type="number"
-                  min="0"
-                  value={this.state.etherAmount}
-                  step="0.000000000000000001"
-                  onChange={this.handleEtherValueCahnge.bind(this)}
-                  placeholder="Amount in Ether"
-                />
+                <legend>Progress</legend>
                 <p>
-                  You will buy: {this.state.tokensAmount}
-                  {this.state.tokenSymbol}
+                  <progress value={this.state.raised} max={this.state.cap} />
                 </p>
-                <button
-                  type="submit"
-                  className="pure-button pure-button-primary"
-                >
-                  Buy
-                </button>
+                <p>
+                  Wei raised: {this.state.raised} Eth / {this.state.cap} Eth
+                </p>
               </fieldset>
-            </form>
-          )}
+            )}
 
-        {this.state &&
-          this.state.hasClosed === true &&
-          this.state.capReached === false &&
-          this.state.userBalance !== undefined &&
-          this.state.tokenSymbol !== undefined && (
-            <form
-              className="pure-form pure-form-ctacked"
-              onSubmit={this.handleRefund.bind(this)}
-            >
-              <fieldset>
-                <legend>Refund</legend>
-                {this.state.userBalance === 0 && (
-                  <p>You haven't Ether to refund</p>
-                )}
-                {this.state.userBalance > 0 && (
-                  <div>
-                    <p>You can refund {this.state.userBalance} Wei</p>
-                    <span className="pure-form-message">
-                      Important: you {this.state.tokenSymbol} tokens balance
-                      must be equal to total bought tokens amount
-                    </span>
-                    <button
-                      type="submit"
-                      className="pure-button pure-button-primary"
-                    >
-                      Refund
-                    </button>
-                  </div>
-                )}
-              </fieldset>
-            </form>
-          )}
+          {this.state &&
+            this.state.auditSelected === true &&
+            this.state.etherAmount !== undefined &&
+            this.state.tokensAmount !== undefined &&
+            this.state.hasClosed === false && (
+              <form
+                className="pure-form pure-form-ctacked"
+                onSubmit={this.handleBuyTokens.bind(this)}
+              >
+                <fieldset>
+                  <legend>Buy Tokens</legend>
+                  <input
+                    type="number"
+                    min="0"
+                    value={this.state.etherAmount}
+                    step="0.000000000000000001"
+                    onChange={this.handleEtherValueCahnge.bind(this)}
+                    placeholder="Amount in Ether"
+                  />
+                  <span> Eth </span>
+                  <p>
+                    You will buy: {this.state.tokensAmount}
+                    {this.state.tokenSymbol}
+                  </p>
+                  <button
+                    type="submit"
+                    className="pure-button pure-button-primary"
+                  >
+                    Buy
+                  </button>
+                </fieldset>
+              </form>
+            )}
 
-        {this.state &&
-          this.state.role &&
-          this.state.role === "superuser" &&
-          SuperuserForm}
+          {this.state &&
+            this.state.hasClosed === true &&
+            this.state.capReached === false &&
+            this.state.userBalance !== undefined &&
+            this.state.tokenSymbol !== undefined && (
+              <form
+                className="pure-form pure-form-ctacked"
+                onSubmit={this.handleRefund.bind(this)}
+              >
+                <fieldset>
+                  <legend>Refund</legend>
+                  {this.state.userBalance === 0 && (
+                    <p>You haven't Ether to refund</p>
+                  )}
+                  {this.state.userBalance > 0 && (
+                    <div>
+                      <p>You can refund {this.state.userBalance} Wei</p>
+                      <span className="pure-form-message">
+                        Important: you {this.state.tokenSymbol} tokens balance
+                        must be equal to total bought tokens amount
+                      </span>
+                      <button
+                        type="submit"
+                        className="pure-button pure-button-primary"
+                      >
+                        Refund
+                      </button>
+                    </div>
+                  )}
+                </fieldset>
+              </form>
+            )}
 
-        {this.state &&
-          this.state.role &&
-          this.state.role === "developer" &&
-          DeveloperForm}
-      </div>
+          {this.state &&
+            this.state.role &&
+            this.state.role === "superuser" &&
+            SuperuserForm}
+
+          {this.state &&
+            this.state.role &&
+            this.state.role === "developer" &&
+            DeveloperForm}
+        </div>
+      </main>
     );
   }
 }

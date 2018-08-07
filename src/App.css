@@ -3,12 +3,13 @@
 body,
 .pure-g [class*="pure-u"] {
   font-family: "Open Sans", sans-serif;
+  background-color: #efe7fe;
 }
 
 h1,
 h2,
 h3 {
-  font-family: "Oswald", "Arial Narrow", sans-serif;
+  font-family: "Open Sans";
 }
 
 code {
@@ -29,7 +30,7 @@ code {
 }
 
 .pure-button-primary:hover {
-  background-color: #233e5e;
+  background-color: #540dd9;
 }
 
 .pure-form input[type="text"]:focus {
@@ -42,7 +43,7 @@ code {
   position: fixed;
   padding: 5px;
   background: #1b0445;
-  font-family: "Oswald", "Arial Narrow", sans-serif;
+  font-family: "Open Sans";
 }
 
 .navbar a {
@@ -74,7 +75,7 @@ code {
   color: #fff;
   left: 0;
   right: 0;
-  top: 50px;
+  top: 48px;
   bottom: 0;
   background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
   background-size: 400% 400%;
