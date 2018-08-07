@@ -30,13 +30,13 @@ class SignUpForm extends Component {
         onSubmit={this.handleSubmit.bind(this)}
       >
         <fieldset>
-          <label htmlFor="name">Name</label>
           <input
             id="name"
             type="text"
             value={this.state.name}
             onChange={this.onInputChange.bind(this)}
-            placeholder="Name"
+            align="center"
+            placeholder="userame"
           />
           <span className="pure-form-message">This is a required field.</span>
 

@@ -95,69 +95,120 @@ export function createNewBREMICO(
                   const factoryPrice = res;
 
                   // Approve BRM token spend to BREM contract address
-                  brmTokenInstance
-                    .approve(brem.address, factoryPrice, { from: coinbase })
-                    .then(res => {
-                      bremInstance
-                        .createBREMICO(
-                          name,
-                          symbol,
-                          rate,
-                          cap,
-                          closingTime.toString(),
-                          description,
-                          // docHash,
-                          [],
-                          { from: coinbase }
-                        )
-                        .then(res => {
-                          const ico = {
-                            address: res.logs[0].args.icoAddress,
-                            developer: {
-                              address: coinbase
-                            }
-                          };
-                          axios
-                            .post("http://127.0.0.1:8080/ico", ico)
-                            .then(res => {
-                              console.log(res);
-                              axios
-                                .get("http://127.0.0.1:8080/ico/dev", {
-                                  params: {
-                                    address: coinbase
-                                  }
-                                })
-                                .then(res => {
-                                  form.setState({ devICOs: res.data });
-                                  form.setState({ icoName: "" });
-                                  form.setState({ icoSymbol: "" });
-                                  form.setState({ icoRate: 0 });
-                                  form.setState({ icoCap: 0 });
-                                  form.setState({ icoDescription: "" });
-                                });
-                            })
-                            .catch(err => console.log(err));
-                          alert(
-                            "TX: " +
-                              res.tx +
-                              " ICO: " +
-                              res.logs[0].args.icoAddress +
-                              " Token: " +
-                              res.logs[0].args.tokenAddress
-                          );
-                        })
-                        .catch(err => {
-                          console.error(err);
-                          // Reject approving of transfering of tokens
-                          brmTokenInstance
-                            .decreaseApproval(brem.address, factoryPrice, {
-                              from: coinbase
-                            })
-                            .then(res => {
-                              console.log(res);
-                            });
-                        });
-                    });
+                  if (form.state.price > 0) {
+                    brmTokenInstance
+                      .approve(brem.address, factoryPrice, { from: coinbase })
+                      .then(res => {
+                        bremInstance
+                          .createBREMICO(
+                            name,
+                            symbol,
+                            rate,
+                            web3.utils.toWei(cap, "ether"),
+                            closingTime.toString(),
+                            description,
+                            // docHash,
+                            [],
+                            { from: coinbase }
+                          )
+                          .then(res => {
+                            const ico = {
+                              address: res.logs[0].args.icoAddress,
+                              developer: {
+                                address: coinbase
+                              }
+                            };
+                            axios
+                              .post("http://127.0.0.1:8080/ico", ico)
+                              .then(res => {
+                                console.log(res);
+                                axios
+                                  .get("http://127.0.0.1:8080/ico/dev", {
+                                    params: {
+                                      address: coinbase
+                                    }
+                                  })
+                                  .then(res => {
+                                    form.setState({ devICOs: res.data });
+                                    form.setState({ icoName: "" });
+                                    form.setState({ icoSymbol: "" });
+                                    form.setState({ icoRate: 0 });
+                                    form.setState({ icoCap: 0 });
+                                    form.setState({ icoDescription: "" });
+                                  });
+                              })
+                              .catch(err => console.log(err));
+                            alert(
+                              "TX: " +
+                                res.tx +
+                                " ICO: " +
+                                res.logs[0].args.icoAddress +
+                                " Token: " +
+                                res.logs[0].args.tokenAddress
+                            );
+                          })
+                          .catch(err => {
+                            console.error(err);
+                            // Reject approving of transfering of tokens
+                            brmTokenInstance
+                              .decreaseApproval(brem.address, factoryPrice, {
+                                from: coinbase
+                              })
+                              .then(res => {
+                                console.log(res);
+                              });
+                          });
+                      });
+                  } else {
+                    bremInstance
+                      .createBREMICO(
+                        name,
+                        symbol,
+                        rate,
+                        web3.utils.toWei(cap, "ether"),
+                        closingTime.toString(),
+                        description,
+                        // docHash,
+                        [],
+                        { from: coinbase }
+                      )
+                      .then(res => {
+                        const ico = {
+                          address: res.logs[0].args.icoAddress,
+                          developer: {
+                            address: coinbase
+                          }
+                        };
+                        axios
+                          .post("http://127.0.0.1:8080/ico", ico)
+                          .then(res => {
+                            console.log(res);
+                            axios
+                              .get("http://127.0.0.1:8080/ico/dev", {
+                                params: {
+                                  address: coinbase
+                                }
+                              })
+                              .then(res => {
+                                form.setState({ devICOs: res.data });
+                                form.setState({ icoName: "" });
+                                form.setState({ icoSymbol: "" });
+                                form.setState({ icoRate: 0 });
+                                form.setState({ icoCap: 0 });
+                                form.setState({ icoDescription: "" });
+                              });
+                          })
+                          .catch(err => console.log(err));
+                        alert(
+                          "TX: " +
+                            res.tx +
+                            " ICO: " +
+                            res.logs[0].args.icoAddress +
+                            " Token: " +
+                            res.logs[0].args.tokenAddress
+                        );
+                      });
+                  }
                 });
               });
             });

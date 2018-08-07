@@ -1,12 +1,14 @@
 /* PAGE */
 
 body,
-.pure-g [class*=pure-u] {
-  font-family: 'Open Sans', sans-serif;
+.pure-g [class*="pure-u"] {
+  font-family: "Open Sans", sans-serif;
 }
 
-h1, h2, h3 {
-  font-family: 'Oswald', 'Arial Narrow', sans-serif;
+h1,
+h2,
+h3 {
+  font-family: "Oswald", "Arial Narrow", sans-serif;
 }
 
 code {
@@ -23,7 +25,7 @@ code {
 }
 
 .pure-button-primary {
-  background-color: #0c1a2b;
+  background-color: #1b0445;
 }
 
 .pure-button-primary:hover {
@@ -31,7 +33,7 @@ code {
 }
 
 .pure-form input[type="text"]:focus {
-  border-color: #0c1a2b;
+  border-color: #1b0445;
 }
 
 /* NAVBAR */
@@ -39,8 +41,8 @@ code {
 .navbar {
   position: fixed;
   padding: 5px;
-  background: #0c1a2b;
-  font-family: 'Oswald', 'Arial Narrow', sans-serif;
+  background: #1b0445;
+  font-family: "Oswald", "Arial Narrow", sans-serif;
 }
 
 .navbar a {
@@ -50,7 +52,7 @@ code {
 .navbar a:active,
 .navbar a:focus,
 .navbar a:hover {
-  background: #233e5e;
+  background: #380891;
 }
 
 .navbar .pure-menu-heading {
@@ -65,4 +67,78 @@ code {
 .navbar .uport-logo {
   height: 16px;
   margin-right: 10px;
+}
+
+.pure-u-1-1-1 {
+  position: absolute;
+  color: #fff;
+  left: 0;
+  right: 0;
+  top: 50px;
+  bottom: 0;
+  background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+  background-size: 400% 400%;
+  -webkit-animation: Gradient 15s ease infinite;
+  -moz-animation: Gradient 15s ease infinite;
+  animation: Gradient 15s ease infinite;
+}
+
+@-webkit-keyframes Gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@-moz-keyframes Gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes Gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.pure-u-1-1-1 h1,
+.pure-u-1-1-1 p,
+.pure-u-1-1-1 form,
+.pure-u-1-1-1 button {
+  font-family: "Open Sans";
+  font-weight: 300;
+  text-align: center;
+}
+
+.pure-u-1-1-1 input {
+  color: #1b0445;
+  font-family: "Open Sans";
+  font-weight: 300;
+  position: relative;
+  left: 35%;
+  width: 30%;
+  text-align: center;
+  align-self: center;
+}
+
+.pure-u-1-1-1 span {
+  color: #c1bcca;
 }

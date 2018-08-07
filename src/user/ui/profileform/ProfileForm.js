@@ -50,7 +50,16 @@ class ProfileForm extends Component {
               this.setState({ icoDescription: "" });
 
               instance.icoCreationPrice().then(price => {
-                this.setState({ price: price.toNumber() });
+                this.setState({
+                  price: web3.utils.fromWei(price.toNumber(), "ether")
+                });
+              });
+
+              // Get withdrawFeePercent
+              instance.withdrawFeePercent().then(withdrawFeePercent => {
+                this.setState({
+                  withdrawFeePercent: withdrawFeePercent.toNumber()
+                });
               });
 
               // Get developer's ICOs
@@ -379,6 +388,9 @@ class ProfileForm extends Component {
     }
 
     const cap = this.state.icoCap;
+    if (cap === 0) {
+      alert("Cap must me bigger than 0");
+    }
 
     const closingTime = this.state.icoClosingTime;
 
@@ -653,10 +665,12 @@ class ProfileForm extends Component {
                     <input
                       id="cap"
                       type="number"
+                      step="0.000000000000000001"
                       value={this.state.icoCap}
                       onChange={this.handleICOCapChange.bind(this)}
                       placeholder="BREM ICO cap"
                     />
+                    <span> Eth </span>
                   </p>
                   <p>
                     <input
@@ -692,7 +706,8 @@ class ProfileForm extends Component {
                     Create new BREM ICO
                   </button>
                   <span className="pure-form-message">
-                    BREM ICO Creation price: {this.state.price} BRM
+                    <p>BREM ICO Creation price: {this.state.price} BRM</p>
+                    <p>BREM Fee: {this.state.withdrawFeePercent} %</p>
                   </span>
                 </fieldset>
               </form>
