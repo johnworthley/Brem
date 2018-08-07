@@ -288,6 +288,11 @@ contract BREMICO {
     function capReached() public view returns (bool) {
         return weiRaised >= cap;
     }
+    
+    function getAuditor(uint256 _index) public view returns (address) {
+        require(_index < auditorsAmount);
+        return auditorsList[_index];
+    }
 
     function isAuditor(address _auditor) public view returns (bool) {
         return auditors[_auditor];
