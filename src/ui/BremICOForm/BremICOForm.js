@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import store from "../../store";
+import axios from "axios";
 import getWeb3 from "../../util/web3/getWeb3";
+import BREMContract from "../../../build/contracts/BREM.json";
 import ICOContract from "../../../build/contracts/BREMICO.json";
 import BREMTokenContract from "../../../build/contracts/BREMToken";
 
@@ -25,6 +27,8 @@ class BremICOForm extends Component {
       tokensAmount: 0,
       userCurrentBalance: 0
     };
+
+    this.icoAuditors.bind(this);
 
     const web3 = store.getState().web3.web3Instance;
     if (typeof web3 !== "undefined" && web3 !== null) {
@@ -111,6 +115,28 @@ class BremICOForm extends Component {
           icoInstance.auditSelected().then(auditSelected => {
             this.setState({ auditSelected: auditSelected });
           });
+
+          const brem = contract(BREMContract);
+          brem.setProvider(web3.currentProvider);
+          brem.deployed().then(bremInstance => {
+            bremInstance.isSuperuser(coinbase).then(isSuperuser => {
+              if (isSuperuser) {
+                this.setState({ role: "superuser" });
+                this.setState({ newAuditorAddress: "" });
+                // Get current ico auditors
+                axios
+                  .get("http://127.0.0.1:8080/ico/audit", {
+                    params: {
+                      address: this.state.address
+                    }
+                  })
+                  .then(res => {
+                    this.setState({ auditors: res.data });
+                  })
+                  .catch(err => console.log(err));
+              }
+            });
+          });
         });
       });
     } else {
@@ -156,7 +182,96 @@ class BremICOForm extends Component {
     );
   }
 
+  icoAuditors() {
+    const amount = this.state.auditors.length;
+    if (amount === 0) {
+      return (
+        <div>
+          <p>Auditors didn't add</p>
+        </div>
+      );
+    }
+    return this.state.auditors.map(auditor => (
+      <p key={auditor.address}>{auditor.address}</p>
+    ));
+  }
+
+  handleAddNewAuditorChange(e) {
+    this.setState({ newAuditorAddress: e.target.value });
+  }
+
+  handleAddNewAuditor(e) {
+    e.preventDefault();
+
+    const web3 = store.getState().web3.web3Instance;
+    if (typeof web3 !== "undefined" && web3 !== null) {
+      const auditorAddress = this.state.newAuditorAddress;
+      if (!web3.utils.isAddress(auditorAddress)) {
+        return alert(auditorAddress + " is not Ethereum address");
+      }
+
+      this.props.onAddNewAuditorSubmit(
+        this.state.address,
+        auditorAddress,
+        this
+      );
+    } else {
+      console.error("Web3 is not initialized.");
+    }
+  }
+
+  handlePublishProject(e) {
+    e.preventDefault();
+    const web3 = store.getState().web3.web3Instance;
+    if (typeof web3 !== "undefined" && web3 !== null) {
+      this.props.onPublishProjectSubmit(this.state.address, this);
+    } else {
+      console.error("Web3 is not initialized.");
+    }
+  }
+
   render() {
+    const SuperuserForm = (
+      <div>
+        <h2>Current ICO Auditors</h2>
+        {this.state && this.state.auditors !== undefined && this.icoAuditors()}
+        {this.state &&
+          this.state.auditSelected === false &&
+          this.state.newAuditorAddress !== undefined && (
+            <div>
+              <form
+                className="pure-form pure-form-ctacked"
+                onSubmit={this.handleAddNewAuditor.bind(this)}
+              >
+                <fieldset>
+                  <legend>Add new auditor to project</legend>
+                  <input
+                    type="text"
+                    value={this.state.newAuditorAddress}
+                    onChange={this.handleAddNewAuditorChange.bind(this)}
+                    placeholder="New Auditor address"
+                  />
+
+                  <button
+                    type="submit"
+                    className="pure-button pure-button-primary"
+                  >
+                    Add auditor to project
+                  </button>
+                </fieldset>
+              </form>
+
+              <button
+                className="pure-button pure-button-primary"
+                onClick={this.handlePublishProject.bind(this)}
+              >
+                Publish project
+              </button>
+            </div>
+          )}
+      </div>
+    );
+
     return (
       <div className="pure-u-1-1">
         {this.state && this.state.icoName && <p>{this.state.icoName}</p>}
@@ -259,6 +374,11 @@ class BremICOForm extends Component {
               </fieldset>
             </form>
           )}
+
+        {this.state &&
+          this.state.role &&
+          this.state.role === "superuser" &&
+          SuperuserForm}
       </div>
     );
   }
