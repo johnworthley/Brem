@@ -86,6 +86,7 @@ class ProfileForm extends Component {
               this.setState({ role: "superuser" });
               this.setState({ withdrawValue: 0 });
               this.setState({ newICOCreationPrice: 0 });
+              this.setState({ newWithdrawFeePercent: 0 });
               this.setState({ newAuditorAddress: "" });
               this.setState({ mintAddress: "" });
               this.setState({ mintAmount: 0 });
@@ -207,6 +208,26 @@ class ProfileForm extends Component {
     }
 
     this.props.onChangeICOCrationPriceSubmit(creationPrice, this);
+  }
+
+  handleFeeValueChange(event) {
+    const fee = event.target.value;
+    if (fee < 0 || fee > 100) {
+      return;
+    }
+    this.setState({ newWithdrawFeePercent: fee });
+  }
+
+  handleWithdrawFeeChange(event) {
+    event.preventDefault();
+
+    const fee = this.state.newWithdrawFeePercent;
+    if (fee === this.state.withdrawFeePercent) {
+      this.setState({ newWithdrawFeePercent: 0 });
+      return;
+    }
+
+    this.props.onChangeWithdrawFeeSubmit(fee, this);
   }
 
   handleNewAuditorChange(e) {
@@ -472,7 +493,39 @@ class ProfileForm extends Component {
 
         {this.state &&
           this.state.withdrawFeePercent !== undefined && (
-            <p>BREM ICO withdraw fee: {this.state.withdrawFeePercent} %</p>
+            <div>
+              <p>BREM ICO withdraw fee: {this.state.withdrawFeePercent} %</p>
+              {this.state &&
+                this.state.withdrawFeePercent !== undefined &&
+                this.state.newWithdrawFeePercent !== undefined && (
+                  <form
+                    className="pure-form pure-form-ctacked"
+                    onSubmit={this.handleWithdrawFeeChange.bind(this)}
+                  >
+                    <fieldset>
+                      <legend>Change ICO creation price</legend>
+                      <input
+                        id="newFeePercent"
+                        type="number"
+                        step="1"
+                        min="0"
+                        max="100"
+                        value={this.state.newWithdrawFeePercent}
+                        onChange={this.handleFeeValueChange.bind(this)}
+                      />
+                      <span> % </span>
+                      <p>
+                        <button
+                          type="submit"
+                          className="pure-button pure-button-primary"
+                        >
+                          Change
+                        </button>
+                      </p>
+                    </fieldset>
+                  </form>
+                )}
+            </div>
           )}
 
         <h4>BRM Token</h4>

@@ -5,7 +5,8 @@ import {
   createNewBREMICO,
   addNewAuditor,
   withdrawFees,
-  changeICOCreationPrice
+  changeICOCreationPrice,
+  changeWithdrawFee
 } from "./ProfileFormActions";
 
 const mapStateToProps = (state, ownProps) => {
@@ -60,6 +61,11 @@ const mapDispatchToProps = dispatch => {
       event.preventDefault();
 
       dispatch(changeICOCreationPrice(icoCreationPrice, form));
+    },
+    onChangeWithdrawFeeSubmit: (value, form) => {
+      event.preventDefault();
+
+      dispatch(changeWithdrawFee(value, form));
     }
   };
 };
