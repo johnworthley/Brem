@@ -9,7 +9,8 @@ import (
 	"os"
 	"io"
 		"log"
-)
+	"io/ioutil"
+	)
 
 const imagesDir = "./ico_images/"
 
@@ -94,16 +95,16 @@ func addICOImage(c *gin.Context) {
 		return
 	}
 	log.Println(address)
-	//ico := data.ICO{Address: address}
-	//err = ico.GetICO()
-	//if err != nil {
-	//	c.JSON(http.StatusInternalServerError, err)
-	//	return
-	//}
-
-	out, err := os.Create(imagesDir + address + ".png")
+	ico := data.ICO{Address: address}
+	err = ico.GetICO()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, err);
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+
+	out, err := os.Create(imagesDir + address + ".jpeg")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
 	defer out.Close()
@@ -113,6 +114,23 @@ func addICOImage(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, nil)
+}
+
+// Get ICO image
+func getICOImage(c *gin.Context) {
+	var ico data.ICO
+	ico.Address = c.Query("address")
+	if len(ico.Address) == 0 {
+		c.JSON(http.StatusBadRequest, nil)
+		return
+	}
+	path := imagesDir + ico.Address + ".jpeg"
+	b, err := ioutil.ReadFile(path)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+	c.Data(http.StatusOK, "image/jpeg", b)
 }
 
 // Get current developer's ICOs

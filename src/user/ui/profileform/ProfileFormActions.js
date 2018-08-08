@@ -112,9 +112,9 @@ export function createNewBREMICO(
                             [],
                             { from: coinbase }
                           )
-                          .then(res => {
+                          .then(TXres => {
                             const ico = {
-                              address: res.logs[0].args.icoAddress,
+                              address: TXres.logs[0].args.icoAddress,
                               developer: {
                                 address: coinbase
                               }
@@ -123,31 +123,33 @@ export function createNewBREMICO(
                               .post("http://127.0.0.1:8080/ico", ico)
                               .then(res => {
                                 console.log(res);
+                                let formData = new FormData();
+                                formData.append(
+                                  "address",
+                                  TXres.logs[0].args.icoAddress
+                                );
+                                formData.append("image", image);
+                                const config = {
+                                  headers: {
+                                    "content-type": "multipart/form-data"
+                                  }
+                                };
                                 axios
-                                  .get("http://127.0.0.1:8080/ico/dev", {
-                                    params: {
-                                      address: coinbase
-                                    }
-                                  })
+                                  .post(
+                                    "http://127.0.0.1:8080/ico/image",
+                                    formData,
+                                    config
+                                  )
                                   .then(res => {
-                                    let formData = new FormData();
-                                    formData.append(
-                                      "address",
-                                      res.logs[0].args.icoAddress
-                                    );
-                                    formData.append("image", image);
-                                    const config = {
-                                      headers: {
-                                        "content-type": "multipart/form-data"
-                                      }
-                                    };
                                     axios
-                                      .post(
-                                        "http://127.0.0.1:8080/ico/image",
-                                        formData,
-                                        config
-                                      )
+                                      .get("http://127.0.0.1:8080/ico/dev", {
+                                        params: {
+                                          address: coinbase
+                                        }
+                                      })
                                       .then(res => {
+                                        console.log(res);
+
                                         form.setState({ devICOs: res.data });
                                         form.setState({ icoName: "" });
                                         form.setState({ icoSymbol: "" });
@@ -160,11 +162,11 @@ export function createNewBREMICO(
                               .catch(err => console.log(err));
                             alert(
                               "TX: " +
-                                res.tx +
+                                TXres.tx +
                                 " ICO: " +
-                                res.logs[0].args.icoAddress +
+                                TXres.logs[0].args.icoAddress +
                                 " Token: " +
-                                res.logs[0].args.tokenAddress
+                                TXres.logs[0].args.tokenAddress
                             );
                           })
                           .catch(err => {
@@ -192,9 +194,9 @@ export function createNewBREMICO(
                         [],
                         { from: coinbase }
                       )
-                      .then(res => {
+                      .then(TXres => {
                         const ico = {
-                          address: res.logs[0].args.icoAddress,
+                          address: TXres.logs[0].args.icoAddress,
                           developer: {
                             address: coinbase
                           }
@@ -203,29 +205,50 @@ export function createNewBREMICO(
                           .post("http://127.0.0.1:8080/ico", ico)
                           .then(res => {
                             console.log(res);
+                            let formData = new FormData();
+                            formData.append(
+                              "address",
+                              TXres.logs[0].args.icoAddress
+                            );
+                            formData.append("image", image);
+                            const config = {
+                              headers: {
+                                "content-type": "multipart/form-data"
+                              }
+                            };
                             axios
-                              .get("http://127.0.0.1:8080/ico/dev", {
-                                params: {
-                                  address: coinbase
-                                }
-                              })
+                              .post(
+                                "http://127.0.0.1:8080/ico/image",
+                                formData,
+                                config
+                              )
                               .then(res => {
-                                form.setState({ devICOs: res.data });
-                                form.setState({ icoName: "" });
-                                form.setState({ icoSymbol: "" });
-                                form.setState({ icoRate: 0 });
-                                form.setState({ icoCap: 0 });
-                                form.setState({ icoDescription: "" });
+                                axios
+                                  .get("http://127.0.0.1:8080/ico/dev", {
+                                    params: {
+                                      address: coinbase
+                                    }
+                                  })
+                                  .then(res => {
+                                    console.log(res);
+
+                                    form.setState({ devICOs: res.data });
+                                    form.setState({ icoName: "" });
+                                    form.setState({ icoSymbol: "" });
+                                    form.setState({ icoRate: 0 });
+                                    form.setState({ icoCap: 0 });
+                                    form.setState({ icoDescription: "" });
+                                  });
                               });
                           })
                           .catch(err => console.log(err));
                         alert(
                           "TX: " +
-                            res.tx +
+                            TXres.tx +
                             " ICO: " +
-                            res.logs[0].args.icoAddress +
+                            TXres.logs[0].args.icoAddress +
                             " Token: " +
-                            res.logs[0].args.tokenAddress
+                            TXres.logs[0].args.tokenAddress
                         );
                       });
                   }

@@ -44,6 +44,19 @@ class BremICOForm extends Component {
             this.setState({ icoName: icoName });
           });
 
+          axios
+            .get("http://127.0.0.1:8080/ico/image", {
+              params: {
+                address: this.state.address
+              },
+              responseType: "arraybuffer"
+            })
+            .then(res => {
+              const base64 = Buffer.from(res.data, "binary").toString("base64");
+              this.setState({ img: "data:image/jpeg;base64," + base64 });
+            })
+            .catch(err => console.error(err));
+
           icoInstance.wallet().then(wallet => {
             this.setState({ wallet: wallet });
           });
@@ -378,6 +391,12 @@ class BremICOForm extends Component {
         <div className="pure-u-1-1">
           {this.state &&
             this.state.icoName !== undefined && <h1>{this.state.icoName}</h1>}
+          {this.state &&
+            this.state.img !== undefined && (
+              <p>
+                <img src={this.state.img} alt="Image loading error" />
+              </p>
+            )}
           <p>BREM ICO Address: {this.state.address}</p>
           <p>Wallet: {this.state.wallet}</p>
           <p>Token address: {this.state.tokenAddress}</p>

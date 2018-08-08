@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import store from "../../../store";
+import axios from "axios";
 import { browserHistory } from "react-router";
 import BREMContract from "../../../../build/contracts/BREM.json";
 import ICOContract from "../../../../build/contracts/BREMICO.json";
@@ -35,6 +36,21 @@ class BremAuditForm extends Component {
               icoInstance.name().then(name => {
                 this.setState({ name: name });
               });
+
+              axios
+                .get("http://127.0.0.1:8080/ico/image", {
+                  params: {
+                    address: this.state.address
+                  },
+                  responseType: "arraybuffer"
+                })
+                .then(res => {
+                  const base64 = Buffer.from(res.data, "binary").toString(
+                    "base64"
+                  );
+                  this.setState({ img: "data:image/jpeg;base64," + base64 });
+                })
+                .catch(err => console.error(err));
 
               icoInstance.description().then(description => {
                 this.setState({ description: description });
@@ -84,6 +100,12 @@ class BremAuditForm extends Component {
           this.state.username && (
             <fieldset>
               <legend>{this.state.name}</legend>
+              {this.state &&
+                this.state.img !== undefined && (
+                  <p>
+                    <img src={this.state.img} alt="Image loading error" />
+                  </p>
+                )}
               <span className="pure-form-message">
                 by {this.state.username}
               </span>
