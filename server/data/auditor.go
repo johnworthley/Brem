@@ -32,6 +32,7 @@ func (auditor *Auditor) GetAuditor() (err error) {
 		log.Println(err)
 		return
 	}
+	defer row.Close()
 	exists := row.Next()
 	if !exists {
 		return errors.New("Auditor doesn't exists")
@@ -47,6 +48,7 @@ func GetAllAuditors() (auditors []Auditor, err error) {
 		log.Println(err)
 		return
 	}
+	defer rows.Close()
 	for rows.Next() {
 		var auditor Auditor
 		err = rows.Scan(&auditor.ID, &auditor.Address)
@@ -67,6 +69,7 @@ func (auditor *Auditor) GetICOs() (icos []ICO, err error) {
 		log.Println(err)
 		return
 	}
+	defer rows.Close()
 	for rows.Next() {
 		var ico ICO
 		err = rows.Scan(&ico.ID, &ico.Address, &ico.Developer.ID, &ico.Status)

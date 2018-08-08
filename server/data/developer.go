@@ -31,6 +31,7 @@ func (dev *Developer) GetDeveloper() (err error) {
 		log.Println(err)
 		return
 	}
+	defer row.Close()
 	row.Next()
 	err = row.Scan(&dev.ID)
 	return
@@ -44,6 +45,7 @@ func (dev *Developer) GetICOs() (icos []ICO, err error)  {
 		log.Println(err)
 		return
 	}
+	defer rows.Close()
 	for rows.Next() {
 		var ico ICO
 		err = rows.Scan(&ico.ID, &ico.Address, &ico.Status)
