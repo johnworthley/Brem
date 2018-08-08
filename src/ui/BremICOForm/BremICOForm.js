@@ -419,7 +419,8 @@ class BremICOForm extends Component {
           <p>
             Docs:{" "}
             <a href={`https://ipfs.infura.io/ipfs/${this.state.docHash}`}>
-              ipfs.infura.io/ipfs/{this.state.docHash}
+              ipfs.infura.io/ipfs/
+              {this.state.docHash}
             </a>
           </p>
           <p>You spend: {this.state.userBalance} Wei </p>
