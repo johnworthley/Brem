@@ -43,7 +43,7 @@ func (ico *ICO) GetICO() (err error) {
 
 // GetCreatedICOs show all ICOs with status "created"
 func GetCreatedICOs() (icos []ICO, err error)  {
-	rows, err := db.Query("SELECT * FROM ico WHERE status = $1", "created")
+	rows, err := db.Query("SELECT * FROM ico WHERE status = $1 ORDER BY id DESC", "created")
 	if err != nil {
 		log.Println(err)
 		return
