@@ -55,6 +55,7 @@ export function createNewBREMICO(
   closingTime,
   description,
   files,
+  image,
   form
 ) {
   let web3 = store.getState().web3.web3Instance;
@@ -95,69 +96,139 @@ export function createNewBREMICO(
                   const factoryPrice = res;
 
                   // Approve BRM token spend to BREM contract address
-                  brmTokenInstance
-                    .approve(brem.address, factoryPrice, { from: coinbase })
-                    .then(res => {
-                      bremInstance
-                        .createBREMICO(
-                          name,
-                          symbol,
-                          rate,
-                          cap,
-                          closingTime.toString(),
-                          description,
-                          // docHash,
-                          [],
-                          { from: coinbase }
-                        )
-                        .then(res => {
-                          const ico = {
-                            address: res.logs[0].args.icoAddress,
-                            developer: {
-                              address: coinbase
-                            }
-                          };
-                          axios
-                            .post("http://127.0.0.1:8080/ico", ico)
-                            .then(res => {
-                              console.log(res);
-                              axios
-                                .get("http://127.0.0.1:8080/ico/dev", {
-                                  params: {
-                                    address: coinbase
-                                  }
-                                })
-                                .then(res => {
-                                  form.setState({ devICOs: res.data });
-                                  form.setState({ icoName: "" });
-                                  form.setState({ icoSymbol: "" });
-                                  form.setState({ icoRate: 0 });
-                                  form.setState({ icoCap: 0 });
-                                  form.setState({ icoDescription: "" });
-                                });
-                            })
-                            .catch(err => console.log(err));
-                          alert(
-                            "TX: " +
-                              res.tx +
-                              " ICO: " +
-                              res.logs[0].args.icoAddress +
-                              " Token: " +
-                              res.logs[0].args.tokenAddress
-                          );
-                        })
-                        .catch(err => {
-                          console.error(err);
-                          // Reject approving of transfering of tokens
-                          brmTokenInstance
-                            .decreaseApproval(brem.address, factoryPrice, {
-                              from: coinbase
-                            })
-                            .then(res => {
-                              console.log(res);
-                            });
-                        });
-                    });
+                  if (form.state.price > 0) {
+                    brmTokenInstance
+                      .approve(brem.address, factoryPrice, { from: coinbase })
+                      .then(res => {
+                        bremInstance
+                          .createBREMICO(
+                            name,
+                            symbol,
+                            rate,
+                            web3.utils.toWei(cap, "ether"),
+                            closingTime.toString(),
+                            description,
+                            // docHash,
+                            [],
+                            { from: coinbase }
+                          )
+                          .then(res => {
+                            const ico = {
+                              address: res.logs[0].args.icoAddress,
+                              developer: {
+                                address: coinbase
+                              }
+                            };
+                            axios
+                              .post("http://127.0.0.1:8080/ico", ico)
+                              .then(res => {
+                                console.log(res);
+                                axios
+                                  .get("http://127.0.0.1:8080/ico/dev", {
+                                    params: {
+                                      address: coinbase
+                                    }
+                                  })
+                                  .then(res => {
+                                    let formData = new FormData();
+                                    formData.append(
+                                      "address",
+                                      res.logs[0].args.icoAddress
+                                    );
+                                    formData.append("image", image);
+                                    const config = {
+                                      headers: {
+                                        "content-type": "multipart/form-data"
+                                      }
+                                    };
+                                    axios
+                                      .post(
+                                        "http://127.0.0.1:8080/ico/image",
+                                        formData,
+                                        config
+                                      )
+                                      .then(res => {
+                                        form.setState({ devICOs: res.data });
+                                        form.setState({ icoName: "" });
+                                        form.setState({ icoSymbol: "" });
+                                        form.setState({ icoRate: 0 });
+                                        form.setState({ icoCap: 0 });
+                                        form.setState({ icoDescription: "" });
+                                      });
+                                  });
+                              })
+                              .catch(err => console.log(err));
+                            alert(
+                              "TX: " +
+                                res.tx +
+                                " ICO: " +
+                                res.logs[0].args.icoAddress +
+                                " Token: " +
+                                res.logs[0].args.tokenAddress
+                            );
+                          })
+                          .catch(err => {
+                            console.error(err);
+                            // Reject approving of transfering of tokens
+                            brmTokenInstance
+                              .decreaseApproval(brem.address, factoryPrice, {
+                                from: coinbase
+                              })
+                              .then(res => {
+                                console.log(res);
+                              });
+                          });
+                      });
+                  } else {
+                    bremInstance
+                      .createBREMICO(
+                        name,
+                        symbol,
+                        rate,
+                        web3.utils.toWei(cap, "ether"),
+                        closingTime.toString(),
+                        description,
+                        // docHash,
+                        [],
+                        { from: coinbase }
+                      )
+                      .then(res => {
+                        const ico = {
+                          address: res.logs[0].args.icoAddress,
+                          developer: {
+                            address: coinbase
+                          }
+                        };
+                        axios
+                          .post("http://127.0.0.1:8080/ico", ico)
+                          .then(res => {
+                            console.log(res);
+                            axios
+                              .get("http://127.0.0.1:8080/ico/dev", {
+                                params: {
+                                  address: coinbase
+                                }
+                              })
+                              .then(res => {
+                                form.setState({ devICOs: res.data });
+                                form.setState({ icoName: "" });
+                                form.setState({ icoSymbol: "" });
+                                form.setState({ icoRate: 0 });
+                                form.setState({ icoCap: 0 });
+                                form.setState({ icoDescription: "" });
+                              });
+                          })
+                          .catch(err => console.log(err));
+                        alert(
+                          "TX: " +
+                            res.tx +
+                            " ICO: " +
+                            res.logs[0].args.icoAddress +
+                            " Token: " +
+                            res.logs[0].args.tokenAddress
+                        );
+                      });
+                  }
                 });
               });
             });
@@ -219,6 +290,119 @@ export function addNewAuditor(address, form) {
               return alert("Success. TX: " + txRes.tx);
             });
           });
+        });
+      });
+    };
+  } else {
+    console.error("Web3 is not initialized.");
+  }
+}
+
+export function withdrawFees(withdrawAmount, form) {
+  let web3 = store.getState().web3.web3Instance;
+
+  // Double-check web3's status.
+  if (typeof web3 !== "undefined") {
+    return function() {
+      const brem = contract(BREMContract);
+      brem.setProvider(web3.currentProvider);
+
+      // Get current ethereum wallet.
+      web3.eth.getCoinbase((error, coinbase) => {
+        // Log errors, if any.
+        if (error) {
+          console.error(error);
+        }
+
+        brem.deployed().then(function(instance) {
+          instance
+            .withdrawFees(web3.utils.toWei(withdrawAmount, "ether"), {
+              from: coinbase
+            })
+            .then(res => {
+              form.setState({ withdrawValue: 0 });
+              web3.eth.getBalance(instance.address).then(balance => {
+                form.setState({
+                  bremBalance: web3.utils.fromWei(balance, "ether")
+                });
+              });
+              return alert(res.tx);
+            });
+        });
+      });
+    };
+  } else {
+    console.error("Web3 is not initialized.");
+  }
+}
+
+export function changeICOCreationPrice(icoCreationPrice, form) {
+  let web3 = store.getState().web3.web3Instance;
+
+  // Double-check web3's status.
+  if (typeof web3 !== "undefined") {
+    return function() {
+      const brem = contract(BREMContract);
+      brem.setProvider(web3.currentProvider);
+
+      // Get current ethereum wallet.
+      web3.eth.getCoinbase((error, coinbase) => {
+        // Log errors, if any.
+        if (error) {
+          console.error(error);
+        }
+
+        brem.deployed().then(function(instance) {
+          instance
+            .setIcoCreationPrice(web3.utils.toWei(icoCreationPrice, "ether"), {
+              from: coinbase
+            })
+            .then(res => {
+              form.setState({ newICOCreationPrice: 0 });
+              instance.icoCreationPrice().then(price => {
+                form.setState({
+                  icoCreationPrice: web3.utils.fromWei(
+                    price.toNumber(),
+                    "ether"
+                  )
+                });
+              });
+              return alert(res.tx);
+            });
+        });
+      });
+    };
+  } else {
+    console.error("Web3 is not initialized.");
+  }
+}
+
+export function changeWithdrawFee(feePercent, form) {
+  let web3 = store.getState().web3.web3Instance;
+
+  // Double-check web3's status.
+  if (typeof web3 !== "undefined") {
+    return function() {
+      const brem = contract(BREMContract);
+      brem.setProvider(web3.currentProvider);
+
+      // Get current ethereum wallet.
+      web3.eth.getCoinbase((error, coinbase) => {
+        // Log errors, if any.
+        if (error) {
+          console.error(error);
+        }
+
+        brem.deployed().then(function(instance) {
+          instance
+            .setWithdrawFeePercent(feePercent, { from: coinbase })
+            .then(res => {
+              form.setState({ newWithdrawFeePercent: 0 });
+              instance.withdrawFeePercent().then(fee => {
+                form.setState({ withdrawFeePercent: 0 });
+              });
+              return alert(res.tx);
+            });
         });
       });
     };

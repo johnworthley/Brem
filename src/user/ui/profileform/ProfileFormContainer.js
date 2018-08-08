@@ -3,7 +3,10 @@ import ProfileForm from "./ProfileForm";
 import {
   mintBRMTokens,
   createNewBREMICO,
-  addNewAuditor
+  addNewAuditor,
+  withdrawFees,
+  changeICOCreationPrice,
+  changeWithdrawFee
 } from "./ProfileFormActions";
 
 const mapStateToProps = (state, ownProps) => {
@@ -27,6 +30,7 @@ const mapDispatchToProps = dispatch => {
       closingTime,
       description,
       files,
+      image,
       form
     ) => {
       event.preventDefault();
@@ -40,6 +44,7 @@ const mapDispatchToProps = dispatch => {
           closingTime,
           description,
           files,
+          image,
           form
         )
       );
@@ -48,6 +53,21 @@ const mapDispatchToProps = dispatch => {
       event.preventDefault();
 
       dispatch(addNewAuditor(address, form));
+    },
+    onWithdrawFormSubmit: (value, form) => {
+      event.preventDefault();
+
+      dispatch(withdrawFees(value, form));
+    },
+    onChangeICOCrationPriceSubmit: (icoCreationPrice, form) => {
+      event.preventDefault();
+
+      dispatch(changeICOCreationPrice(icoCreationPrice, form));
+    },
+    onChangeWithdrawFeeSubmit: (value, form) => {
+      event.preventDefault();
+
+      dispatch(changeWithdrawFee(value, form));
     }
   };
 };

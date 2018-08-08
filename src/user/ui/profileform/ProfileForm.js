@@ -50,7 +50,16 @@ class ProfileForm extends Component {
               this.setState({ icoDescription: "" });
 
               instance.icoCreationPrice().then(price => {
-                this.setState({ price: price.toNumber() });
+                this.setState({
+                  price: web3.utils.fromWei(price.toNumber(), "ether")
+                });
+              });
+
+              // Get withdrawFeePercent
+              instance.withdrawFeePercent().then(withdrawFeePercent => {
+                this.setState({
+                  withdrawFeePercent: withdrawFeePercent.toNumber()
+                });
               });
 
               // Get developer's ICOs
@@ -84,9 +93,35 @@ class ProfileForm extends Component {
           instance.isSuperuser(coinbase).then(res => {
             if (res) {
               this.setState({ role: "superuser" });
+              this.setState({ withdrawValue: 0 });
+              this.setState({ newICOCreationPrice: 0 });
+              this.setState({ newWithdrawFeePercent: 0 });
               this.setState({ newAuditorAddress: "" });
               this.setState({ mintAddress: "" });
               this.setState({ mintAmount: 0 });
+
+              // Get BREM contract balance
+              web3.eth.getBalance(instance.address).then(bremBalance => {
+                this.setState({
+                  bremBalance: web3.utils.fromWei(bremBalance, "ether")
+                });
+              });
+
+              // Get ICO creation price
+              instance.icoCreationPrice().then(icoCreationPrice => {
+                this.setState({
+                  icoCreationPrice: web3.utils.fromWei(
+                    icoCreationPrice.toNumber(),
+                    "ether"
+                  )
+                });
+              });
+              // Get withdrawFeePercent
+              instance.withdrawFeePercent().then(withdrawFeePercent => {
+                this.setState({
+                  withdrawFeePercent: withdrawFeePercent.toNumber()
+                });
+              });
               // Get all auditors' addresses
               axios
                 .get("http://127.0.0.1:8080/audit")
@@ -142,6 +177,66 @@ class ProfileForm extends Component {
 
       this.props.onMintFormSubmit(recieverAddress, mintAmount, this);
     }
+  }
+
+  handleWithdrawValueChange(event) {
+    const withdrawValue = event.target.value;
+    if (withdrawValue > this.state.bremBalance) {
+      alert(
+        "Error, withdraw value must be less than " +
+          this.state.bremBalance +
+          " Eth"
+      );
+      return;
+    }
+    this.setState({ withdrawValue: event.target.value });
+  }
+
+  handleWithdraw(event) {
+    event.preventDefault();
+
+    const withdrawAmount = this.state.withdrawValue;
+    if (withdrawAmount <= 0 || withdrawAmount > this.state.bremBalance) {
+      return alert("Mint amount must be bigger than 0");
+    }
+
+    this.props.onWithdrawFormSubmit(withdrawAmount, this);
+  }
+
+  handleCreationPriceChange(event) {
+    this.setState({ newICOCreationPrice: event.target.value });
+  }
+
+  handleChangeICOCreationPrice(event) {
+    event.preventDefault();
+
+    const creationPrice = this.state.newICOCreationPrice;
+    if (creationPrice === this.state.icoCreationPrice) {
+      this.setState({ newICOCreationPrice: 0 });
+      return;
+    }
+
+    this.props.onChangeICOCrationPriceSubmit(creationPrice, this);
+  }
+
+  handleFeeValueChange(event) {
+    const fee = event.target.value;
+    if (fee < 0 || fee > 100) {
+      return;
+    }
+    this.setState({ newWithdrawFeePercent: fee });
+  }
+
+  handleWithdrawFeeChange(event) {
+    event.preventDefault();
+
+    const fee = this.state.newWithdrawFeePercent;
+    if (fee === this.state.withdrawFeePercent) {
+      this.setState({ newWithdrawFeePercent: 0 });
+      return;
+    }
+
+    this.props.onChangeWithdrawFeeSubmit(fee, this);
   }
 
   handleNewAuditorChange(e) {
@@ -268,6 +363,18 @@ class ProfileForm extends Component {
     }
   }
 
+  handleImageFileChange(e) {
+    e.preventDefault();
+
+    const file = e.target.files[0];
+    let reader = new window.FileReader();
+    reader.readAsArrayBuffer(file);
+
+    reader.onloadend = () => {
+      this.setState({ image: file });
+    };
+  }
+
   _addDirectory(node) {
     if (node) {
       node.webkitdirectory = true;
@@ -293,12 +400,20 @@ class ProfileForm extends Component {
     }
 
     const cap = this.state.icoCap;
+    if (cap === 0) {
+      alert("Cap must me bigger than 0");
+    }
 
     const closingTime = this.state.icoClosingTime;
 
     const description = this.state.icoDescription;
     if (description == null || description.length === 0) {
       return alert("BREM ICO description");
+    }
+
+    const image = this.state.image;
+    if (image == null || image === undefined) {
+      return alert("Error, image");
     }
 
     const files = this.state.icoFiles;
@@ -310,6 +425,7 @@ class ProfileForm extends Component {
       closingTime,
       description,
       files,
+      image,
       this
     );
   }
@@ -332,6 +448,115 @@ class ProfileForm extends Component {
     const SuperuserForm = (
       <div>
         <h3>Superuser</h3>
+
+        <h4>BREM</h4>
+        {this.state &&
+          this.state.bremBalance && (
+            <div>
+              <p>BREM balance: {this.state.bremBalance} Eth</p>
+              {this.state &&
+                this.state.bremBalance > 0 && (
+                  <form
+                    className="pure-form pure-form-ctacked"
+                    onSubmit={this.handleWithdraw.bind(this)}
+                  >
+                    <fieldset>
+                      <legend>Withdraw fees</legend>
+                      <input
+                        id="withdrawValue"
+                        type="number"
+                        step="0.000000000000000001"
+                        value={this.state.withdrawValue}
+                        onChange={this.handleWithdrawValueChange.bind(this)}
+                        placeholder="Amount in ETH"
+                      />
+                      <span> Eth </span>
+                      <p>
+                        <button
+                          type="submit"
+                          className="pure-button pure-button-primary"
+                        >
+                          Withdraw fees
+                        </button>
+                      </p>
+                    </fieldset>
+                  </form>
+                )}
+            </div>
+          )}
+
+        {this.state &&
+          this.state.icoCreationPrice !== undefined && (
+            <div>
+              <p>BREM ICO creation price: {this.state.icoCreationPrice} BRM</p>
+              {this.state &&
+                this.state.icoCreationPrice !== undefined &&
+                this.state.newICOCreationPrice !== undefined && (
+                  <form
+                    className="pure-form pure-form-ctacked"
+                    onSubmit={this.handleChangeICOCreationPrice.bind(this)}
+                  >
+                    <fieldset>
+                      <legend>Change ICO creation price</legend>
+                      <input
+                        id="newCreatonPrice"
+                        type="number"
+                        step="0.000000000000000001"
+                        value={this.state.newICOCreationPrice}
+                        onChange={this.handleCreationPriceChange.bind(this)}
+                        placeholder="Amount in BRM"
+                      />
+                      <span> BRM </span>
+                      <p>
+                        <button
+                          type="submit"
+                          className="pure-button pure-button-primary"
+                        >
+                          Change
+                        </button>
+                      </p>
+                    </fieldset>
+                  </form>
+                )}
+            </div>
+          )}
+
+        {this.state &&
+          this.state.withdrawFeePercent !== undefined && (
+            <div>
+              <p>BREM ICO withdraw fee: {this.state.withdrawFeePercent} %</p>
+              {this.state &&
+                this.state.withdrawFeePercent !== undefined &&
+                this.state.newWithdrawFeePercent !== undefined && (
+                  <form
+                    className="pure-form pure-form-ctacked"
+                    onSubmit={this.handleWithdrawFeeChange.bind(this)}
+                  >
+                    <fieldset>
+                      <legend>Change ICO creation price</legend>
+                      <input
+                        id="newFeePercent"
+                        type="number"
+                        step="1"
+                        min="0"
+                        max="100"
+                        value={this.state.newWithdrawFeePercent}
+                        onChange={this.handleFeeValueChange.bind(this)}
+                      />
+                      <span> % </span>
+                      <p>
+                        <button
+                          type="submit"
+                          className="pure-button pure-button-primary"
+                        >
+                          Change
+                        </button>
+                      </p>
+                    </fieldset>
+                  </form>
+                )}
+            </div>
+          )}
 
         <h4>BRM Token</h4>
         {this.state &&
@@ -458,10 +683,12 @@ class ProfileForm extends Component {
                     <input
                       id="cap"
                       type="number"
+                      step="0.000000000000000001"
                       value={this.state.icoCap}
                       onChange={this.handleICOCapChange.bind(this)}
                       placeholder="BREM ICO cap"
                     />
+                    <span> Eth </span>
                   </p>
                   <p>
                     <input
@@ -484,10 +711,19 @@ class ProfileForm extends Component {
                     />
                   </p>
                   <p>
+                    <span>ICO docs </span>
                     <input
                       type="file"
                       onChange={this.handleICOFilesChange.bind(this)}
                       ref={node => this._addDirectory(node)}
+                    />
+                  </p>
+                  <p>
+                    <span>ICO Image </span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={this.handleImageFileChange.bind(this)}
                     />
                   </p>
                   <button
@@ -497,7 +733,8 @@ class ProfileForm extends Component {
                     Create new BREM ICO
                   </button>
                   <span className="pure-form-message">
-                    BREM ICO Creation price: {this.state.price} BRM
+                    <p>BREM ICO Creation price: {this.state.price} BRM</p>
+                    <p>BREM Fee: {this.state.withdrawFeePercent} %</p>
                   </span>
                 </fieldset>
               </form>
