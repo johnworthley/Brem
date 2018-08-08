@@ -8,6 +8,8 @@ import (
 var router *gin.Engine
 
 func main() {
+	gin.SetMode(gin.ReleaseMode)
+
 	go RunUpdater()
 
 	router = gin.Default()
