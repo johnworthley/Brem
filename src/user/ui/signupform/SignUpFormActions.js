@@ -2,6 +2,7 @@ import BREMContract from "../../../../build/contracts/BREM.json";
 import { loginUser } from "../loginbutton/LoginButtonActions";
 import store from "../../../store";
 import axios from "axios";
+import mHost from "../../../../config";
 
 const contract = require("truffle-contract");
 
@@ -41,7 +42,7 @@ export function signUpUser(name) {
                         address: coinbase
                       };
                       axios
-                        .post("http://127.0.0.1:8080/dev", developer)
+                        .post("http://" + mHost + "/dev", developer)
                         .then(res => {
                           console.log(res);
                         })

@@ -2,6 +2,7 @@ import BRMTokenContract from "../../../../build/contracts/BRMToken.json";
 import BREMContract from "../../../../build/contracts/BREM.json";
 import store from "../../../store";
 import axios from "axios";
+import mHost from "../../../../config";
 
 import ipfs from "../../../ipfs";
 
@@ -120,7 +121,7 @@ export function createNewBREMICO(
                               }
                             };
                             axios
-                              .post("http://127.0.0.1:8080/ico", ico)
+                              .post("http://" + mHost + "/ico", ico)
                               .then(res => {
                                 console.log(res);
                                 let formData = new FormData();
@@ -136,13 +137,13 @@ export function createNewBREMICO(
                                 };
                                 axios
                                   .post(
-                                    "http://127.0.0.1:8080/ico/image",
+                                    "http://" + mHost + "/ico/image",
                                     formData,
                                     config
                                   )
                                   .then(res => {
                                     axios
-                                      .get("http://127.0.0.1:8080/ico/dev", {
+                                      .get("http://" + mHost + "/ico/dev", {
                                         params: {
                                           address: coinbase
                                         }
@@ -202,7 +203,7 @@ export function createNewBREMICO(
                           }
                         };
                         axios
-                          .post("http://127.0.0.1:8080/ico", ico)
+                          .post("http://" + mHost + "/ico", ico)
                           .then(res => {
                             console.log(res);
                             let formData = new FormData();
@@ -218,13 +219,13 @@ export function createNewBREMICO(
                             };
                             axios
                               .post(
-                                "http://127.0.0.1:8080/ico/image",
+                                "http://" + mHost + "/ico/image",
                                 formData,
                                 config
                               )
                               .then(res => {
                                 axios
-                                  .get("http://127.0.0.1:8080/ico/dev", {
+                                  .get("http://" + mHost + "/ico/dev", {
                                     params: {
                                       address: coinbase
                                     }
@@ -293,12 +294,12 @@ export function addNewAuditor(address, form) {
                 address: address
               };
               axios
-                .post("http://127.0.0.1:8080/audit", auditor)
+                .post("http://" + mHost + "/audit", auditor)
                 .then(res => {
                   console.log(res);
                   form.setState({ newAuditorAddress: "" });
                   axios
-                    .get("http://127.0.0.1:8080/audit")
+                    .get("http://" + mHost + "/audit")
                     .then(res => {
                       form.setState({ auditors: res.data });
                       form.setState({ newAuditorAddress: "" });

@@ -5,6 +5,7 @@ import getWeb3 from "../../util/web3/getWeb3";
 import BREMContract from "../../../build/contracts/BREM.json";
 import ICOContract from "../../../build/contracts/BREMICO.json";
 import BREMTokenContract from "../../../build/contracts/BREMToken";
+import mHost from "../../../config";
 
 const contract = require("truffle-contract");
 
@@ -45,7 +46,7 @@ class BremICOForm extends Component {
           });
 
           axios
-            .get("http://127.0.0.1:8080/ico/image", {
+            .get("http://" + mHost + "/ico/image", {
               params: {
                 address: this.state.address
               },
@@ -159,7 +160,7 @@ class BremICOForm extends Component {
                 this.setState({ newAuditorAddress: "" });
                 // Get current ico auditors
                 axios
-                  .get("http://127.0.0.1:8080/ico/audit", {
+                  .get("http://" + mHost + "/ico/audit", {
                     params: {
                       address: this.state.address
                     }

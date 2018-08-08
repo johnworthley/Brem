@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import axios from "axios";
 import BremItem from "../BremItem/BremItem";
+import mHost from "../../../config";
 
 class MarketplaceForm extends Component {
   constructor(props) {
@@ -18,7 +19,7 @@ class MarketplaceForm extends Component {
     switch (this.state.status) {
       case "opened":
         axios
-          .get("http://127.0.0.1:8080/ico/opened")
+          .get("http://" + mHost + "/ico/opened")
           .then(res => {
             this.setState({ icos: res.data });
           })
@@ -26,17 +27,17 @@ class MarketplaceForm extends Component {
         break;
       case "success":
         axios
-          .get("http://127.0.0.1:8080/ico/success")
+          .get("http://" + mHost + "/ico/success")
           .then(res => this.setState({ icos: res.data }));
         break;
       case "failed":
         axios
-          .get("http://127.0.0.1:8080/ico/failed")
+          .get("http://" + mHost + "/ico/failed")
           .then(res => this.setState({ icos: res.data }));
         break;
       case "withdrawn":
         axios
-          .get("http://127.0.0.1:8080/ico/withdrawn")
+          .get("http://" + mHost + "/ico/withdrawn")
           .then(res => this.setState({ icos: res.data }));
         break;
       default:

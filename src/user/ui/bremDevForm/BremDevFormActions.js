@@ -1,6 +1,7 @@
 import BREMICOContract from "../../../../build/contracts/BREMICO.json";
 import store from "../../../store";
 import axios from "axios";
+import mHost from "../../../../config";
 
 const contract = require("truffle-contract");
 
@@ -48,7 +49,7 @@ export function makeWithrawRequest(contractAddress, weiValue, form) {
                       .withdraw(weiValue, { from: coinbase })
                       .then(resTX => {
                         axios
-                          .put("http://127.0.0.1:8080/ico/request", {
+                          .put("http://" + mHost + "/ico/request", {
                             address: contractAddress
                           })
                           .then(res => {
