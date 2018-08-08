@@ -36,6 +36,7 @@ func initAPI() {
 	router.GET("/ico/failed", getFailedICOs)
 	router.GET("/ico/withdrawn", getWithdrawnICOs)
 	router.POST("/ico", addICO)
+	router.POST("/ico/image", addICOImage)
 	router.POST("/ico/audit", addAuditorToICO)
 	router.PUT("/ico/open", publishICO)
 	router.PUT("/ico/success", setICOSucccessStatus)

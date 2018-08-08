@@ -30,6 +30,7 @@ const mapDispatchToProps = dispatch => {
       closingTime,
       description,
       files,
+      image,
       form
     ) => {
       event.preventDefault();
@@ -43,6 +44,7 @@ const mapDispatchToProps = dispatch => {
           closingTime,
           description,
           files,
+          image,
           form
         )
       );

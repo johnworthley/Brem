@@ -363,6 +363,18 @@ class ProfileForm extends Component {
     }
   }
 
+  handleImageFileChange(e) {
+    e.preventDefault();
+
+    const file = e.target.files[0];
+    let reader = new window.FileReader();
+    reader.readAsArrayBuffer(file);
+
+    reader.onloadend = () => {
+      this.setState({ image: file });
+    };
+  }
+
   _addDirectory(node) {
     if (node) {
       node.webkitdirectory = true;
@@ -399,6 +411,11 @@ class ProfileForm extends Component {
       return alert("BREM ICO description");
     }
 
+    const image = this.state.image;
+    if (image == null || image === undefined) {
+      return alert("Error, image");
+    }
+
     const files = this.state.icoFiles;
     this.props.onCreateBREMICOFormSubmit(
       name,
@@ -408,6 +425,7 @@ class ProfileForm extends Component {
       closingTime,
       description,
       files,
+      image,
       this
     );
   }
@@ -693,10 +711,19 @@ class ProfileForm extends Component {
                     />
                   </p>
                   <p>
+                    <span>ICO docs </span>
                     <input
                       type="file"
                       onChange={this.handleICOFilesChange.bind(this)}
                       ref={node => this._addDirectory(node)}
+                    />
+                  </p>
+                  <p>
+                    <span>ICO Image </span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={this.handleImageFileChange.bind(this)}
                     />
                   </p>
                   <button

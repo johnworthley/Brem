@@ -6,7 +6,12 @@ import (
 	"../server/data"
 
 	"github.com/gin-gonic/gin"
-			)
+	"os"
+	"io"
+		"log"
+)
+
+const imagesDir = "./ico_images/"
 
 // Add new developer to db
 func addDeveloper(c *gin.Context) {
@@ -74,6 +79,40 @@ func addICO(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusCreated, nil)
+}
+
+// Upload ICO image
+func addICOImage(c *gin.Context) {
+	file, _, err := c.Request.FormFile("image")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+	address := c.Request.FormValue("address")
+	if len(address) == 0 {
+		c.JSON(http.StatusBadRequest, nil)
+		return
+	}
+	log.Println(address)
+	//ico := data.ICO{Address: address}
+	//err = ico.GetICO()
+	//if err != nil {
+	//	c.JSON(http.StatusInternalServerError, err)
+	//	return
+	//}
+
+	out, err := os.Create(imagesDir + address + ".png")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err);
+		return
+	}
+	defer out.Close()
+	_, err = io.Copy(out, file)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+	c.JSON(http.StatusOK, nil)
 }
 
 // Get current developer's ICOs

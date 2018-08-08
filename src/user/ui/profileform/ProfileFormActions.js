@@ -55,6 +55,7 @@ export function createNewBREMICO(
   closingTime,
   description,
   files,
+  image,
   form
 ) {
   let web3 = store.getState().web3.web3Instance;
@@ -129,12 +130,31 @@ export function createNewBREMICO(
                                     }
                                   })
                                   .then(res => {
-                                    form.setState({ devICOs: res.data });
-                                    form.setState({ icoName: "" });
-                                    form.setState({ icoSymbol: "" });
-                                    form.setState({ icoRate: 0 });
-                                    form.setState({ icoCap: 0 });
-                                    form.setState({ icoDescription: "" });
+                                    let formData = new FormData();
+                                    formData.append(
+                                      "address",
+                                      res.logs[0].args.icoAddress
+                                    );
+                                    formData.append("image", image);
+                                    const config = {
+                                      headers: {
+                                        "content-type": "multipart/form-data"
+                                      }
+                                    };
+                                    axios
+                                      .post(
+                                        "http://127.0.0.1:8080/ico/image",
+                                        formData,
+                                        config
+                                      )
+                                      .then(res => {
+                                        form.setState({ devICOs: res.data });
+                                        form.setState({ icoName: "" });
+                                        form.setState({ icoSymbol: "" });
+                                        form.setState({ icoRate: 0 });
+                                        form.setState({ icoCap: 0 });
+                                        form.setState({ icoDescription: "" });
+                                      });
                                   });
                               })
                               .catch(err => console.log(err));
