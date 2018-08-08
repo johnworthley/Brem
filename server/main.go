@@ -8,7 +8,7 @@ import (
 var router *gin.Engine
 
 func main() {
-	//go RunUpdater()
+	go RunUpdater()
 
 	router = gin.Default()
 	router.Use(gin.Logger())

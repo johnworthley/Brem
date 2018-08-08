@@ -23,7 +23,7 @@ import (
 
 var   BREMcontractAddress	= ""
 const etherscanApiKey       = "194M4NC49RXX52KMM1W5U91Y6UK2RM5WUW"
-const intervalInMinutes		= 10
+const intervalInMinutes		= 1
 const etherscanApiUrl		= "api-rinkeby.etherscan.io"
 const infuraApiUrl			= "rinkeby.infura.io"
 

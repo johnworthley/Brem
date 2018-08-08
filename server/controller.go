@@ -7,10 +7,11 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"os"
-	"io"
-		"log"
+			"log"
 	"io/ioutil"
-	)
+	"image/jpeg"
+	"github.com/nfnt/resize"
+)
 
 const imagesDir = "./ico_images/"
 
@@ -101,6 +102,14 @@ func addICOImage(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
+	// Resize file
+	img, err := jpeg.Decode(file)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+	file.Close()
+	resizedImg := resize.Resize(400, 260, img, resize.Lanczos3)
 
 	out, err := os.Create(imagesDir + address + ".jpeg")
 	if err != nil {
@@ -108,7 +117,7 @@ func addICOImage(c *gin.Context) {
 		return
 	}
 	defer out.Close()
-	_, err = io.Copy(out, file)
+	err = jpeg.Encode(out, resizedImg, nil)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return
