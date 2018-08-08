@@ -34,7 +34,7 @@ func (auditor *Auditor) GetAuditor() (err error) {
 	}
 	exists := row.Next()
 	if !exists {
-		return errors.New("ICO doesn't exists")
+		return errors.New("Auditor doesn't exists")
 	}
 	err = row.Scan(&auditor.ID, &auditor.Address)
 	return
