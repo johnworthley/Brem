@@ -59,6 +59,21 @@ class BremPublicationForm extends Component {
                 this.setState({ auditors: res.data });
               })
               .catch(err => console.log(err));
+            // Get ICO image
+            axios
+              .get("http://127.0.0.1:8080/ico/image", {
+                params: {
+                  address: this.state.address
+                },
+                responseType: "arraybuffer"
+              })
+              .then(res => {
+                const base64 = Buffer.from(res.data, "binary").toString(
+                  "base64"
+                );
+                this.setState({ img: "data:image/jpeg;base64," + base64 });
+              })
+              .catch(err => console.error(err));
           }
         });
       });
@@ -135,6 +150,13 @@ class BremPublicationForm extends Component {
           this.state.visible && (
             <fieldset>
               <legend>{this.state.icoName}</legend>
+              {this.state &&
+                this.state.img !== undefined && (
+                  <p>
+                    <img src={this.state.img} alt="Image loading error" />
+                  </p>
+                )}
+
               <p>{this.state.icoDescription}</p>
               <p>Wallet: {this.state.wallet} </p>
               <span className="pure-form-message">

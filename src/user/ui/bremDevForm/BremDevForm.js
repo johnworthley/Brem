@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import store from "../../../store";
+import axios from "axios";
 import { browserHistory } from "react-router";
 import ICOContract from "../../../../build/contracts/BREMICO.json";
 
@@ -23,6 +24,20 @@ class BremDevForm extends Component {
         icoInstance.name().then(name => {
           this.setState({ name: name });
         });
+
+        // Get ICO image
+        axios
+          .get("http://127.0.0.1:8080/ico/image", {
+            params: {
+              address: this.state.address
+            },
+            responseType: "arraybuffer"
+          })
+          .then(res => {
+            const base64 = Buffer.from(res.data, "binary").toString("base64");
+            this.setState({ img: "data:image/jpeg;base64," + base64 });
+          })
+          .catch(err => console.error(err));
 
         icoInstance.description().then(description => {
           this.setState({ description: description });
@@ -87,6 +102,12 @@ class BremDevForm extends Component {
           this.state.description && (
             <fieldset>
               <legend>{this.state.name}</legend>
+              {this.state &&
+                this.state.img !== undefined && (
+                  <p>
+                    <img src={this.state.img} alt="Image loading error" />
+                  </p>
+                )}
               <p>Address: {this.state.address}</p>
               <p>{this.state.description}</p>
               <p>Status: {this.state.status}</p>
