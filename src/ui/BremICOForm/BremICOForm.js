@@ -172,9 +172,9 @@ class BremICOForm extends Component {
             });
 
             bremInstance.isDeveloper(coinbase).then(isDeveloper => {
-              if (isDeveloper) {
+              if (isDeveloper && coinbase === this.state.wallet) {
                 this.setState({ role: "developer" });
-                this.setState({ withdrawValueInWei: 100 });
+                this.setState({ withdrawValue: 0 });
               }
             });
 
@@ -280,32 +280,38 @@ class BremICOForm extends Component {
 
   // Developer form
   handleChangeWithdrawValue(e) {
-    const wei = e.target.value;
-    if (this.state.balanceInWei - wei < 0) {
+    const eth = e.target.value;
+    if (this.state.balance - eth <= 0) {
       return alert("Error, withdraw value must be less than ICO balance");
     }
-    if (wei < 100) {
-      return alert("Error, withdraw value must by bigger or equal 100 Wei");
+    const web3 = store.getState().web3.web3Instance;
+    if (typeof web3 !== "undefined" && web3 !== null) {
+      const wei = web3.utils.toWei(eth, "ether");
+      if (wei < 100) {
+        return alert("Error, withdraw value must by bigger or equal 100 Wei");
+      }
+      const icoBalance = web3.utils.toWei(this.state.balance, "ether");
+      const delta = icoBalance - wei;
+      if (delta > 0 && delta < 100) {
+        this.setState({ withdrawValue: this.state.balance });
+      } else {
+        this.setState({ withdrawValue: eth });
+      }
+    } else {
+      console.error("Web3 is not initialized.");
     }
-
-    const delta = this.state.balanceInWei - wei;
-    if (delta > 0 && delta < 100) {
-      alert(
-        "WARNING, if you will accept tx, you loss " + delta + " in contract"
-      );
-    }
-    this.setState({ withdrawValueInWei: e.target.value });
   }
 
   handleSubmitWithrawRequest(e) {
     e.preventDefault();
-    if (this.state.withdrawValueInWei < 100) {
-      return alert("Error, set up withdraw value more or equal 100 Wei");
+
+    if (this.state.withdrawValue <= 0) {
+      return alert("Withdraw value must be bigger than 0");
     }
 
     this.props.onSubmitWithdrawRequest(
       this.state.address,
-      this.state.withdrawValueInWei,
+      this.state.withdrawValue,
       this
     );
   }
@@ -355,8 +361,8 @@ class BremICOForm extends Component {
     const DeveloperForm = (
       <div>
         {this.state &&
-          this.state.withdrawValueInWei !== undefined &&
-          this.state.balanceInWei !== undefined &&
+          this.state.withdrawValue !== undefined &&
+          this.state.balance !== undefined &&
           this.state.hasClosed === true &&
           this.state.capReached === true &&
           this.state.isWithdrawn === false &&
@@ -369,8 +375,8 @@ class BremICOForm extends Component {
                 <legend>Request withdraw</legend>
                 <input
                   type="number"
-                  value={this.state.withdrawValueInWei}
-                  step="1"
+                  value={this.state.withdrawValue}
+                  step="0.000000000000000001"
                   onChange={this.handleChangeWithdrawValue.bind(this)}
                   placeholder="Request value in Wei"
                 />

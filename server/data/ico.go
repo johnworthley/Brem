@@ -150,7 +150,7 @@ func (ico *ICO) AddAuditorToICO(auditor Auditor) (err error) {
 
 // GetICOAuditors returns all current ICO auditors
 func (ico *ICO) GetICOAuditors() (auditors []Auditor, err error) {
-	rows, err := db.Query("SELECT * FROM auditors WHERE id = " +
+	rows, err := db.Query("SELECT * FROM auditors WHERE id IN " +
 		"(SELECT auditorID FROM icoAuditors WHERE icoID = $1)", ico.ID)
 	if err != nil {
 		log.Println(err)

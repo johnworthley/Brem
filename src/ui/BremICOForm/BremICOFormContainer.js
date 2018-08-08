@@ -34,10 +34,10 @@ const mapDispatchToProps = dispatch => {
 
       dispatch(publishProject(contractAddress, form));
     },
-    onSubmitWithdrawRequest: (contractAddress, weiValue, form) => {
+    onSubmitWithdrawRequest: (contractAddress, value, form) => {
       event.preventDefault();
 
-      dispatch(makeWithrawRequest(contractAddress, weiValue, form));
+      dispatch(makeWithrawRequest(contractAddress, value, form));
     }
   };
 };

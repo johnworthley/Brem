@@ -245,7 +245,7 @@ export function publishProject(contractAddress, form) {
 }
 
 // Developer form
-export function makeWithrawRequest(contractAddress, weiValue, form) {
+export function makeWithrawRequest(contractAddress, value, form) {
   let web3 = store.getState().web3.web3Instance;
 
   // Double-check web3's status.
@@ -286,7 +286,9 @@ export function makeWithrawRequest(contractAddress, weiValue, form) {
                     }
 
                     instance
-                      .withdraw(weiValue, { from: coinbase })
+                      .withdraw(web3.utils.toWei(value, "ether"), {
+                        from: coinbase
+                      })
                       .then(resTX => {
                         axios
                           .put("http://127.0.0.1:8080/ico/request", {
