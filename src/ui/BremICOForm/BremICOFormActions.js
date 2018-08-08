@@ -2,7 +2,7 @@ import ICOContract from "../../../build/contracts/BREMICO.json";
 import BREMTokenContract from "../../../build/contracts/BREMToken";
 import store from "../../store";
 import axios from "axios";
-import mHost from "../../../config";
+import mHost from "../../config";
 
 const contract = require("truffle-contract");
 

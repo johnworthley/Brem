@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import axios from "axios";
 import BremItem from "../BremItem/BremItem";
-import mHost from "../../../config";
+import mHost from "../../config";
 
 class MarketplaceForm extends Component {
   constructor(props) {

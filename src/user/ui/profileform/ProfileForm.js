@@ -5,7 +5,7 @@ import BREMContract from "../../../../build/contracts/BREM.json";
 import BremPublicationFormContainer from "../bremPublicationForm/BremPublicationFormContainer";
 import BremAuditFormContainer from "../bremAuditForm/BremAuditFormContrainer";
 import BremDevFormContainer from "../bremDevForm/BremDevFormContainer";
-import mHost from "../../../../config";
+import mHost from "../../../config";
 
 const contract = require("truffle-contract");
 

@@ -2,7 +2,7 @@ import BREMContract from "../../../../build/contracts/BREM.json";
 import { loginUser } from "../loginbutton/LoginButtonActions";
 import store from "../../../store";
 import axios from "axios";
-import mHost from "../../../../config";
+import mHost from "../../../config";
 
 const contract = require("truffle-contract");
 

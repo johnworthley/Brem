@@ -5,7 +5,7 @@ import getWeb3 from "../../util/web3/getWeb3";
 import BREMContract from "../../../build/contracts/BREM.json";
 import ICOContract from "../../../build/contracts/BREMICO.json";
 import BREMTokenContract from "../../../build/contracts/BREMToken";
-import mHost from "../../../config";
+import mHost from "../../config";
 
 const contract = require("truffle-contract");
 

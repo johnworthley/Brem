@@ -1,7 +1,7 @@
 import BREMICOContract from "../../../../build/contracts/BREMICO.json";
 import store from "../../../store";
 import axios from "axios";
-import mHost from "../../../../config";
+import mHost from "../../../config";
 
 const contract = require("truffle-contract");
 

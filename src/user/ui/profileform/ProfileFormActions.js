@@ -2,7 +2,7 @@ import BRMTokenContract from "../../../../build/contracts/BRMToken.json";
 import BREMContract from "../../../../build/contracts/BREM.json";
 import store from "../../../store";
 import axios from "axios";
-import mHost from "../../../../config";
+import mHost from "../../../config";
 
 import ipfs from "../../../ipfs";
 

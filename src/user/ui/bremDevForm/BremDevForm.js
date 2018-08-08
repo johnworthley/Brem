@@ -3,7 +3,7 @@ import store from "../../../store";
 import axios from "axios";
 import { browserHistory } from "react-router";
 import ICOContract from "../../../../build/contracts/BREMICO.json";
-import mHost from "../../../../config";
+import mHost from "../../../config";
 
 const contract = require("truffle-contract");
 
