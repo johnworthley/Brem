@@ -123,7 +123,7 @@ func GetFailedICOs() (icos []ICO, err error) {
 
 // GetWithdrawnICOs show all ICOs with status "withdrawn"
 func GetWithdrawnICOs() (icos []ICO, err error) {
-	rows, err := db.Query("SELECT * FROM ico WHERE status = $1", "failed")
+	rows, err := db.Query("SELECT * FROM ico WHERE status = $1", "withdrawn")
 	defer rows.Close()
 	if err != nil {
 		log.Println(err)
