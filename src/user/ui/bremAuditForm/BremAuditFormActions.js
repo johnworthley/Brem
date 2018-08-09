@@ -1,6 +1,7 @@
 import BREMICOContract from "../../../../build/contracts/BREMICO.json";
 import store from "../../../store";
 import axios from "axios";
+import mHost from "../../../config";
 
 const contract = require("truffle-contract");
 
@@ -33,7 +34,7 @@ export function confirmWithdraw(contractAddress, form) {
                   instance.isWithdrawn().then(isWithdrawn => {
                     if (isWithdrawn) {
                       axios
-                        .put("http://127.0.0.1:8080/ico/withdrawn", {
+                        .put("http://" + mHost + "/ico/withdrawn", {
                           address: contractAddress
                         })
                         .then(res => {
@@ -42,7 +43,7 @@ export function confirmWithdraw(contractAddress, form) {
                         .catch(err => console.error(err));
                     } else {
                       axios
-                        .put("http://127.0.0.1:8080/ico/success", {
+                        .put("http://" + mHost + "/ico/success", {
                           address: contractAddress
                         })
                         .then(res => {

@@ -5,6 +5,7 @@ import BREMContract from "../../../../build/contracts/BREM.json";
 import BremPublicationFormContainer from "../bremPublicationForm/BremPublicationFormContainer";
 import BremAuditFormContainer from "../bremAuditForm/BremAuditFormContrainer";
 import BremDevFormContainer from "../bremDevForm/BremDevFormContainer";
+import mHost from "../../../config";
 
 const contract = require("truffle-contract");
 
@@ -64,7 +65,7 @@ class ProfileForm extends Component {
 
               // Get developer's ICOs
               axios
-                .get("http://127.0.0.1:8080/ico/dev", {
+                .get("http://" + mHost + "/ico/dev", {
                   params: {
                     address: coinbase
                   }
@@ -79,7 +80,7 @@ class ProfileForm extends Component {
 
               // Get current auditor ICOs
               axios
-                .get("http://127.0.0.1:8080/audit/ico", {
+                .get("http://" + mHost + "/audit/ico", {
                   params: {
                     address: coinbase
                   }
@@ -124,7 +125,7 @@ class ProfileForm extends Component {
               });
               // Get all auditors' addresses
               axios
-                .get("http://127.0.0.1:8080/audit")
+                .get("http://" + mHost + "/audit")
                 .then(res => {
                   this.setState({ auditors: res.data });
                 })
@@ -133,7 +134,7 @@ class ProfileForm extends Component {
                 });
               // Get all new icos
               axios
-                .get("http://127.0.0.1:8080/ico/created")
+                .get("http://" + mHost + "/ico/created")
                 .then(res => {
                   this.setState({ createdICOs: res.data });
                 })

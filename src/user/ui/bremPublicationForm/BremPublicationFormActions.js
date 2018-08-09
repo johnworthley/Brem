@@ -1,6 +1,7 @@
 import BREMICOContract from "../../../../build/contracts/BREMICO.json";
 import store from "../../../store";
 import axios from "axios";
+import mHost from "../../../config";
 
 const contract = require("truffle-contract");
 
@@ -31,12 +32,12 @@ export function addNewAuditor(contractAddress, auditorAddress, form) {
                 }
               };
               axios
-                .post("http://127.0.0.1:8080/ico/audit", data)
+                .post("http://" + mHost + "/ico/audit", data)
                 .then(res => {
                   console.log(res);
                   form.setState({ newAuditorAddress: "" });
                   axios
-                    .get("http://127.0.0.1:8080/ico/audit", {
+                    .get("http://" + mHost + "/ico/audit", {
                       params: {
                         address: contractAddress
                       }
@@ -72,7 +73,7 @@ export function publishProject(contractAddress, form) {
       ico.at(contractAddress).then(instance => {
         instance.finishAuditorSelection({ from: coinbase }).then(txRes => {
           axios
-            .put("http://127.0.0.1:8080/ico/open", {
+            .put("http://" + mHost + "/ico/open", {
               address: contractAddress
             })
             .then(res => {

@@ -3,6 +3,7 @@ import store from "../../../store";
 import axios from "axios";
 import { browserHistory } from "react-router";
 import ICOContract from "../../../../build/contracts/BREMICO.json";
+import mHost from "../../../config";
 
 const contract = require("truffle-contract");
 
@@ -27,7 +28,7 @@ class BremDevForm extends Component {
 
         // Get ICO image
         axios
-          .get("http://127.0.0.1:8080/ico/image", {
+          .get("http://" + mHost + "/ico/image", {
             params: {
               address: this.state.address
             },
