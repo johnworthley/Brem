@@ -63,7 +63,7 @@ func GetCreatedICOs() (icos []ICO, err error)  {
 
 // GetOpenedICOs show all ICOs with status "opened"
 func GetOpenedICOs() (icos []ICO, err error) {
-	rows, err := db.Query("SELECT * FROM ico WHERE status = $1", "opened")
+	rows, err := db.Query("SELECT * FROM ico WHERE status = $1 ORDER BY id DESC", "opened")
 	if err != nil {
 		log.Println(err)
 		return
@@ -83,7 +83,7 @@ func GetOpenedICOs() (icos []ICO, err error) {
 
 // GetSuccessICOs show all ICOs with statuses "success" or "requested"
 func GetSuccessICOs() (icos []ICO, err error) {
-	rows, err := db.Query("SELECT * FROM ico WHERE status = $1 OR status = $2", "success", "requested")
+	rows, err := db.Query("SELECT * FROM ico WHERE status = $1 OR status = $2 ORDER BY id DESC", "success", "requested")
 	if err != nil {
 		log.Println(err)
 		return
@@ -103,7 +103,7 @@ func GetSuccessICOs() (icos []ICO, err error) {
 
 // GetFailedICOs show all ICOs with status "failed"
 func GetFailedICOs() (icos []ICO, err error) {
-	rows, err := db.Query("SELECT * FROM ico WHERE status = $1", "failed")
+	rows, err := db.Query("SELECT * FROM ico WHERE status = $1 ORDER BY id DESC", "failed")
 	if err != nil {
 		log.Println(err)
 		return
@@ -123,7 +123,7 @@ func GetFailedICOs() (icos []ICO, err error) {
 
 // GetWithdrawnICOs show all ICOs with status "withdrawn"
 func GetWithdrawnICOs() (icos []ICO, err error) {
-	rows, err := db.Query("SELECT * FROM ico WHERE status = $1", "withdrawn")
+	rows, err := db.Query("SELECT * FROM ico WHERE status = $1 ORDER BY id DESC", "withdrawn")
 	defer rows.Close()
 	if err != nil {
 		log.Println(err)

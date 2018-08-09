@@ -12,15 +12,6 @@ class BremICOForm extends Component {
   constructor(props) {
     super(props);
 
-    getWeb3
-      .then(results => {
-        console.log("Web3 initialized!");
-        this.setState({ loaded: true });
-      })
-      .catch(() => {
-        console.log("Error in web3 initialization.");
-      });
-
     this.state = {
       address: props.value,
       etherAmount: 0,
@@ -30,166 +21,198 @@ class BremICOForm extends Component {
 
     this.icoAuditors.bind(this);
 
-    const web3 = store.getState().web3.web3Instance;
-    if (typeof web3 !== "undefined" && web3 !== null) {
-      const ico = contract(ICOContract);
-      ico.setProvider(web3.currentProvider);
-      ico.at(this.state.address).then(icoInstance => {
-        web3.eth.getCoinbase((err, coinbase) => {
-          if (err) {
-            console.error(err);
-          }
+    getWeb3
+      .then(results => {
+        console.log("Web3 initialized!");
+        this.setState({ loaded: true });
 
-          icoInstance.name().then(icoName => {
-            this.setState({ icoName: icoName });
-          });
+        const web3 = store.getState().web3.web3Instance;
+        if (typeof web3 !== "undefined" && web3 !== null) {
+          const ico = contract(ICOContract);
+          ico.setProvider(web3.currentProvider);
+          ico.at(this.state.address).then(icoInstance => {
+            web3.eth.getCoinbase((err, coinbase) => {
+              if (err) {
+                console.error(err);
+              }
 
-          axios
-            .get("http://127.0.0.1:8080/ico/image", {
-              params: {
-                address: this.state.address
-              },
-              responseType: "arraybuffer"
-            })
-            .then(res => {
-              const base64 = Buffer.from(res.data, "binary").toString("base64");
-              this.setState({ img: "data:image/jpeg;base64," + base64 });
-            })
-            .catch(err => console.error(err));
-
-          icoInstance.wallet().then(wallet => {
-            this.setState({ wallet: wallet });
-          });
-
-          icoInstance.token().then(tokenAddress => {
-            this.setState({ tokenAddress: tokenAddress });
-
-            const bremToken = contract(BREMTokenContract);
-            bremToken.setProvider(web3.currentProvider);
-            bremToken.at(tokenAddress).then(tokenInstance => {
-              tokenInstance.symbol().then(tokenSymbol => {
-                this.setState({ tokenSymbol: tokenSymbol });
+              icoInstance.name().then(icoName => {
+                this.setState({ icoName: icoName });
               });
 
-              tokenInstance.decimals().then(tokenDecimals => {
-                this.setState({ tokenDecimals: tokenDecimals.toNumber() });
+              axios
+                .get("http://127.0.0.1:8080/ico/image", {
+                  params: {
+                    address: this.state.address
+                  },
+                  responseType: "arraybuffer"
+                })
+                .then(res => {
+                  const base64 = Buffer.from(res.data, "binary").toString(
+                    "base64"
+                  );
+                  this.setState({ img: "data:image/jpeg;base64," + base64 });
+                })
+                .catch(err => console.error(err));
+
+              icoInstance.wallet().then(wallet => {
+                this.setState({ wallet: wallet });
               });
 
-              tokenInstance.balanceOf(coinbase).then(userCurrentBalance => {
+              icoInstance.token().then(tokenAddress => {
+                this.setState({ tokenAddress: tokenAddress });
+
+                const bremToken = contract(BREMTokenContract);
+                bremToken.setProvider(web3.currentProvider);
+                bremToken.at(tokenAddress).then(tokenInstance => {
+                  tokenInstance.symbol().then(tokenSymbol => {
+                    this.setState({ tokenSymbol: tokenSymbol });
+                  });
+
+                  tokenInstance.decimals().then(tokenDecimals => {
+                    this.setState({ tokenDecimals: tokenDecimals.toNumber() });
+                  });
+
+                  tokenInstance.balanceOf(coinbase).then(userCurrentBalance => {
+                    this.setState({
+                      userCurrentBalance: userCurrentBalance.toNumber()
+                    });
+                  });
+                });
+              });
+
+              icoInstance.closingTime().then(closingTime => {
                 this.setState({
-                  userCurrentBalance: userCurrentBalance.toNumber()
+                  closingTime: new Date(
+                    closingTime.toNumber() * 1000
+                  ).toString()
+                });
+              });
+
+              icoInstance.rate().then(rate => {
+                this.setState({ rate: rate.toNumber() });
+              });
+
+              web3.eth.getBalance(this.state.address).then(balance => {
+                this.setState({
+                  balance: web3.utils.fromWei(balance, "ether")
+                });
+              });
+
+              icoInstance.balances(coinbase).then(userBalance => {
+                this.setState({
+                  userBalance: web3.utils.fromWei(userBalance, "ether")
+                });
+              });
+
+              icoInstance.balancesInToken(coinbase).then(userTotalTokens => {
+                this.setState({
+                  userTotalTokens: web3.utils.fromWei(userTotalTokens, "ether")
+                });
+              });
+
+              icoInstance.weiRaised().then(weiRaised => {
+                this.setState({
+                  raised: web3.utils.fromWei(weiRaised, "ether")
+                });
+              });
+
+              icoInstance.cap().then(cap => {
+                this.setState({ cap: web3.utils.fromWei(cap, "ether") });
+              });
+
+              icoInstance.docHash().then(docHash => {
+                this.setState({ docHash: docHash });
+              });
+
+              icoInstance.hasClosed().then(hasClosed => {
+                this.setState({ hasClosed: hasClosed });
+              });
+
+              icoInstance.capReached().then(capReached => {
+                this.setState({ capReached: capReached });
+              });
+
+              icoInstance.auditSelected().then(auditSelected => {
+                this.setState({ auditSelected: auditSelected });
+              });
+
+              icoInstance.request().then(request => {
+                this.setState({
+                  requestedValue: web3.utils.fromWei(request[0], "ether")
+                });
+              });
+
+              icoInstance.isRequested().then(isRequested => {
+                this.setState({ isRequested: isRequested });
+              });
+
+              icoInstance.isWithdrawn().then(isWithdrawn => {
+                this.setState({ isWithdrawn: isWithdrawn });
+              });
+
+              // Get current ico auditors
+              axios
+                .get("http://127.0.0.1:8080/ico/audit", {
+                  params: {
+                    address: this.state.address
+                  }
+                })
+                .then(res => {
+                  this.setState({ auditors: res.data });
+                })
+                .catch(err => console.log(err));
+
+              const brem = contract(BREMContract);
+              brem.setProvider(web3.currentProvider);
+              brem.deployed().then(bremInstance => {
+                bremInstance.isSuperuser(coinbase).then(isSuperuser => {
+                  if (isSuperuser) {
+                    this.setState({ role: "superuser" });
+                    this.setState({ newAuditorAddress: "" });
+                    // Get current ico auditors
+                    axios
+                      .get("http://127.0.0.1:8080/ico/audit", {
+                        params: {
+                          address: this.state.address
+                        }
+                      })
+                      .then(res => {
+                        this.setState({ auditors: res.data });
+                      })
+                      .catch(err => console.log(err));
+                  }
+                });
+
+                bremInstance.isDeveloper(coinbase).then(isDeveloper => {
+                  if (isDeveloper && coinbase === this.state.wallet) {
+                    this.setState({ role: "developer" });
+                    this.setState({ withdrawValue: 0 });
+
+                    bremInstance.withdrawFeePercent().then(fee => {
+                      this.setState({ fee: fee.toNumber() });
+                    });
+                  }
+                });
+
+                bremInstance.isAuditor(coinbase).then(isAuditor => {
+                  if (isAuditor) {
+                    this.setState({ role: "auditor" });
+                    icoInstance.isConfirmed(coinbase).then(isConfirmed => {
+                      this.setState({ isConfirmed: isConfirmed });
+                    });
+                  }
                 });
               });
             });
           });
-
-          icoInstance.closingTime().then(closingTime => {
-            this.setState({
-              closingTime: new Date(closingTime.toNumber() * 1000).toString()
-            });
-          });
-
-          icoInstance.rate().then(rate => {
-            this.setState({ rate: rate.toNumber() });
-          });
-
-          web3.eth.getBalance(this.state.address).then(balance => {
-            this.setState({ balance: web3.utils.fromWei(balance, "ether") });
-          });
-
-          icoInstance.balances(coinbase).then(userBalance => {
-            this.setState({
-              userBalance: web3.utils.fromWei(userBalance.toNumber(), "ether")
-            });
-          });
-
-          icoInstance.balancesInToken(coinbase).then(userTotalTokens => {
-            this.setState({
-              userTotalTokens: web3.utils.fromWei(
-                userTotalTokens.toNumber(),
-                "ether"
-              )
-            });
-          });
-
-          icoInstance.weiRaised().then(weiRaised => {
-            this.setState({
-              raised: web3.utils.fromWei(weiRaised.toNumber(), "ether")
-            });
-          });
-
-          icoInstance.cap().then(cap => {
-            this.setState({ cap: web3.utils.fromWei(cap.toNumber(), "ether") });
-          });
-
-          icoInstance.docHash().then(docHash => {
-            this.setState({ docHash: docHash });
-          });
-
-          icoInstance.hasClosed().then(hasClosed => {
-            this.setState({ hasClosed: hasClosed });
-          });
-
-          icoInstance.capReached().then(capReached => {
-            this.setState({ capReached: capReached });
-          });
-
-          icoInstance.auditSelected().then(auditSelected => {
-            this.setState({ auditSelected: auditSelected });
-          });
-
-          icoInstance.request().then(request => {
-            this.setState({ requestedValue: request[0].toNumber() });
-          });
-
-          icoInstance.isRequested().then(isRequested => {
-            this.setState({ isRequested: isRequested });
-          });
-
-          icoInstance.isWithdrawn().then(isWithdrawn => {
-            this.setState({ isWithdrawn: isWithdrawn });
-          });
-
-          const brem = contract(BREMContract);
-          brem.setProvider(web3.currentProvider);
-          brem.deployed().then(bremInstance => {
-            bremInstance.isSuperuser(coinbase).then(isSuperuser => {
-              if (isSuperuser) {
-                this.setState({ role: "superuser" });
-                this.setState({ newAuditorAddress: "" });
-                // Get current ico auditors
-                axios
-                  .get("http://127.0.0.1:8080/ico/audit", {
-                    params: {
-                      address: this.state.address
-                    }
-                  })
-                  .then(res => {
-                    this.setState({ auditors: res.data });
-                  })
-                  .catch(err => console.log(err));
-              }
-            });
-
-            bremInstance.isDeveloper(coinbase).then(isDeveloper => {
-              if (isDeveloper && coinbase === this.state.wallet) {
-                this.setState({ role: "developer" });
-                this.setState({ withdrawValue: 0 });
-              }
-            });
-
-            bremInstance.isAuditor(coinbase).then(isAuditor => {
-              if (isAuditor) {
-                this.setState({ role: "auditor" });
-                // TODO: Finish
-              }
-            });
-          });
-        });
+        } else {
+          console.error("Web3 is not initialized.");
+        }
+      })
+      .catch(() => {
+        console.log("Error in web3 initialization.");
       });
-    } else {
-      console.error("Web3 is not initialized.");
-    }
   }
 
   handleEtherValueCahnge(e) {
@@ -281,7 +304,7 @@ class BremICOForm extends Component {
   // Developer form
   handleChangeWithdrawValue(e) {
     const eth = e.target.value;
-    if (this.state.balance - eth <= 0) {
+    if (this.state.balance - eth < 0) {
       return alert("Error, withdraw value must be less than ICO balance");
     }
     const web3 = store.getState().web3.web3Instance;
@@ -316,11 +339,16 @@ class BremICOForm extends Component {
     );
   }
 
+  // Auditor form
+  handleConfirm(e) {
+    e.preventDefault();
+
+    this.props.onConfirmSubmit(this.state.address, this);
+  }
+
   render() {
     const SuperuserForm = (
       <div>
-        <h2>Current ICO Auditors</h2>
-        {this.state && this.state.auditors !== undefined && this.icoAuditors()}
         {this.state &&
           this.state.auditSelected === false &&
           this.state.newAuditorAddress !== undefined && (
@@ -386,6 +414,33 @@ class BremICOForm extends Component {
                 >
                   Request withdraw
                 </button>
+                <br />
+                <span className="pure-form-message">
+                  <br />Withdraw fee: {this.state.fee} %
+                </span>
+              </fieldset>
+            </form>
+          )}
+      </div>
+    );
+
+    const AuditorForm = (
+      <div>
+        {this.state &&
+          this.state.isRequested === true &&
+          this.state.isConfirmed === false && (
+            <form
+              className="pure-form pure-form-ctacked"
+              onSubmit={this.handleConfirm.bind(this)}
+            >
+              <fieldset>
+                <legend>Auditor form</legend>
+                <button
+                  type="submit"
+                  className="pure-button pure-button-primary"
+                >
+                  Submit withdraw
+                </button>
               </fieldset>
             </form>
           )}
@@ -416,9 +471,8 @@ class BremICOForm extends Component {
               </p>
             )}
           {this.state &&
-            this.state.requestedValue !== undefined &&
-            this.state.requestedValue > 0 && (
-              <p>Developer's Request: {this.state.requestedValue} Wei </p>
+            this.state.isRequested === true && (
+              <p>Developer's Request: {this.state.requestedValue} Eth </p>
             )}
           <p>Contract balance: {this.state.balance} Ether</p>
           <p>
@@ -427,12 +481,12 @@ class BremICOForm extends Component {
               ipfs.infura.io/ipfs/{this.state.docHash}
             </a>
           </p>
-          <p>You spend: {this.state.userBalance} Wei </p>
+          <p>You spend: {this.state.userBalance} Eth </p>
           <p>
             You bought: {this.state.userTotalTokens} {this.state.tokenSymbol}
           </p>
           <p>
-            Current Balance: {this.state.userCurrentBalance}{" "}
+            Current Balance: {this.state.userCurrentBalance.toLocaleString()}{" "}
             {this.state.tokenSymbol}
           </p>
           {this.state &&
@@ -448,6 +502,10 @@ class BremICOForm extends Component {
                 </p>
               </fieldset>
             )}
+          <h3>Current ICO Auditors</h3>
+          {this.state &&
+            this.state.auditors !== undefined &&
+            this.icoAuditors()}
 
           {this.state &&
             this.state.auditSelected === true &&
@@ -470,7 +528,7 @@ class BremICOForm extends Component {
                   />
                   <span> Eth </span>
                   <p>
-                    You will buy: {this.state.tokensAmount}
+                    You will buy: {this.state.tokensAmount}{" "}
                     {this.state.tokenSymbol}
                   </p>
                   <button
@@ -487,7 +545,8 @@ class BremICOForm extends Component {
             this.state.hasClosed === true &&
             this.state.capReached === false &&
             this.state.userBalance !== undefined &&
-            this.state.tokenSymbol !== undefined && (
+            this.state.tokenSymbol !== undefined &&
+            this.state.userBalance > 0 && (
               <form
                 className="pure-form pure-form-ctacked"
                 onSubmit={this.handleRefund.bind(this)}
@@ -525,6 +584,11 @@ class BremICOForm extends Component {
             this.state.role &&
             this.state.role === "developer" &&
             DeveloperForm}
+
+          {this.state &&
+            this.state.role &&
+            this.state.role === "auditor" &&
+            AuditorForm}
         </div>
       </main>
     );

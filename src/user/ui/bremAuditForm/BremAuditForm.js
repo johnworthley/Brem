@@ -27,11 +27,14 @@ class BremAuditForm extends Component {
 
         ico.at(this.state.address).then(icoInstance => {
           icoInstance.request().then(request => {
-            this.setState({ requestedValue: request[0].toNumber() });
+            this.setState({
+              requestedValue: web3.utils.fromWei(request[0], "ether")
+            });
           });
 
           icoInstance.isConfirmed(coinbase).then(isConfirmed => {
             this.setState({ visible: !isConfirmed });
+            this.setState({ isConfirmed: isConfirmed });
             if (!isConfirmed) {
               icoInstance.name().then(name => {
                 this.setState({ name: name });
@@ -94,6 +97,7 @@ class BremAuditForm extends Component {
       <div>
         {this.state &&
           this.state.visible === true &&
+          this.state.isConfirmed === false &&
           this.state.name &&
           this.state.description &&
           this.state.requestedValue &&

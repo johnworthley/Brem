@@ -43,13 +43,19 @@ class BremDevForm extends Component {
           this.setState({ description: description });
         });
 
+        icoInstance.withdrawFeePercent().then(fee => {
+          this.setState({ fee: fee.toNumber() });
+        });
+
         web3.eth.getBalance(this.state.address).then(balance => {
           this.setState({ balance: web3.utils.fromWei(balance, "ether") });
         });
 
         if (this.state.status === "requested") {
           icoInstance.request().then(request => {
-            this.setState({ requestedValue: request[0].toNumber() });
+            this.setState({
+              requestedValue: web3.utils.fromWei(request[0], "ether")
+            });
           });
         }
       });
@@ -118,7 +124,7 @@ class BremDevForm extends Component {
               <p>Address: {this.state.address}</p>
               <p>{this.state.description}</p>
               <p>Status: {this.state.status}</p>
-              <p>ICO balance: {this.state.balance} Wei</p>
+              <p>ICO balance: {this.state.balance} Eth</p>
               {this.state.status === "success" && (
                 <form
                   className="pure-form pure-form-ctacked"
@@ -145,7 +151,7 @@ class BremDevForm extends Component {
 
               {this.state.status === "requested" &&
                 this.state.requestedValue !== undefined && (
-                  <p>Requested value: {this.state.requestedValue} Wei </p>
+                  <p>Requested value: {this.state.requestedValue} Eth </p>
                 )}
 
               <p>
@@ -155,6 +161,9 @@ class BremDevForm extends Component {
                 >
                   Open ICO Page
                 </button>
+                <span className="pure-form-message">
+                  <br />Withdraw fee: {this.state.fee} %
+                </span>
               </p>
             </fieldset>
           )}
