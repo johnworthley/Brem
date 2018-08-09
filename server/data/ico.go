@@ -32,6 +32,7 @@ func (ico *ICO) GetICO() (err error) {
 		log.Println(err)
 		return
 	}
+	defer row.Close()
 	exists := row.Next()
 	if !exists {
 		return errors.New("ICO doesn't exists")
@@ -42,11 +43,12 @@ func (ico *ICO) GetICO() (err error) {
 
 // GetCreatedICOs show all ICOs with status "created"
 func GetCreatedICOs() (icos []ICO, err error)  {
-	rows, err := db.Query("SELECT * FROM ico WHERE status = $1", "created")
+	rows, err := db.Query("SELECT * FROM ico WHERE status = $1 ORDER BY id DESC", "created")
 	if err != nil {
 		log.Println(err)
 		return
 	}
+	defer rows.Close()
 	for rows.Next() {
 		var ico ICO
 		err = rows.Scan(&ico.ID, &ico.Address, &ico.Developer.ID, &ico.Status)
@@ -61,11 +63,12 @@ func GetCreatedICOs() (icos []ICO, err error)  {
 
 // GetOpenedICOs show all ICOs with status "opened"
 func GetOpenedICOs() (icos []ICO, err error) {
-	rows, err := db.Query("SELECT * FROM ico WHERE status = $1", "opened")
+	rows, err := db.Query("SELECT * FROM ico WHERE status = $1 ORDER BY id DESC", "opened")
 	if err != nil {
 		log.Println(err)
 		return
 	}
+	defer rows.Close()
 	for rows.Next() {
 		var ico ICO
 		err = rows.Scan(&ico.ID, &ico.Address, &ico.Developer.ID, &ico.Status)
@@ -80,11 +83,12 @@ func GetOpenedICOs() (icos []ICO, err error) {
 
 // GetSuccessICOs show all ICOs with statuses "success" or "requested"
 func GetSuccessICOs() (icos []ICO, err error) {
-	rows, err := db.Query("SELECT * FROM ico WHERE status = $1 OR status = $2", "success", "requested")
+	rows, err := db.Query("SELECT * FROM ico WHERE status = $1 OR status = $2 ORDER BY id DESC", "success", "requested")
 	if err != nil {
 		log.Println(err)
 		return
 	}
+	defer rows.Close()
 	for rows.Next() {
 		var ico ICO
 		err = rows.Scan(&ico.ID, &ico.Address, &ico.Developer.ID, &ico.Status)
@@ -99,11 +103,12 @@ func GetSuccessICOs() (icos []ICO, err error) {
 
 // GetFailedICOs show all ICOs with status "failed"
 func GetFailedICOs() (icos []ICO, err error) {
-	rows, err := db.Query("SELECT * FROM ico WHERE status = $1", "failed")
+	rows, err := db.Query("SELECT * FROM ico WHERE status = $1 ORDER BY id DESC", "failed")
 	if err != nil {
 		log.Println(err)
 		return
 	}
+	defer rows.Close()
 	for rows.Next() {
 		var ico ICO
 		err = rows.Scan(&ico.ID, &ico.Address, &ico.Developer.ID, &ico.Status)
@@ -118,7 +123,8 @@ func GetFailedICOs() (icos []ICO, err error) {
 
 // GetWithdrawnICOs show all ICOs with status "withdrawn"
 func GetWithdrawnICOs() (icos []ICO, err error) {
-	rows, err := db.Query("SELECT * FROM ico WHERE status = $1", "failed")
+	rows, err := db.Query("SELECT * FROM ico WHERE status = $1 ORDER BY id DESC", "withdrawn")
+	defer rows.Close()
 	if err != nil {
 		log.Println(err)
 		return
@@ -150,12 +156,13 @@ func (ico *ICO) AddAuditorToICO(auditor Auditor) (err error) {
 
 // GetICOAuditors returns all current ICO auditors
 func (ico *ICO) GetICOAuditors() (auditors []Auditor, err error) {
-	rows, err := db.Query("SELECT * FROM auditors WHERE id = " +
+	rows, err := db.Query("SELECT * FROM auditors WHERE id IN " +
 		"(SELECT auditorID FROM icoAuditors WHERE icoID = $1)", ico.ID)
 	if err != nil {
 		log.Println(err)
 		return
 	}
+	defer rows.Close()
 	for rows.Next() {
 		var auditor Auditor
 		err = rows.Scan(&auditor.ID, &auditor.Address)

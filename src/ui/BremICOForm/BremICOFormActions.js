@@ -246,7 +246,7 @@ export function publishProject(contractAddress, form) {
 }
 
 // Developer form
-export function makeWithrawRequest(contractAddress, weiValue, form) {
+export function makeWithrawRequest(contractAddress, value, form) {
   let web3 = store.getState().web3.web3Instance;
 
   // Double-check web3's status.
@@ -287,7 +287,9 @@ export function makeWithrawRequest(contractAddress, weiValue, form) {
                     }
 
                     instance
-                      .withdraw(weiValue, { from: coinbase })
+                      .withdraw(web3.utils.toWei(value, "ether"), {
+                        from: coinbase
+                      })
                       .then(resTX => {
                         axios
                           .put("http://" + mHost + "/ico/request", {
@@ -297,6 +299,7 @@ export function makeWithrawRequest(contractAddress, weiValue, form) {
                             console.log(res);
                             form.setState({ isRequested: true });
                             instance.request().then(request => {
+                              this.setState({ isRequested: true });
                               form.setState({
                                 requestedValue: request[0].toNumber()
                               });
@@ -307,6 +310,69 @@ export function makeWithrawRequest(contractAddress, weiValue, form) {
                   });
                 });
               });
+            });
+          });
+        });
+      });
+    };
+  } else {
+    console.error("Web3 is not initialized.");
+  }
+}
+
+// Auditor form
+export function confirmWithdraw(contractAddress, form) {
+  let web3 = store.getState().web3.web3Instance;
+
+  // Double-check web3's status.
+  if (typeof web3 !== "undefined") {
+    return function() {
+      const ico = contract(ICOContract);
+      ico.setProvider(web3.currentProvider);
+
+      web3.eth.getCoinbase((error, coinbase) => {
+        if (error) {
+          console.error(error);
+        }
+
+        ico.at(contractAddress).then(instance => {
+          instance.isAuditor(coinbase).then(res => {
+            if (!res) {
+              return alert(
+                "Error, coinbase is not current ICO auditor address"
+              );
+            }
+
+            instance.confirmWithdraw({ from: coinbase }).then(res => {
+              form.setState({ isConfirmed: true });
+
+              instance.isRequested().then(isRequested => {
+                form.setState({ isRequested: isRequested });
+                if (!isRequested) {
+                  instance.isWithdrawn().then(isWithdrawn => {
+                    if (isWithdrawn) {
+                      axios
+                        .put("http://127.0.0.1:8080/ico/withdrawn", {
+                          address: contractAddress
+                        })
+                        .then(res => {
+                          console.log(res);
+                        })
+                        .catch(err => console.error(err));
+                    } else {
+                      axios
+                        .put("http://127.0.0.1:8080/ico/success", {
+                          address: contractAddress
+                        })
+                        .then(res => {
+                          console.log(res);
+                        })
+                        .catch(err => console.error(err));
+                    }
+                  });
+                }
+              });
+              return alert("TX: " + res.tx);
             });
           });
         });

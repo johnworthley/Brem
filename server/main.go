@@ -8,7 +8,9 @@ import (
 var router *gin.Engine
 
 func main() {
-	//go RunUpdater()
+	gin.SetMode(gin.ReleaseMode)
+
+	go RunUpdater()
 
 	router = gin.Default()
 	router.Use(gin.Logger())

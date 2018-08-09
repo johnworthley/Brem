@@ -28,6 +28,7 @@ export function confirmWithdraw(contractAddress, form) {
             }
 
             instance.confirmWithdraw({ from: coinbase }).then(res => {
+              form.setState({ isConfirmed: true });
               instance.isRequested().then(isRequested => {
                 if (!isRequested) {
                   instance.isWithdrawn().then(isWithdrawn => {
@@ -38,7 +39,6 @@ export function confirmWithdraw(contractAddress, form) {
                         })
                         .then(res => {
                           console.log(res);
-                          form.setState({ visible: false });
                         })
                         .catch(err => console.error(err));
                     } else {
@@ -48,7 +48,6 @@ export function confirmWithdraw(contractAddress, form) {
                         })
                         .then(res => {
                           console.log(res);
-                          form.setState({ visible: false });
                         })
                         .catch(err => console.error(err));
                     }

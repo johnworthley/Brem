@@ -10,10 +10,10 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    onSubmitWithdrawRequest: (contractAddress, weiValue, form) => {
+    onSubmitWithdrawRequest: (contractAddress, value, form) => {
       event.preventDefault();
 
-      dispatch(makeWithrawRequest(contractAddress, weiValue, form));
+      dispatch(makeWithrawRequest(contractAddress, value, form));
     }
   };
 };

@@ -534,7 +534,7 @@ class ProfileForm extends Component {
                     onSubmit={this.handleWithdrawFeeChange.bind(this)}
                   >
                     <fieldset>
-                      <legend>Change ICO creation price</legend>
+                      <legend>Change ICO withdraw fee</legend>
                       <input
                         id="newFeePercent"
                         type="number"
@@ -654,6 +654,9 @@ class ProfileForm extends Component {
                 <fieldset>
                   <legend>Create BREM ICO</legend>
                   <p>
+                    <span>
+                      Name: <br />
+                    </span>
                     <input
                       id="name"
                       type="text"
@@ -663,6 +666,9 @@ class ProfileForm extends Component {
                     />
                   </p>
                   <p>
+                    <span>
+                      Symbol: <br />{" "}
+                    </span>
                     <input
                       id="symbol"
                       type="text"
@@ -672,6 +678,9 @@ class ProfileForm extends Component {
                     />
                   </p>
                   <p>
+                    <span>
+                      Rate: <br />
+                    </span>
                     <input
                       id="rate"
                       type="number"
@@ -681,6 +690,9 @@ class ProfileForm extends Component {
                     />
                   </p>
                   <p>
+                    <span>
+                      Cap: <br />{" "}
+                    </span>
                     <input
                       id="cap"
                       type="number"
@@ -692,6 +704,9 @@ class ProfileForm extends Component {
                     <span> Eth </span>
                   </p>
                   <p>
+                    <span>
+                      Closing time: <br />{" "}
+                    </span>
                     <input
                       id="closingTime"
                       type="datetime-local"
@@ -701,6 +716,9 @@ class ProfileForm extends Component {
                     />
                   </p>
                   <p>
+                    <span>
+                      Short description: <br />
+                    </span>
                     <textarea
                       id="description"
                       rows="5"
