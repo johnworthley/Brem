@@ -154,7 +154,7 @@ class BremICOForm extends Component {
 
               // Get current ico auditors
               axios
-                .get("http://127.0.0.1:8080/ico/audit", {
+                .get("http://" + mHost + "/ico/audit", {
                   params: {
                     address: this.state.address
                   }
@@ -173,7 +173,7 @@ class BremICOForm extends Component {
                     this.setState({ newAuditorAddress: "" });
                     // Get current ico auditors
                     axios
-                      .get("http://127.0.0.1:8080/ico/audit", {
+                      .get("http://" + mHost + "/ico/audit", {
                         params: {
                           address: this.state.address
                         }
