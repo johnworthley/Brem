@@ -86,11 +86,11 @@ export function createNewBREMICO(
               bremInstance = instance;
 
               ipfs.files.add(files, (error, result) => {
-                // if (error) {
-                //   console.log(error);
-                //   return;
-                // }
-                // docHash = result[result.length - 1].hash;
+                if (error) {
+                  console.log(error);
+                  return;
+                }
+                docHash = result[result.length - 1].hash;
 
                 // Get ICO creation price
                 bremInstance.icoCreationPrice({ from: coinbase }).then(res => {
@@ -109,8 +109,7 @@ export function createNewBREMICO(
                             web3.utils.toWei(cap, "ether"),
                             closingTime.toString(),
                             description,
-                            // docHash,
-                            [],
+                            docHash,
                             { from: coinbase }
                           )
                           .then(TXres => {
