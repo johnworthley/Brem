@@ -302,6 +302,10 @@ contract BREMICO {
         return hasClosed() && capReached() && address(this).balance < 100;
     }
     
+    function isOverdue() public view returns (bool) {
+        return hasClosed() && !auditSelected;
+    }
+    
   // -----------------------------------------
   // Internal interface (extensible)
   // -----------------------------------------
