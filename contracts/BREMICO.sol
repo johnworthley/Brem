@@ -123,17 +123,15 @@ contract BREMICO {
         address _wallet, 
         uint256 _closingTime,
         string _docHash,
-        Auditable _auditAddress,
         uint256 _withdrawFeePercent
     ) 
         public 
     {
         require(_brem != address(0));
         require(bytes(_name).length > 0);
-        require(_cap > 0);
+        require(_cap >= 100);
         require(_rate > 0);
         require(_wallet != address(0));
-        require(_auditAddress != address(0));
         require(_closingTime >= block.timestamp);
         require(_withdrawFeePercent >= 0 && _withdrawFeePercent <= 100);
         
@@ -143,11 +141,10 @@ contract BREMICO {
         wallet = _wallet;
         closingTime = _closingTime;
         docHash = _docHash;
-        audit = Auditable(_auditAddress);
+        audit = Auditable(brem);
         withdrawFeePercent = _withdrawFeePercent;
-
-        BREMToken _token = new BREMToken(_name, _symbol, this);
-        require(address(_token) != address(0));
+        
+        BREMToken _token = new BREMToken(_name, _symbol, address(this));
         token = _token;
     }
 

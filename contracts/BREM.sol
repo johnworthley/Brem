@@ -50,10 +50,10 @@ contract BREM is BREMFactory {
             msg.sender,
             _closingTime,
             _docHash, 
-            this,
             withdrawFeePercent
         );
         icoAddress = address(ico);
+        tokenAddress = ico.token();
 
         projects[projectsAmount] = icoAddress;
         indexes[_name] = projectsAmount;

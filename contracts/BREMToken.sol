@@ -298,10 +298,10 @@ contract BREMToken is BurnableToken {
     
     BREMICO ico;
   
-    constructor(string _name, string _symbol, BREMICO _ico) public {
+    constructor(string _name, string _symbol, address _ico) public {
         name = _name;
         symbol = _symbol;
-        ico = _ico;
+        ico = BREMICO(_ico);
     }
     
     modifier onlyAfterSuccess() {
