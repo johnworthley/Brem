@@ -36,9 +36,6 @@ contract BREMICO {
 
     // The token being sold
     BREMToken public token;
-    
-    // ICO name (equals to token's name)
-    string public name;
 
     // Address where funds are collected
     address public wallet;
@@ -54,9 +51,6 @@ contract BREMICO {
     
     // Value in wei that need owner
     uint256  public cap;
-    
-    // ICO description
-    string public description;
     
     // ICO documentation hashes
     string public docHash;
@@ -89,7 +83,6 @@ contract BREMICO {
     
     // Token sale payment registry
     mapping(address => uint256) public balances;
-    mapping(address => uint256) public balancesInToken;
     
     // Withdraw fee percent
     uint256 public withdrawFeePercent;
@@ -120,17 +113,15 @@ contract BREMICO {
     /**
     * @param _rate Number of token units a buyer gets per wei
     * @param _wallet Address where collected funds will be forwarded to
-    * @param _token Address of the token being sold
     */
     constructor(
         address _brem,
         string _name,
+        string _symbol,
         uint256 _cap,
         uint256 _rate, 
         address _wallet, 
-        BREMToken _token,
         uint256 _closingTime,
-        string _description, 
         string _docHash,
         Auditable _auditAddress,
         uint256 _withdrawFeePercent
@@ -142,22 +133,22 @@ contract BREMICO {
         require(_cap > 0);
         require(_rate > 0);
         require(_wallet != address(0));
-        require(_token != address(0));
         require(_auditAddress != address(0));
         require(_closingTime >= block.timestamp);
         require(_withdrawFeePercent >= 0 && _withdrawFeePercent <= 100);
         
-        name = _name;
         brem = _brem;
         cap = _cap;
         rate = _rate;
         wallet = _wallet;
-        token = _token;
         closingTime = _closingTime;
-        description = _description;
         docHash = _docHash;
         audit = Auditable(_auditAddress);
         withdrawFeePercent = _withdrawFeePercent;
+
+        BREMToken _token = new BREMToken(_name, _symbol, this);
+        require(address(_token) != address(0));
+        token = _token;
     }
 
     // -----------------------------------------
@@ -268,9 +259,8 @@ contract BREMICO {
         require(balances[msg.sender] > 0);
         
         uint256 _value = balances[msg.sender];
-        uint256 _tokenAmount = balancesInToken[msg.sender];
         balances[msg.sender] = 0;
-        balancesInToken[msg.sender] = 0;
+        uint256 _tokenAmount = _getTokenAmount(_value);
         token.burnForRefund(msg.sender, _tokenAmount);
         weiRaised = weiRaised.sub(_value);
         msg.sender.transfer(_value);
@@ -374,7 +364,6 @@ contract BREMICO {
         internal
     {
         balances[_beneficiary] += _weiAmount;
-        balancesInToken[_beneficiary] += _getTokenAmount(_weiAmount);
     }
 
     /**

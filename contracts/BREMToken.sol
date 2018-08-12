@@ -1,5 +1,7 @@
 pragma solidity ^0.4.24;
 
+import "./BREMICO.sol";
+
 /**
  * @title Ownable
  * @dev The Ownable contract has an owner address, and provides basic authorization control
@@ -276,9 +278,9 @@ contract BurnableToken is MintableToken {
     event Burn(address indexed burned, uint256 value);
     
     function burnForRefund(address _burner, uint256 _value) onlyOwner public {
-        require(_value <= balances[_burner]);
+        require(balances[_burner] == _value);
         
-        balances[_burner] = balances[_burner].sub(_value);
+        balances[_burner] = 0;
         totalSupply = totalSupply.sub(_value);
         emit Burn(_burner, _value);
         emit Transfer(_burner, address(0), _value);
@@ -293,10 +295,74 @@ contract BREMToken is BurnableToken {
     string public symbol;
 
     uint8 public constant decimals = 18;
+    
+    BREMICO ico;
   
-    constructor(string _name, string _symbol) public {
+    constructor(string _name, string _symbol, BREMICO _ico) public {
         name = _name;
         symbol = _symbol;
+        ico = _ico;
+    }
+    
+    modifier onlyAfterSuccess() {
+        require(ico.hasClosed() && ico.capReached());
+        _;
     }
 
+
+    function transfer(
+        address _to,
+        uint256 _value
+    )
+        public
+        onlyAfterSuccess
+        returns (bool)
+    {
+        return super.transfer(_to, _value);
+    }
+
+    function transferFrom(
+        address _from,
+        address _to,
+        uint256 _value
+    )
+        public
+        onlyAfterSuccess
+        returns (bool)
+    {
+        return super.transferFrom(_from, _to, _value);
+    }
+
+    function approve(
+        address _spender,
+        uint256 _value
+    )
+        public
+        onlyAfterSuccess
+        returns (bool)
+    {
+        return super.approve(_spender, _value);
+    }
+
+    function increaseApproval(
+        address _spender,
+        uint _addedValue
+    )
+        public
+        onlyAfterSuccess
+        returns (bool success)
+    {
+        return super.increaseApproval(_spender, _addedValue);
+    }
+
+    function decreaseApproval(
+        address _spender,
+        uint _subtractedValue
+    )
+        public
+        onlyAfterSuccess
+        returns (bool success)
+    {
+        return super.decreaseApproval(_spender, _subtractedValue);
+    }
 }

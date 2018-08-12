@@ -39,15 +39,15 @@ contract BREMFactory is Userable{
         string name
     );
     
-    uint256 public icoCreationPrice;
+    // uint256 public icoCreationPrice;
 
-    function setIcoCreationPrice(uint256 _icoCreationPrice)
-        public 
-        onlySuperuser
-    {
-        require(_icoCreationPrice != icoCreationPrice);
-        icoCreationPrice = _icoCreationPrice;
-    }
+    // function setIcoCreationPrice(uint256 _icoCreationPrice)
+    //     public 
+    //     onlySuperuser
+    // {
+    //     require(_icoCreationPrice != icoCreationPrice);
+    //     icoCreationPrice = _icoCreationPrice;
+    // }
 
     uint256 public withdrawFeePercent;
 
