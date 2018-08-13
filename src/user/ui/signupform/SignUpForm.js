@@ -36,7 +36,7 @@ class SignUpForm extends Component {
             value={this.state.name}
             onChange={this.onInputChange.bind(this)}
             align="center"
-            placeholder="userame"
+            placeholder="username"
           />
           <span className="pure-form-message">This is a required field.</span>
 
