@@ -18,6 +18,8 @@ contract BREMFactory is Userable{
         return projects[_index];
     }
     
+    bytes32 internal firtProjectNameHash;
+    
     mapping(string => uint256) indexes;
     
     function getProjectByName(string _projectName)

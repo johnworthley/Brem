@@ -30,11 +30,14 @@ contract BREM is BREMFactory {
         string _docHash
     ) 
     public
-    onlyDeveloper
+    // onlyDeveloper
     returns (address tokenAddress, address icoAddress)
     {
         // require(BRM.balanceOf(msg.sender) >= icoCreationPrice);
+        require(!isSuperuser(msg.sender) && !isAuditor(msg.sender));
         require(bytes(_name).length > 0 && bytes(_symbol).length > 0);
+        bytes32 nameHash = keccak256(bytes(_name));
+        require(nameHash != firtProjectNameHash);
         require(indexes[_name] == 0);
         require(_cap >= 100);
         
@@ -57,6 +60,9 @@ contract BREM is BREMFactory {
 
         projects[projectsAmount] = icoAddress;
         indexes[_name] = projectsAmount;
+        if (projectsAmount == 0) {
+            firtProjectNameHash = nameHash;
+        }
         projectsAmount++;
         emit BREMICOCreated(msg.sender, icoAddress, tokenAddress, _name);
     }
