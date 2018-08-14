@@ -4,6 +4,7 @@ import (
 	"log"
 	"errors"
 	"strings"
+	"database/sql"
 )
 
 // Auditor structure represents brem ico auditor
@@ -40,7 +41,11 @@ func (auditor *Auditor) GetAuditor() (err error) {
 	if !exists {
 		return errors.New("Auditor doesn't exists")
 	}
-	err = row.Scan(&auditor.ID, &auditor.Address)
+	var username_string sql.NullString
+	err = row.Scan(&auditor.ID, &auditor.Address, &username_string)
+	if username_string.Valid {
+		auditor.Username = username_string.String
+	}
 	return
 }
 

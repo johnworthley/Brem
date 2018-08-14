@@ -3,25 +3,35 @@ package data
 import (
 	"log"
 	"github.com/pkg/errors"
+	"time"
+	"database/sql"
 )
 
 type ICO struct {
-	ID 			int
-	Address 	string		`json:"address" binding:"required"`
-	Developer 	Developer	`json:"developer"`
-	Status		string
+	ID 				int
+	Address 		string		`json:"address" binding:"required"`
+	Developer 		Developer	`json:"developer"`
+	Description 	string
+	ClosingTime 	time.Time
+	FeePercent  	int
+	TokenAddress	string
+	Name			string
+	Symbol			string
+	Status			string
+	Location		string
+	LocAddress		string
 }
 
 // AddICO inserts new ICO to db
 func (ico *ICO) AddICO() (err error) {
-	statement := "INSERT INTO ico (address, developerID, status) VALUES ($1, $2, $3) RETURNING id"
+	statement := "INSERT INTO ico (address, developerID, closingTime, feePercent, tokenAddress, name, symbol, status) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id"
 	stmt, err := db.Prepare(statement)
 	if err != nil {
 		log.Println(err)
 		return
 	}
 	defer stmt.Close()
-	err = stmt.QueryRow(ico.Address, ico.Developer.ID, "created").Scan(&ico.ID)
+	err = stmt.QueryRow(ico.Address, ico.Developer.ID, ico.ClosingTime, ico.FeePercent, ico.TokenAddress, ico.Name, ico.Symbol, "created").Scan(&ico.ID)
 	return
 }
 
@@ -37,7 +47,19 @@ func (ico *ICO) GetICO() (err error) {
 	if !exists {
 		return errors.New("ICO doesn't exists")
 	}
-	err = row.Scan(&ico.ID, &ico.Address, &ico.Developer.ID, &ico.Status)
+	var description_string sql.NullString
+	var location_string sql.NullString
+	var locAddress_string sql.NullString
+	err = row.Scan(&ico.ID, &ico.Address, &ico.Developer.ID, &description_string, &ico.ClosingTime, &ico.FeePercent, &ico.TokenAddress, &ico.Name, &ico.Symbol, &ico.Status, &location_string, &locAddress_string)
+	if description_string.Valid {
+		ico.Description = description_string.String
+	}
+	if location_string.Valid {
+		ico.Location = location_string.String
+	}
+	if locAddress_string.Valid {
+		ico.LocAddress = locAddress_string.String
+	}
 	return
 }
 
