@@ -34,9 +34,13 @@ func initAPI() {
 	router.POST("/signup", addDeveloper)
 	router.GET("/login", login)
 
+	superuserGroup := router.Group("/super")
+	superuserGroup.Use(SuperuserAuth())
+	{
+		superuserGroup.GET("/audit", getAllAuditors)
+	}
 
-	router.GET("/audit", getAllAuditors)
-	router.POST("/audit", addAuditor)
+	//router.POST("/audit", addAuditor)
 	router.GET("/ico/dev", getDevelopersICOs)
 	router.GET("/audit/ico", getAuditorICOs)
 	router.GET("/ico/audit", getICOAuditors)

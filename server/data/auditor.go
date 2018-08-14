@@ -8,10 +8,12 @@ import (
 
 // Auditor structure represents brem ico auditor
 type Auditor struct {
-	ID      int
-	Address string `json:"address" binding:"required"`
+	ID      	int
+	Address 	string
+	Username	string
 }
 
+// TODO: Change
 // AddAuditor insert auditor in auditors table
 func (auditor *Auditor) AddAuditor() (err error) {
 	statement := "INSERT INTO auditors (address) VALUES ($1) RETURNING id"
@@ -25,6 +27,7 @@ func (auditor *Auditor) AddAuditor() (err error) {
 	return
 }
 
+// TODO: Change
 // GetAuditors returns auditor by address
 func (auditor *Auditor) GetAuditor() (err error) {
 	row, err := db.Query("SELECT * FROM auditors WHERE LOWER(address) = LOWER($1)", auditor.Address)
@@ -41,9 +44,9 @@ func (auditor *Auditor) GetAuditor() (err error) {
 	return
 }
 
-//GetAllAuditors making query and return all auditors addresses
+//GetAllAuditors making query and return all auditors addresses (with usernames)
 func GetAllAuditors() (auditors []Auditor, err error) {
-	rows, err := db.Query("SELECT * FROM auditors")
+	rows, err := db.Query("SELECT * FROM auditors WHERE username LENGTH(username) > 0")
 	if err != nil {
 		log.Println(err)
 		return
@@ -51,7 +54,7 @@ func GetAllAuditors() (auditors []Auditor, err error) {
 	defer rows.Close()
 	for rows.Next() {
 		var auditor Auditor
-		err = rows.Scan(&auditor.ID, &auditor.Address)
+		err = rows.Scan(&auditor.ID, &auditor.Address, &auditor.Username)
 		if err != nil {
 			log.Println(err)
 			return

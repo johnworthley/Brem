@@ -19,6 +19,7 @@ func (dev Developer) IsExists() (exists bool, err error)  {
 		log.Println(err)
 		return
 	}
+	defer row.Close()
 	exists = row.Next()
 	return
 }

@@ -15,22 +15,23 @@ import (
 
 const imagesDir = "./ico_images/"
 
+// FILLING IN UPDATER
 // Add new auditor to db
-func addAuditor(c *gin.Context) {
-	var auditor data.Auditor
-	err := c.BindJSON(&auditor)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, err)
-		return
-	}
-	err = auditor.AddAuditor()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, err)
-		return
-	}
-
-	c.JSON(http.StatusCreated, nil)
-}
+//func addAuditor(c *gin.Context) {
+//	var auditor data.Auditor
+//	err := c.BindJSON(&auditor)
+//	if err != nil {
+//		c.JSON(http.StatusBadRequest, err)
+//		return
+//	}
+//	err = auditor.AddAuditor()
+//	if err != nil {
+//		c.JSON(http.StatusInternalServerError, err)
+//		return
+//	}
+//
+//	c.JSON(http.StatusCreated, nil)
+//}
 
 // Get all BREM auditors
 func getAllAuditors(c *gin.Context) {
@@ -38,9 +39,6 @@ func getAllAuditors(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return
-	}
-	if auditors == nil {
-		auditors = make([]data.Auditor, 0)
 	}
 	c.JSON(http.StatusOK, auditors)
 }
