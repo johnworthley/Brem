@@ -187,10 +187,10 @@ func BREMresolveTransaction(act JsonTransaction){
 	switch fn {
 		case "addAuditor" :
 			BREMaddAuditor(getAddressFromBytes32(act.Input[10:]))
-		case "addDeveloper" :
-			BREMaddDeveloper(getAddressFromBytes32(act.From))
-		case "signUp" :
-			BREMaddDeveloper(getAddressFromBytes32(act.From))
+//		case "addDeveloper" :
+//			BREMaddDeveloper(getAddressFromBytes32(act.From))
+//		case "signUp" :
+//			BREMaddDeveloper(getAddressFromBytes32(act.From))
 	}
 }
 func BREMICOresolveTransaction(act JsonTransaction){
@@ -319,7 +319,7 @@ func checkIco(icoAddress string, client bind.ContractBackend, startBlock int64){
 			log.Println(err)
 		}
 
-		BREMaddDeveloper("0x" + hex.EncodeToString(devAddress[:]))
+//		BREMaddDeveloper("0x" + hex.EncodeToString(devAddress[:]))
 
 		var dev data.Developer
 		dev.Address = "0x" + hex.EncodeToString(devAddress[:])
