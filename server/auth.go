@@ -8,6 +8,7 @@ import (
 	"strings"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"github.com/gin-contrib/sessions"
 )
 
 func validate(address string, sign string) (res bool, err error) {
@@ -70,4 +71,46 @@ func addDeveloper(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, nil)
+}
+
+// Developer login
+func login(c *gin.Context) {
+	var developer data.Developer
+	err := c.BindJSON(&developer)
+	if err != nil || len(developer.Address) == 0 || len(developer.Sign) == 0 {
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+	// Validate request
+	isValid, err := validate(developer.Address, developer.Sign)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+	if !isValid {
+		c.JSON(http.StatusNotAcceptable, nil)
+		return
+	}
+
+	exists, err := developer.IsExists()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+	if !exists {
+		c.JSON(http.StatusUnauthorized, err)
+		return
+	}
+
+	err = developer.GetDeveloper()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+	// Set up session
+	session := sessions.Default(c)
+	session.Set("address", developer.Address)
+	session.Set("sign", developer.Sign)
+
+	c.JSON(http.StatusOK, developer)
 }

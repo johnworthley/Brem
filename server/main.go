@@ -3,6 +3,8 @@ package main
 import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/gin-contrib/sessions/cookie"
+	"github.com/gin-contrib/sessions"
 )
 
 var router *gin.Engine
@@ -16,6 +18,9 @@ func main() {
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
 
+	store := cookie.NewStore([]byte("secret"))
+	router.Use(sessions.Sessions("brem", store))
+
 	corsConfig := cors.DefaultConfig()
 	corsConfig.AllowOrigins = []string{"http://localhost:3000"}
 	router.Use(cors.New(corsConfig))
@@ -26,7 +31,10 @@ func main() {
 }
 
 func initAPI() {
-	router.POST("/dev", addDeveloper)
+	router.POST("/signup", addDeveloper)
+	router.GET("/login", login)
+
+
 	router.GET("/audit", getAllAuditors)
 	router.POST("/audit", addAuditor)
 	router.GET("/ico/dev", getDevelopersICOs)
