@@ -43,3 +43,46 @@ func SuperuserAuth() gin.HandlerFunc {
 		c.Next()
 	}
 }
+
+// Developer requests middleware
+func DeveloperAuth() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		session := sessions.Default(c)
+		iAddress := session.Get("address")
+		if iAddress == nil {
+			c.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
+		address := iAddress.(string)
+		iSign := session.Get("sign")
+		if iSign == nil {
+			c.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
+		sign := iSign.(string)
+		// Validate session
+		isValid, err := validate(address, sign)
+		if err != nil || !isValid {
+			c.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
+
+		developer := data.Developer{Address: address}
+		isExists, err := developer.IsExists()
+		if err != nil {
+			c.AbortWithStatus(http.StatusInternalServerError)
+			return
+		}
+		if !isExists {
+			c.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
+		err = developer.GetDeveloper()
+		if err != nil {
+			c.AbortWithStatus(http.StatusInternalServerError)
+			return
+		}
+		c.Set("dev", developer)
+		c.Next()
+	}
+}
