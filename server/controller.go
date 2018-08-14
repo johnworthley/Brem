@@ -7,47 +7,13 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"os"
-			"log"
+	"log"
 	"io/ioutil"
 	"image/jpeg"
 	"github.com/nfnt/resize"
 )
 
 const imagesDir = "./ico_images/"
-
-// Add new developer to db
-func addDeveloper(c *gin.Context) {
-	var developer data.Developer
-	err := c.BindJSON(&developer)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, err)
-		return
-	}
-	err = developer.Create()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, err)
-		return
-	}
-
-	c.JSON(http.StatusCreated, nil)
-}
-
-// Add new auditor to db
-func addAuditor(c *gin.Context) {
-	var auditor data.Auditor
-	err := c.BindJSON(&auditor)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, err)
-		return
-	}
-	err = auditor.AddAuditor()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, err)
-		return
-	}
-
-	c.JSON(http.StatusCreated, nil)
-}
 
 // Get all BREM auditors
 func getAllAuditors(c *gin.Context) {

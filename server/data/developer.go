@@ -6,26 +6,39 @@ import (
 
 // Developer represents developer structure
 type Developer struct {
-	ID      int
-	Address string `json:"address"`
+	ID      	int
+	Address 	string 	`json:"address"`
+	Username	string 	`json:"username"`
+	Sign		string	`json:"sign"`
+}
+
+// Check for existing of address
+func (dev Developer) IsExists() (exists bool, err error)  {
+	row, err := db.Query("SELECT * FROM developers WHERE address = $1", dev.Address)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	exists = row.Next()
+	return
 }
 
 // Create insert new developer address to db
 func (dev *Developer) Create() (err error) {
-	statement := "INSERT INTO developers (address) VALUES ($1) RETURNING id"
+	statement := "INSERT INTO developers (address, username) VALUES ($1, $2)"
 	stmt, err := db.Prepare(statement)
 	if err != nil {
 		log.Println(err)
 		return
 	}
 	defer stmt.Close()
-	err = stmt.QueryRow(dev.Address).Scan(&dev.ID)
+	_, err = stmt.Exec(dev.Address, dev.Username)
 	return
 }
 
 // GetDeveloper select developer's id from by address
 func (dev *Developer) GetDeveloper() (err error) {
-	statement := "SELECT id FROM developers WHERE address = $1"
+	statement := "SELECT * FROM developers WHERE address = $1"
 	row, err := db.Query(statement, dev.Address)
 	if err != nil {
 		log.Println(err)
@@ -33,7 +46,7 @@ func (dev *Developer) GetDeveloper() (err error) {
 	}
 	defer row.Close()
 	row.Next()
-	err = row.Scan(&dev.ID)
+	err = row.Scan(&dev.ID, &dev.Address, &dev.Username)
 	return
 }
 
