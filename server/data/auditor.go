@@ -28,7 +28,6 @@ func (auditor *Auditor) AddAuditor() (err error) {
 	return
 }
 
-// TODO: Change
 // GetAuditors returns auditor by address
 func (auditor *Auditor) GetAuditor() (err error) {
 	row, err := db.Query("SELECT * FROM auditors WHERE LOWER(address) = LOWER($1)", auditor.Address)
@@ -51,7 +50,7 @@ func (auditor *Auditor) GetAuditor() (err error) {
 
 //GetAllAuditors making query and return all auditors addresses (with usernames)
 func GetAllAuditors() (auditors []Auditor, err error) {
-	rows, err := db.Query("SELECT * FROM auditors WHERE username LENGTH(username) > 0")
+	rows, err := db.Query("SELECT * FROM auditors WHERE LENGTH(username) > 0")
 	if err != nil {
 		log.Println(err)
 		return
@@ -71,7 +70,7 @@ func GetAllAuditors() (auditors []Auditor, err error) {
 
 // GetICOs returns current auditor ICOs
 func (auditor *Auditor) GetICOs() (icos []ICO, err error) {
-	rows, err := db.Query("SELECT * FROM ico WHERE status = 'requested' AND" +
+	rows, err := db.Query("SELECT id, address, closingTime, feePercent, tokenAddress, name, symbol, status, locAddress FROM ico WHERE status = 'requested' AND" +
 		" id IN (SELECT icoID FROM icoAuditors WHERE auditorID = $1)", auditor.ID)
 	if err != nil {
 		log.Println(err)
@@ -80,7 +79,7 @@ func (auditor *Auditor) GetICOs() (icos []ICO, err error) {
 	defer rows.Close()
 	for rows.Next() {
 		var ico ICO
-		err = rows.Scan(&ico.ID, &ico.Address, &ico.Developer.ID, &ico.Status)
+		err = rows.Scan(&ico.ID, &ico.Address, &ico.ClosingTime, &ico.FeePercent, &ico.TokenAddress, &ico.Name, &ico.Symbol, &ico.Status, &ico.LocAddress)
 		if err != nil {
 			log.Println(err)
 			return

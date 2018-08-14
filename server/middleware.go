@@ -44,6 +44,40 @@ func SuperuserAuth() gin.HandlerFunc {
 	}
 }
 
+// Auditors requests middleware
+func AuditorAuth() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		session := sessions.Default(c)
+		iAddress := session.Get("address")
+		if iAddress == nil {
+			c.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
+		address := iAddress.(string)
+		iSign := session.Get("sign")
+		if iSign == nil {
+			c.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
+		sign := iSign.(string)
+		// Validate session
+		isValid, err := validate(address, sign)
+		if err != nil || !isValid {
+			c.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
+
+		auditor := data.Auditor{Address: address}
+		err = auditor.GetAuditor()
+		if err != nil {
+			c.AbortWithStatus(http.StatusInternalServerError)
+			return
+		}
+		c.Set("auditor", auditor)
+		c.Next()
+	}
+}
+
 // Developer requests middleware
 func DeveloperAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {

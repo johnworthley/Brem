@@ -46,8 +46,13 @@ func initAPI() {
 		developerGroup.GET("/ico/dev", getDevelopersICOs)
 	}
 
+	auditorGroup := router.Group("/auditor")
+	auditorGroup.Use(AuditorAuth())
+	{
+		auditorGroup.GET("/audit/ico", getAuditorICOs)
+	}
+
 	//router.POST("/audit", addAuditor)
-	router.GET("/audit/ico", getAuditorICOs)
 	router.GET("/ico/audit", getICOAuditors)
 	router.GET("/ico/created", getCreatedICOs)
 	router.GET("/ico/opened", getOpennedICOs)
