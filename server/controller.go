@@ -10,6 +10,10 @@ import (
 	"log"
 	"io/ioutil"
 	"image/jpeg"
+	"image"
+	_ "image/png"
+	_ "image/gif"
+	_ "image/jpeg"
 	"github.com/nfnt/resize"
 )
 
@@ -84,7 +88,7 @@ func addICOImage(c *gin.Context) {
 		return
 	}
 	// Resize file
-	img, err := jpeg.Decode(file)
+	img, _, err := image.Decode(file)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return
