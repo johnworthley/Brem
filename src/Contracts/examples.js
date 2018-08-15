@@ -4,6 +4,8 @@ import axios from "axios";
 
 const contract = require("truffle-contract");
 
+const host = "Здесь нужна константа для хоста"
+
 export function signUpUser(name) {
   const web3 = web3Provider.getWeb3();
   // Using truffle-contract we create the authentication object.
@@ -69,7 +71,6 @@ export function signUpUser(name) {
                   })
                 } else {
                  // Register developer
-                 const host = "Здесь должна быть переменная с используменым сервером"
                  const developer = {
                    address: coinbase,
                    username: name,
@@ -126,7 +127,6 @@ export function signUpUser(name) {
             // Write to cokkie address and sign
           })
           .catch(res => {
-            const host = "Здесь должна быть переменная с используменым сервером"
             const developer = {
               address: coinbase,
               sign: sign
