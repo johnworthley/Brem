@@ -6,7 +6,8 @@ const style = StyleSheet.create({
   main: {
     width: '100%',
     maxWidth: config.pageWidth,
-    margin: '50px auto'
+    margin: '50px auto',
+    padding: '0 20px'
   }
 })
 

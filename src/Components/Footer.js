@@ -9,7 +9,8 @@ const style = StyleSheet.create({
     background: '#262b2e',
     color: '#fff',
     height: footerHeight,
-  },
+    padding: '0 20px'
+},
   holder: {
     width: '100%',
     height: footerHeight,
