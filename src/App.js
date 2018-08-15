@@ -1,65 +1,26 @@
-import React, { Component } from "react";
-import { Link } from "react-router";
-import { HiddenOnlyAuth, VisibleOnlyAuth } from "./util/wrappers.js";
+import React, { Component } from 'react'
+import Routing from './Route/Routing'
+import Header from './Components/Header'
+import Footer from './Components/Footer'
+import store from 'Store'
 
-// UI Components
-import LoginButtonContainer from "./user/ui/loginbutton/LoginButtonContainer";
-import LogoutButtonContainer from "./user/ui/logoutbutton/LogoutButtonContainer";
+import getweb3 from './util/getweb3'
 
-// Styles
-import "./css/oswald.css";
-import "./css/open-sans.css";
-import "./css/pure-min.css";
-import "./App.css";
+import './App.css'
+
+getweb3()
+
+console.log(store)
+
 
 class App extends Component {
-  render() {
-    const OnlyAuthLinks = VisibleOnlyAuth(() => (
-      <span>
-        <li className="pure-menu-item">
-          <Link to="/dashboard" className="pure-menu-link">
-            Dashboard
-          </Link>
-        </li>
-        <li className="pure-menu-item">
-          <Link to="/profile" className="pure-menu-link">
-            Account
-          </Link>
-        </li>
-        <LogoutButtonContainer />
-      </span>
-    ));
-
-    const OnlyGuestLinks = HiddenOnlyAuth(() => (
-      <span>
-        <li className="pure-menu-item">
-          <Link to="/signup" className="pure-menu-link">
-            Sign Up
-          </Link>
-        </li>
-        <LoginButtonContainer />
-      </span>
-    ));
-
-    return (
-      <div className="App">
-        <nav className="navbar pure-menu pure-menu-horizontal">
-          <ul className="pure-menu-list navbar-right">
-            <OnlyGuestLinks />
-            <OnlyAuthLinks />
-          </ul>
-          <Link to="/" className="pure-menu-heading pure-menu-link">
-            BREM
-          </Link>
-          <Link to="/marketplace" className="pure-menu-heading pure-menu-link">
-            Marketplace
-          </Link>
-        </nav>
-
-        {this.props.children}
-      </div>
-    );
-  }
+  render = () => (
+    <div>
+      <Header />
+      <Routing />
+      <Footer />
+    </div>
+  )
 }
 
-export default App;
+export default App
