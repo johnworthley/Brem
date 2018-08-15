@@ -2,9 +2,9 @@ package main
 
 import (
 	"github.com/gin-contrib/cors"
-	"github.com/gin-gonic/gin"
-	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
+	"github.com/gin-gonic/gin"
 )
 
 var router *gin.Engine
@@ -43,22 +43,28 @@ func initAPI() {
 	developerGroup := router.Group("/dev")
 	developerGroup.Use(DeveloperAuth())
 	{
-		developerGroup.GET("/ico/dev", getDevelopersICOs)
+		developerGroup.GET("/ico", getDevelopersICOs)
 	}
 
 	auditorGroup := router.Group("/auditor")
 	auditorGroup.Use(AuditorAuth())
 	{
-		auditorGroup.GET("/audit/ico", getAuditorICOs)
+		auditorGroup.GET("/ico", getAuditorICOs)
 	}
 
 	//router.POST("/audit", addAuditor)
-	router.GET("/ico/audit", getICOAuditors)
-	router.GET("/ico/created", getCreatedICOs)
-	router.GET("/ico/opened", getOpennedICOs)
-	router.GET("/ico/success", getSuccessICOs)
-	router.GET("/ico/failed", getFailedICOs)
-	router.GET("/ico/withdrawn", getWithdrawnICOs)
+	//router.GET("/ico/audit", getICOAuditors)
+
+	icoGroup := router.Group("/ico")
+	{
+		icoGroup.GET("/", getAllICOs)
+		icoGroup.GET("/created", getCreatedICOs)
+		icoGroup.GET("/opened", getOpennedICOs)
+		icoGroup.GET("/success", getSuccessICOs)
+		icoGroup.GET("/failed", getFailedICOs)
+		icoGroup.GET("/withdrawn", getWithdrawnICOs)
+		icoGroup.GET("/overdue", getOverdueICOs)
+	}
 	router.POST("/ico", addICO)
 	router.GET("/ico/image", getICOImage)
 	router.POST("/ico/image", addICOImage)
