@@ -2,22 +2,22 @@ pragma solidity ^0.4.24;
 
 import "./BREMFactory.sol";
 import "./Userable.sol";
-import "./BRMToken.sol";
+// import "./BRMToken.sol";
 
 contract BREM is BREMFactory {
 
-    BRMToken public BRM;
+    // BRMToken public BRM;
 
     constructor(
-        address _brmAddress,
-        uint256 _icoCreationPrice,
+        // address _brmAddress,
+        // uint256 _icoCreationPrice,
         uint256 _withdrawFeePercent
     ) 
     public 
     {
         require(_withdrawFeePercent >= 0 && _withdrawFeePercent <=100);
-        BRM = BRMToken(_brmAddress);
-        icoCreationPrice = _icoCreationPrice;
+        // BRM = BRMToken(_brmAddress);
+        // icoCreationPrice = _icoCreationPrice;
         withdrawFeePercent = _withdrawFeePercent;
     }    
     
@@ -27,42 +27,42 @@ contract BREM is BREMFactory {
         uint256 _rate,
         uint256 _cap,
         uint256 _closingTime,
-        string _description,
         string _docHash
     ) 
     public
-    onlyDeveloper
+    // onlyDeveloper
     returns (address tokenAddress, address icoAddress)
     {
-        require(BRM.balanceOf(msg.sender) >= icoCreationPrice);
+        // require(BRM.balanceOf(msg.sender) >= icoCreationPrice);
+        require(!isSuperuser(msg.sender) && !isAuditor(msg.sender));
         require(bytes(_name).length > 0 && bytes(_symbol).length > 0);
+        bytes32 nameHash = keccak256(bytes(_name));
+        require(nameHash != firtProjectNameHash);
         require(indexes[_name] == 0);
         require(_cap >= 100);
         
-        require(BRM.transferFrom(msg.sender, address(this), icoCreationPrice));
+        // require(BRM.transferFrom(msg.sender, address(this), icoCreationPrice));
         
-        
-        BREMToken token = new BREMToken(_name, _symbol);
-        tokenAddress = address(token);
         
         BREMICO ico = new BREMICO(
             address(this),
             _name,
+            _symbol,
             _cap, 
             _rate,
             msg.sender,
-            token,
             _closingTime,
-            _description, 
             _docHash, 
-            this,
             withdrawFeePercent
         );
         icoAddress = address(ico);
-        token.transferOwnership(icoAddress);
+        tokenAddress = ico.token();
 
         projects[projectsAmount] = icoAddress;
         indexes[_name] = projectsAmount;
+        if (projectsAmount == 0) {
+            firtProjectNameHash = nameHash;
+        }
         projectsAmount++;
         emit BREMICOCreated(msg.sender, icoAddress, tokenAddress, _name);
     }

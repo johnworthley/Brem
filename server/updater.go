@@ -19,7 +19,7 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/ethclient"
 
-)
+	)
 
 var   BREMcontractAddress	= ""
 const etherscanApiKey       = "194M4NC49RXX52KMM1W5U91Y6UK2RM5WUW"
@@ -151,6 +151,7 @@ func BREMaddDeveloper(devAddress string){
 		dev.Create()
 	}
 }
+
 func BREMICOaddAuditor(icoAddress string, auditorAddress string){
 
 	var ico data.ICO
@@ -186,10 +187,10 @@ func BREMresolveTransaction(act JsonTransaction){
 	switch fn {
 		case "addAuditor" :
 			BREMaddAuditor(getAddressFromBytes32(act.Input[10:]))
-		case "addDeveloper" :
-			BREMaddDeveloper(getAddressFromBytes32(act.From))
-		case "signUp" :
-			BREMaddDeveloper(getAddressFromBytes32(act.From))
+//		case "addDeveloper" :
+//			BREMaddDeveloper(getAddressFromBytes32(act.From))
+//		case "signUp" :
+//			BREMaddDeveloper(getAddressFromBytes32(act.From))
 	}
 }
 func BREMICOresolveTransaction(act JsonTransaction){
@@ -247,36 +248,48 @@ func getBREMICOstatus(contract *BREMICO) string{
 		}
 
 		if res == true {
-			res, err := contract.CapReached(&bind.CallOpts{})
+
+			res, err := contract.IsOverdue(&bind.CallOpts{})
 			if err != nil {
 				log.Println(err)
 			}
 
-			if res == true {
-				res, err := contract.IsRequested(&bind.CallOpts{})
+			if res == false {
+
+				res, err := contract.CapReached(&bind.CallOpts{})
 				if err != nil {
 					log.Println(err)
 				}
 
-				if res == false {
-					res, err := contract.IsWithdrawn(&bind.CallOpts{})
+				if res == true {
+					res, err := contract.IsRequested(&bind.CallOpts{})
 					if err != nil {
 						log.Println(err)
 					}
 
 					if res == false {
-						status = "success"
+						res, err := contract.IsWithdrawn(&bind.CallOpts{})
+						if err != nil {
+							log.Println(err)
+						}
+
+						if res == false {
+							status = "success"
+
+						} else {
+							status = "withdrawn"
+						}
 
 					} else {
-						status = "withdrawn"
+						status = "requested"
 					}
 
 				} else {
-					status = "requested"
+					status = "failed"
 				}
 
 			} else {
-				status = "failed"
+				status = "overdue"
 			}
 
 		} else {
@@ -306,7 +319,7 @@ func checkIco(icoAddress string, client bind.ContractBackend, startBlock int64){
 			log.Println(err)
 		}
 
-		BREMaddDeveloper("0x" + hex.EncodeToString(devAddress[:]))
+//		BREMaddDeveloper("0x" + hex.EncodeToString(devAddress[:]))
 
 		var dev data.Developer
 		dev.Address = "0x" + hex.EncodeToString(devAddress[:])
@@ -315,8 +328,47 @@ func checkIco(icoAddress string, client bind.ContractBackend, startBlock int64){
 			log.Println(err)
 		}
 
-
 		ico.Developer = dev
+
+		closingTime, err := contract.ClosingTime(&bind.CallOpts{})
+		if err != nil {
+			log.Println(err)
+		}
+		unixTime, err := strconv.Atoi(closingTime.String())
+		if err != nil {
+			log.Println(err)
+		}
+		ico.ClosingTime = time.Unix(int64(unixTime), 0) //
+
+		feePercent, err := contract.WithdrawFeePercent(&bind.CallOpts{})
+		if err != nil {
+			log.Println(err)
+		}
+		ico.FeePercent, err = strconv.Atoi(feePercent.String()) //
+
+		tokenAddress, err := contract.Token(&bind.CallOpts{})
+		if err != nil {
+			log.Println(err)
+		}
+		ico.TokenAddress = "0x" + hex.EncodeToString(tokenAddress[:])
+
+
+		tokenContract, err := NewBREMToken(common.HexToAddress(ico.TokenAddress), client)
+		if err != nil {
+			log.Println(err)
+		}
+
+		name, err := tokenContract.Name(&bind.CallOpts{})
+		if err != nil {
+			log.Println(err)
+		}
+		ico.Name = name
+
+		symbol, err := tokenContract.Symbol(&bind.CallOpts{})
+		if err != nil {
+			log.Println(err)
+		}
+		ico.Symbol = symbol
 
 		ico.AddICO()
 	}
@@ -325,21 +377,18 @@ func checkIco(icoAddress string, client bind.ContractBackend, startBlock int64){
 	status := getBREMICOstatus(contract)	//
 
 
-	if status == "created" {
+
+	res, err := contract.AuditorsAmount(&bind.CallOpts{})
+	if err != nil {
+		log.Println(err)
+	}
+
+	auditors, err := ico.GetICOAuditors()
+	ln := int64(len(auditors))
+	if res.Cmp(big.NewInt(ln)) > 0 {
 		updateAuditorsIco(icoAddress, startBlock)
 	}
-	if status == "opened" {
-		res, err := contract.AuditorsAmount(&bind.CallOpts{})
-		if err != nil {
-			log.Println(err)
-		}
 
-		auditors, err := ico.GetICOAuditors()
-		ln := int64(len(auditors))
-		if res.Cmp(big.NewInt(ln)) > 0 {
-			updateAuditorsIco(icoAddress, startBlock)
-		}
-	}
 
 	ico.SetStatusICO(status)
 
@@ -382,6 +431,10 @@ func getNumLastBlock() int64 {
 
 	}
 
+	if len(numLastBlock.Result) < 2 {
+		log.Println("Error: len(numLastBlock.Result) < 2")
+		return 0
+	}
 	result, err := strconv.ParseInt(numLastBlock.Result[2:], 16, 64)
 	if err != nil{
 		log.Println(err)
@@ -419,6 +472,9 @@ func getKminuteBlock(K int) int64{
 	numLastBlock := getNumLastBlock()
 
 	numBlock := numLastBlock - int64(int64(K)*int64(blocksPerMinute))
+	if numLastBlock == 0 {
+		numBlock = 0
+	}
 	time := getTimeFromKBlock(numBlock)
 	if time < wantedTime {
 		return numBlock
@@ -456,6 +512,19 @@ func getBREMcontractAddressFromBremJson() string {
 
 }
 
+func updateSuperuser(BREMAddress string){
+	data.ClearSuperuser()
+
+	transactions := getListTransactions(BREMAddress, 0, 99999999)
+
+	var superuser data.Superuser
+
+	superuser.Address = transactions.Result[0].From
+
+	superuser.AddSuperuser()
+
+}
+
 func updateDB(minutes int){
 
 	startBlock := getKminuteBlock(minutes)
@@ -464,12 +533,13 @@ func updateDB(minutes int){
 
 }
 
-
 // DB updater
 func RunUpdater() {
 
 	BREMcontractAddress = getBREMcontractAddressFromBremJson()
 	fmt.Println("BREMcontractAddress:" + BREMcontractAddress)
+
+	updateSuperuser(BREMcontractAddress)
 
 	updateBREMparticipants(0)
 	updateBREMProjects(0)

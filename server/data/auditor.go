@@ -1,19 +1,22 @@
 package data
 
 import (
-	"log"
+	"database/sql"
 	"errors"
+	"log"
 	"strings"
 )
 
 // Auditor structure represents brem ico auditor
 type Auditor struct {
-	ID      int
-	Address string `json:"address" binding:"required"`
+	ID       int    `json:"id"`
+	Address  string `json:"address"`
+	Username string `json:"username"`
 }
 
 // AddAuditor insert auditor in auditors table
 func (auditor *Auditor) AddAuditor() (err error) {
+	auditor.Address = strings.ToLower(auditor.Address)
 	statement := "INSERT INTO auditors (address) VALUES ($1) RETURNING id"
 	stmt, err := db.Prepare(statement)
 	if err != nil {
@@ -37,13 +40,17 @@ func (auditor *Auditor) GetAuditor() (err error) {
 	if !exists {
 		return errors.New("Auditor doesn't exists")
 	}
-	err = row.Scan(&auditor.ID, &auditor.Address)
+	var username_string sql.NullString
+	err = row.Scan(&auditor.ID, &auditor.Address, &username_string)
+	if username_string.Valid {
+		auditor.Username = username_string.String
+	}
 	return
 }
 
-//GetAllAuditors making query and return all auditors addresses
+//GetAllAuditors making query and return all auditors addresses (with usernames)
 func GetAllAuditors() (auditors []Auditor, err error) {
-	rows, err := db.Query("SELECT * FROM auditors")
+	rows, err := db.Query("SELECT * FROM auditors WHERE LENGTH(username) > 0")
 	if err != nil {
 		log.Println(err)
 		return
@@ -51,7 +58,7 @@ func GetAllAuditors() (auditors []Auditor, err error) {
 	defer rows.Close()
 	for rows.Next() {
 		var auditor Auditor
-		err = rows.Scan(&auditor.ID, &auditor.Address)
+		err = rows.Scan(&auditor.ID, &auditor.Address, &auditor.Username)
 		if err != nil {
 			log.Println(err)
 			return
@@ -63,7 +70,7 @@ func GetAllAuditors() (auditors []Auditor, err error) {
 
 // GetICOs returns current auditor ICOs
 func (auditor *Auditor) GetICOs() (icos []ICO, err error) {
-	rows, err := db.Query("SELECT * FROM ico WHERE status = 'requested' AND" +
+	rows, err := db.Query("SELECT id, address, closingTime, feePercent, tokenAddress, name, symbol, status, locAddress FROM ico WHERE status = 'requested' AND"+
 		" id IN (SELECT icoID FROM icoAuditors WHERE auditorID = $1)", auditor.ID)
 	if err != nil {
 		log.Println(err)
@@ -72,7 +79,7 @@ func (auditor *Auditor) GetICOs() (icos []ICO, err error) {
 	defer rows.Close()
 	for rows.Next() {
 		var ico ICO
-		err = rows.Scan(&ico.ID, &ico.Address, &ico.Developer.ID, &ico.Status)
+		err = rows.Scan(&ico.ID, &ico.Address, &ico.ClosingTime, &ico.FeePercent, &ico.TokenAddress, &ico.Name, &ico.Symbol, &ico.Status, &ico.LocAddress)
 		if err != nil {
 			log.Println(err)
 			return

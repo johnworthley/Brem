@@ -2,6 +2,8 @@ package main
 
 import (
 	"github.com/gin-contrib/cors"
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 )
 
@@ -16,6 +18,9 @@ func main() {
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
 
+	store := cookie.NewStore([]byte("secret"))
+	router.Use(sessions.Sessions("brem", store))
+
 	corsConfig := cors.DefaultConfig()
 	corsConfig.AllowOrigins = []string{"http://localhost:3000"}
 	router.Use(cors.New(corsConfig))
@@ -26,23 +31,46 @@ func main() {
 }
 
 func initAPI() {
-	router.POST("/dev", addDeveloper)
-	router.GET("/audit", getAllAuditors)
-	router.POST("/audit", addAuditor)
-	router.GET("/ico/dev", getDevelopersICOs)
-	router.GET("/audit/ico", getAuditorICOs)
-	router.GET("/ico/audit", getICOAuditors)
-	router.GET("/ico/created", getCreatedICOs)
-	router.GET("/ico/opened", getOpennedICOs)
-	router.GET("/ico/success", getSuccessICOs)
-	router.GET("/ico/failed", getFailedICOs)
-	router.GET("/ico/withdrawn", getWithdrawnICOs)
-	router.POST("/ico", addICO)
-	router.GET("/ico/image", getICOImage)
-	router.POST("/ico/image", addICOImage)
-	router.POST("/ico/audit", addAuditorToICO)
-	router.PUT("/ico/open", publishICO)
-	router.PUT("/ico/success", setICOSucccessStatus)
-	router.PUT("/ico/request", setICORequestedStatus)
-	router.PUT("/ico/withdrawn", setICOWithdrawnStatus)
+	router.POST("/signup", addDeveloper)
+	router.POST("/login", login)
+
+	superuserGroup := router.Group("/super")
+	superuserGroup.Use(SuperuserAuth())
+	{
+		superuserGroup.GET("/audit", getAllAuditors)
+		superuserGroup.POST("/ico/audit", addAuditorToICO)
+		superuserGroup.PUT("/ico/open", publishICO)
+	}
+
+	developerGroup := router.Group("/dev")
+	developerGroup.Use(DeveloperAuth())
+	{
+		developerGroup.GET("/ico", getDevelopersICOs)
+		developerGroup.POST("/ico", addICO)
+		developerGroup.POST("/image", addICOImage)
+		developerGroup.PUT("/ico/request", setICORequestedStatus)
+	}
+
+	auditorGroup := router.Group("/auditor")
+	auditorGroup.Use(AuditorAuth())
+	{
+		auditorGroup.GET("/ico", getAuditorICOs)
+	}
+
+	//router.POST("/audit", addAuditor)
+	//router.GET("/ico/audit", getICOAuditors)
+
+	icoGroup := router.Group("/ico")
+	{
+		icoGroup.GET("/", getICO)
+		icoGroup.GET("/all", getAllICOs)
+		icoGroup.GET("/created", getCreatedICOs)
+		icoGroup.GET("/opened", getOpennedICOs)
+		icoGroup.GET("/success", getSuccessICOs)
+		icoGroup.GET("/failed", getFailedICOs)
+		icoGroup.GET("/withdrawn", getWithdrawnICOs)
+		icoGroup.GET("/overdue", getOverdueICOs)
+		icoGroup.GET("/image", getICOImage)
+	}
+
 }

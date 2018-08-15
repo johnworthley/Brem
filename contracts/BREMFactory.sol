@@ -18,6 +18,8 @@ contract BREMFactory is Userable{
         return projects[_index];
     }
     
+    bytes32 internal firtProjectNameHash;
+    
     mapping(string => uint256) indexes;
     
     function getProjectByName(string _projectName)
@@ -39,15 +41,15 @@ contract BREMFactory is Userable{
         string name
     );
     
-    uint256 public icoCreationPrice;
+    // uint256 public icoCreationPrice;
 
-    function setIcoCreationPrice(uint256 _icoCreationPrice)
-        public 
-        onlySuperuser
-    {
-        require(_icoCreationPrice != icoCreationPrice);
-        icoCreationPrice = _icoCreationPrice;
-    }
+    // function setIcoCreationPrice(uint256 _icoCreationPrice)
+    //     public 
+    //     onlySuperuser
+    // {
+    //     require(_icoCreationPrice != icoCreationPrice);
+    //     icoCreationPrice = _icoCreationPrice;
+    // }
 
     uint256 public withdrawFeePercent;
 

@@ -206,30 +206,30 @@ contract Auditable is Superuserable {
     }
 }
 
-contract Developerable is Auditable {
+// contract Developerable is Auditable {
     
-    string public constant ROLE_DEVELOPER = "developer";
+//     string public constant ROLE_DEVELOPER = "developer";
     
-    function addDeveloper() public {
-        require(msg.sender != address(0));
-        addRole(msg.sender, ROLE_DEVELOPER);
-    }
+//     function addDeveloper() public {
+//         require(msg.sender != address(0));
+//         addRole(msg.sender, ROLE_DEVELOPER);
+//     }
     
-    modifier onlyDeveloper() {
-        checkRole(msg.sender, ROLE_DEVELOPER);
-        _;
-    }
+//     modifier onlyDeveloper() {
+//         checkRole(msg.sender, ROLE_DEVELOPER);
+//         _;
+//     }
     
-    function isDeveloper(address _addr) 
-        public
-        view
-    returns (bool)
-    {
-        return hasRole(_addr, ROLE_DEVELOPER);
-    }
-}
+//     function isDeveloper(address _addr) 
+//         public
+//         view
+//     returns (bool)
+//     {
+//         return hasRole(_addr, ROLE_DEVELOPER);
+//     }
+// }
 
-contract Userable is Developerable {
+contract Userable is Auditable {
     
     struct User {
         string name;
@@ -256,9 +256,9 @@ contract Userable is Developerable {
             users[msg.sender].name = _name;
         }
         
-        if (!isSuperuser(msg.sender) && !isAuditor(msg.sender)) {
-            addDeveloper();
-        }
+        // if (!isSuperuser(msg.sender) && !isAuditor(msg.sender)) {
+        //     addDeveloper();
+        // }
         
         return users[msg.sender].name;
     }

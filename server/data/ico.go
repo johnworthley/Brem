@@ -1,32 +1,71 @@
 package data
 
 import (
-	"log"
+	"database/sql"
 	"github.com/pkg/errors"
+	"log"
+	"strings"
+	"time"
 )
 
 type ICO struct {
-	ID 			int
-	Address 	string		`json:"address" binding:"required"`
-	Developer 	Developer	`json:"developer"`
-	Status		string
+	ID           int       `json:"id"`
+	Address      string    `json:"address" binding:"required"`
+	Developer    Developer `json:"developer"`
+	Description  string    `json:"description"`
+	ClosingTime  time.Time `json:"closing_time"`
+	FeePercent   int       `json:"fee_percent"`
+	TokenAddress string    `json:"token_address"`
+	Name         string    `json:"name"`
+	Symbol       string    `json:"symbol"`
+	Status       string    `json:"status"`
+	Location     string    `json:"location"`
+	LocAddress   string    `json:"loc_address"`
 }
+
+const (
+	CREATED   = "created"
+	OPENED    = "opened"
+	SUCCESS   = "success"
+	FAILED    = "failed"
+	WITHDRAWN = "withdrawn"
+	OVERDUE   = "overdue"
+)
 
 // AddICO inserts new ICO to db
 func (ico *ICO) AddICO() (err error) {
-	statement := "INSERT INTO ico (address, developerID, status) VALUES ($1, $2, $3) RETURNING id"
+	ico.Address = strings.ToLower(ico.Address)
+	ico.TokenAddress = strings.ToLower(ico.TokenAddress)
+	statement := "INSERT INTO ico (address, developerID, closingTime, feePercent, tokenAddress, name, symbol, status) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id"
 	stmt, err := db.Prepare(statement)
 	if err != nil {
 		log.Println(err)
 		return
 	}
 	defer stmt.Close()
-	err = stmt.QueryRow(ico.Address, ico.Developer.ID, "created").Scan(&ico.ID)
+	err = stmt.QueryRow(ico.Address, ico.Developer.ID, ico.ClosingTime, ico.FeePercent, ico.TokenAddress, ico.Name, ico.Symbol, "created").Scan(&ico.ID)
+	return
+}
+
+// CreateICO from request
+func (ico *ICO) CreateICO() (err error) {
+	ico.Address = strings.ToLower(ico.Address)
+	ico.TokenAddress = strings.ToLower(ico.TokenAddress)
+	statement := "INSERT INTO ico (address, developerID, description, closingTime, feePercent, tokenAddress, name, symbol, status, location, locAddress) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id"
+	stmt, err := db.Prepare(statement)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	defer stmt.Close()
+	err = stmt.QueryRow(ico.Address, ico.Developer.ID, ico.ClosingTime, ico.FeePercent, ico.TokenAddress, ico.Name, ico.Symbol, CREATED, ico.Location, ico.LocAddress).Scan(&ico.ID)
 	return
 }
 
 // GetICO returns ICO by ICO's address
 func (ico *ICO) GetICO() (err error) {
+	ico.Address = strings.ToLower(ico.Address)
+	ico.TokenAddress = strings.ToLower(ico.TokenAddress)
 	row, err := db.Query("SELECT * FROM ico WHERE address = $1", ico.Address)
 	if err != nil {
 		log.Println(err)
@@ -37,13 +76,29 @@ func (ico *ICO) GetICO() (err error) {
 	if !exists {
 		return errors.New("ICO doesn't exists")
 	}
-	err = row.Scan(&ico.ID, &ico.Address, &ico.Developer.ID, &ico.Status)
+	var description_string sql.NullString
+	var location_string sql.NullString
+	var locAddress_string sql.NullString
+	err = row.Scan(&ico.ID, &ico.Address, &ico.Developer.ID, &description_string, &ico.ClosingTime, &ico.FeePercent, &ico.TokenAddress, &ico.Name, &ico.Symbol, &ico.Status, &location_string, &locAddress_string)
+	if description_string.Valid {
+		ico.Description = description_string.String
+	}
+	if location_string.Valid {
+		ico.Location = location_string.String
+	}
+	if locAddress_string.Valid {
+		ico.LocAddress = locAddress_string.String
+	}
 	return
 }
 
-// GetCreatedICOs show all ICOs with status "created"
-func GetCreatedICOs() (icos []ICO, err error)  {
-	rows, err := db.Query("SELECT * FROM ico WHERE status = $1 ORDER BY id DESC", "created")
+const ICOs_AMOUNT_IN_PAGE = 6
+
+// GetAllICOs returns ICOs in one page
+func GetAllICOs(page int) (icos []ICO, err error) {
+	start := ICOs_AMOUNT_IN_PAGE * page
+	rows, err := db.Query("SELECT id, address, developerid, closingtime, tokenaddress, name, symbol, status, location, locaddress FROM ico  ORDER BY id DESC LIMIT $1 OFFSET $2",
+		ICOs_AMOUNT_IN_PAGE, start)
 	if err != nil {
 		log.Println(err)
 		return
@@ -51,19 +106,47 @@ func GetCreatedICOs() (icos []ICO, err error)  {
 	defer rows.Close()
 	for rows.Next() {
 		var ico ICO
-		err = rows.Scan(&ico.ID, &ico.Address, &ico.Developer.ID, &ico.Status)
-		if err != nil {
-			log.Println(err)
-			return
+		var location, locAddress sql.NullString
+		err = rows.Scan(&ico.ID, &ico.Address, &ico.Developer.ID, &ico.ClosingTime, &ico.TokenAddress, &ico.Name, &ico.Symbol, &ico.Status, &location, &locAddress)
+		if location.Valid {
+			ico.Location = location.String
 		}
-		icos = append(icos, ico)
+		if locAddress.Valid {
+			ico.LocAddress = locAddress.String
+		}
+	}
+	return
+}
+
+// GetCreatedICOs show all ICOs with status "created"
+func GetCreatedICOs(page int) (icos []ICO, err error) {
+	start := ICOs_AMOUNT_IN_PAGE * page
+	rows, err := db.Query("SELECT id, address, developerid, closingtime, tokenaddress, name, symbol, status, location, locaddress FROM ico WHERE status = $1 ORDER BY id DESC LIMIT $2 OFFSET $3",
+		CREATED, ICOs_AMOUNT_IN_PAGE, start)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var ico ICO
+		var location, locAddress sql.NullString
+		err = rows.Scan(&ico.ID, &ico.Address, &ico.Developer.ID, &ico.ClosingTime, &ico.TokenAddress, &ico.Name, &ico.Symbol, &ico.Status, &location, &locAddress)
+		if location.Valid {
+			ico.Location = location.String
+		}
+		if locAddress.Valid {
+			ico.LocAddress = locAddress.String
+		}
 	}
 	return
 }
 
 // GetOpenedICOs show all ICOs with status "opened"
-func GetOpenedICOs() (icos []ICO, err error) {
-	rows, err := db.Query("SELECT * FROM ico WHERE status = $1 ORDER BY id DESC", "opened")
+func GetOpenedICOs(page int) (icos []ICO, err error) {
+	start := ICOs_AMOUNT_IN_PAGE * page
+	rows, err := db.Query("SELECT id, address, developerid, closingtime, tokenaddress, name, symbol, status, location, locaddress FROM ico WHERE status = $1 ORDER BY id DESC LIMIT $2 OFFSET $3",
+		OPENED, ICOs_AMOUNT_IN_PAGE, start)
 	if err != nil {
 		log.Println(err)
 		return
@@ -71,19 +154,23 @@ func GetOpenedICOs() (icos []ICO, err error) {
 	defer rows.Close()
 	for rows.Next() {
 		var ico ICO
-		err = rows.Scan(&ico.ID, &ico.Address, &ico.Developer.ID, &ico.Status)
-		if err != nil {
-			log.Println(err)
-			return
+		var location, locAddress sql.NullString
+		err = rows.Scan(&ico.ID, &ico.Address, &ico.Developer.ID, &ico.ClosingTime, &ico.TokenAddress, &ico.Name, &ico.Symbol, &ico.Status, &location, &locAddress)
+		if location.Valid {
+			ico.Location = location.String
 		}
-		icos = append(icos, ico)
+		if locAddress.Valid {
+			ico.LocAddress = locAddress.String
+		}
 	}
 	return
 }
 
 // GetSuccessICOs show all ICOs with statuses "success" or "requested"
-func GetSuccessICOs() (icos []ICO, err error) {
-	rows, err := db.Query("SELECT * FROM ico WHERE status = $1 OR status = $2 ORDER BY id DESC", "success", "requested")
+func GetSuccessICOs(page int) (icos []ICO, err error) {
+	start := ICOs_AMOUNT_IN_PAGE * page
+	rows, err := db.Query("SELECT id, address, developerid, closingtime, tokenaddress, name, symbol, status, location, locaddress FROM ico WHERE status = $1 ORDER BY id DESC LIMIT $2 OFFSET $3",
+		SUCCESS, ICOs_AMOUNT_IN_PAGE, start)
 	if err != nil {
 		log.Println(err)
 		return
@@ -91,19 +178,23 @@ func GetSuccessICOs() (icos []ICO, err error) {
 	defer rows.Close()
 	for rows.Next() {
 		var ico ICO
-		err = rows.Scan(&ico.ID, &ico.Address, &ico.Developer.ID, &ico.Status)
-		if err != nil {
-			log.Println(err)
-			return
+		var location, locAddress sql.NullString
+		err = rows.Scan(&ico.ID, &ico.Address, &ico.Developer.ID, &ico.ClosingTime, &ico.TokenAddress, &ico.Name, &ico.Symbol, &ico.Status, &location, &locAddress)
+		if location.Valid {
+			ico.Location = location.String
 		}
-		icos = append(icos, ico)
+		if locAddress.Valid {
+			ico.LocAddress = locAddress.String
+		}
 	}
 	return
 }
 
 // GetFailedICOs show all ICOs with status "failed"
-func GetFailedICOs() (icos []ICO, err error) {
-	rows, err := db.Query("SELECT * FROM ico WHERE status = $1 ORDER BY id DESC", "failed")
+func GetFailedICOs(page int) (icos []ICO, err error) {
+	start := ICOs_AMOUNT_IN_PAGE * page
+	rows, err := db.Query("SELECT id, address, developerid, closingtime, tokenaddress, name, symbol, status, location, locaddress FROM ico WHERE status = $1 ORDER BY id DESC LIMIT $2 OFFSET $3",
+		FAILED, ICOs_AMOUNT_IN_PAGE, start)
 	if err != nil {
 		log.Println(err)
 		return
@@ -111,32 +202,62 @@ func GetFailedICOs() (icos []ICO, err error) {
 	defer rows.Close()
 	for rows.Next() {
 		var ico ICO
-		err = rows.Scan(&ico.ID, &ico.Address, &ico.Developer.ID, &ico.Status)
-		if err != nil {
-			log.Println(err)
-			return
+		var location, locAddress sql.NullString
+		err = rows.Scan(&ico.ID, &ico.Address, &ico.Developer.ID, &ico.ClosingTime, &ico.TokenAddress, &ico.Name, &ico.Symbol, &ico.Status, &location, &locAddress)
+		if location.Valid {
+			ico.Location = location.String
 		}
-		icos = append(icos, ico)
+		if locAddress.Valid {
+			ico.LocAddress = locAddress.String
+		}
 	}
 	return
 }
 
 // GetWithdrawnICOs show all ICOs with status "withdrawn"
-func GetWithdrawnICOs() (icos []ICO, err error) {
-	rows, err := db.Query("SELECT * FROM ico WHERE status = $1 ORDER BY id DESC", "withdrawn")
-	defer rows.Close()
+func GetWithdrawnICOs(page int) (icos []ICO, err error) {
+	start := ICOs_AMOUNT_IN_PAGE * page
+	rows, err := db.Query("SELECT id, address, developerid, closingtime, tokenaddress, name, symbol, status, location, locaddress FROM ico WHERE status = $1 ORDER BY id DESC LIMIT $2 OFFSET $3",
+		WITHDRAWN, ICOs_AMOUNT_IN_PAGE, start)
 	if err != nil {
 		log.Println(err)
 		return
 	}
+	defer rows.Close()
 	for rows.Next() {
 		var ico ICO
-		err = rows.Scan(&ico.ID, &ico.Address, &ico.Developer.ID, &ico.Status)
-		if err != nil {
-			log.Println(err)
-			return
+		var location, locAddress sql.NullString
+		err = rows.Scan(&ico.ID, &ico.Address, &ico.Developer.ID, &ico.ClosingTime, &ico.TokenAddress, &ico.Name, &ico.Symbol, &ico.Status, &location, &locAddress)
+		if location.Valid {
+			ico.Location = location.String
 		}
-		icos = append(icos, ico)
+		if locAddress.Valid {
+			ico.LocAddress = locAddress.String
+		}
+	}
+	return
+}
+
+// GetOverdueICOs show all ICOs with status "overdue"
+func GetOverdueICOs(page int) (icos []ICO, err error) {
+	start := ICOs_AMOUNT_IN_PAGE * page
+	rows, err := db.Query("SELECT id, address, developerid, closingtime, tokenaddress, name, symbol, status, location, locaddress FROM ico WHERE status = $1 ORDER BY id DESC LIMIT $2 OFFSET $3",
+		OVERDUE, ICOs_AMOUNT_IN_PAGE, start)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var ico ICO
+		var location, locAddress sql.NullString
+		err = rows.Scan(&ico.ID, &ico.Address, &ico.Developer.ID, &ico.ClosingTime, &ico.TokenAddress, &ico.Name, &ico.Symbol, &ico.Status, &location, &locAddress)
+		if location.Valid {
+			ico.Location = location.String
+		}
+		if locAddress.Valid {
+			ico.LocAddress = locAddress.String
+		}
 	}
 	return
 }
@@ -156,7 +277,7 @@ func (ico *ICO) AddAuditorToICO(auditor Auditor) (err error) {
 
 // GetICOAuditors returns all current ICO auditors
 func (ico *ICO) GetICOAuditors() (auditors []Auditor, err error) {
-	rows, err := db.Query("SELECT * FROM auditors WHERE id IN " +
+	rows, err := db.Query("SELECT * FROM auditors WHERE id IN "+
 		"(SELECT auditorID FROM icoAuditors WHERE icoID = $1)", ico.ID)
 	if err != nil {
 		log.Println(err)
@@ -177,6 +298,7 @@ func (ico *ICO) GetICOAuditors() (auditors []Auditor, err error) {
 
 // PublishICO change ICO status to "opened"
 func (ico *ICO) PublishICO() (err error) {
+	ico.Address = strings.ToLower(ico.Address)
 	statement := "UPDATE ico SET status = $1 WHERE address = $2"
 	stmt, err := db.Prepare(statement)
 	if err != nil {
@@ -184,7 +306,7 @@ func (ico *ICO) PublishICO() (err error) {
 		return
 	}
 	defer stmt.Close()
-	_, err = stmt.Exec("opened", ico.Address)
+	_, err = stmt.Exec(OPENED, ico.Address)
 	return
 }
 
@@ -226,6 +348,7 @@ func (ico *ICO) SetWithdrawnStatus() (err error) {
 	_, err = stmt.Exec("withdrawn", ico.Address)
 	return
 }
+
 // SetStatusICO set ICO status
 func (ico *ICO) SetStatusICO(status string) (err error) {
 	statement := "UPDATE ico SET status = $1 WHERE address = $2"
