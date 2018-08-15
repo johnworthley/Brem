@@ -9,9 +9,9 @@ import (
 
 // Auditor structure represents brem ico auditor
 type Auditor struct {
-	ID       int
-	Address  string
-	Username string
+	ID       int    `json:"id"`
+	Address  string `json:"address"`
+	Username string `json:"username"`
 }
 
 // AddAuditor insert auditor in auditors table

@@ -7,7 +7,7 @@ import (
 
 // Developer represents developer structure
 type Developer struct {
-	ID       int
+	ID       int    `json:"id"`
 	Address  string `json:"address"`
 	Username string `json:"username"`
 	Sign     string `json:"sign"`

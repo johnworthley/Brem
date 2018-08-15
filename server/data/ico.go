@@ -9,18 +9,18 @@ import (
 )
 
 type ICO struct {
-	ID           int
+	ID           int       `json:"id"`
 	Address      string    `json:"address" binding:"required"`
 	Developer    Developer `json:"developer"`
-	Description  string
-	ClosingTime  time.Time
-	FeePercent   int
-	TokenAddress string
-	Name         string
-	Symbol       string
-	Status       string
-	Location     string
-	LocAddress   string
+	Description  string    `json:"description"`
+	ClosingTime  time.Time `json:"closing_time"`
+	FeePercent   int       `json:"fee_percent"`
+	TokenAddress string    `json:"token_address"`
+	Name         string    `json:"name"`
+	Symbol       string    `json:"symbol"`
+	Status       string    `json:"status"`
+	Location     string    `json:"location"`
+	LocAddress   string    `json:"loc_address"`
 }
 
 const (

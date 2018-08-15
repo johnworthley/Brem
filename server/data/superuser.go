@@ -1,15 +1,14 @@
 package data
 
 import (
-"log"
-"strings"
+	"log"
+	"strings"
 )
 
 type Superuser struct {
-	ID       int
-	Address  string
+	ID      int    `json:"id"`
+	Address string `json:"address"`
 }
-
 
 func (superuser *Superuser) AddSuperuser() (err error) {
 	superuser.Address = strings.ToLower(superuser.Address)
@@ -38,7 +37,7 @@ func (superuser *Superuser) GetSuperuser() (err error) {
 	return
 }
 
-func ClearSuperuser() (err error){
+func ClearSuperuser() (err error) {
 	statement := "DELETE FROM superuser"
 	stmt, err := db.Prepare(statement)
 	if err != nil {
