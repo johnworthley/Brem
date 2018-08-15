@@ -147,6 +147,27 @@ func getICOImage(c *gin.Context) {
 	c.Data(http.StatusOK, "image/jpeg", b)
 }
 
+func getICO(c *gin.Context) {
+	var ico data.ICO
+	ico.Address = c.Query("address")
+	if len(ico.Address) == 0 {
+		c.JSON(http.StatusBadRequest, nil)
+		return
+	}
+	ico.Address = strings.ToLower(ico.Address)
+	err := ico.GetICO()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+	err = ico.Developer.GetDeveloper()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+	c.JSON(http.StatusOK, ico)
+}
+
 // Get current developer's ICOs
 func getDevelopersICOs(c *gin.Context) {
 	iDeveloper, exists := c.Get("dev")

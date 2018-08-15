@@ -34,6 +34,8 @@ const (
 
 // AddICO inserts new ICO to db
 func (ico *ICO) AddICO() (err error) {
+	ico.Address = strings.ToLower(ico.Address)
+	ico.TokenAddress = strings.ToLower(ico.TokenAddress)
 	statement := "INSERT INTO ico (address, developerID, closingTime, feePercent, tokenAddress, name, symbol, status) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id"
 	stmt, err := db.Prepare(statement)
 	if err != nil {
@@ -47,6 +49,8 @@ func (ico *ICO) AddICO() (err error) {
 
 // CreateICO from request
 func (ico *ICO) CreateICO() (err error) {
+	ico.Address = strings.ToLower(ico.Address)
+	ico.TokenAddress = strings.ToLower(ico.TokenAddress)
 	statement := "INSERT INTO ico (address, developerID, description, closingTime, feePercent, tokenAddress, name, symbol, status, location, locAddress) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id"
 	stmt, err := db.Prepare(statement)
 	if err != nil {
@@ -60,6 +64,8 @@ func (ico *ICO) CreateICO() (err error) {
 
 // GetICO returns ICO by ICO's address
 func (ico *ICO) GetICO() (err error) {
+	ico.Address = strings.ToLower(ico.Address)
+	ico.TokenAddress = strings.ToLower(ico.TokenAddress)
 	row, err := db.Query("SELECT * FROM ico WHERE address = $1", ico.Address)
 	if err != nil {
 		log.Println(err)

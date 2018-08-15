@@ -1,22 +1,22 @@
 package data
 
 import (
-	"log"
-	"errors"
-	"strings"
 	"database/sql"
+	"errors"
+	"log"
+	"strings"
 )
 
 // Auditor structure represents brem ico auditor
 type Auditor struct {
-	ID      	int
-	Address 	string
-	Username	string
+	ID       int
+	Address  string
+	Username string
 }
 
-// TODO: Change
 // AddAuditor insert auditor in auditors table
 func (auditor *Auditor) AddAuditor() (err error) {
+	auditor.Address = strings.ToLower(auditor.Address)
 	statement := "INSERT INTO auditors (address) VALUES ($1) RETURNING id"
 	stmt, err := db.Prepare(statement)
 	if err != nil {
@@ -70,7 +70,7 @@ func GetAllAuditors() (auditors []Auditor, err error) {
 
 // GetICOs returns current auditor ICOs
 func (auditor *Auditor) GetICOs() (icos []ICO, err error) {
-	rows, err := db.Query("SELECT id, address, closingTime, feePercent, tokenAddress, name, symbol, status, locAddress FROM ico WHERE status = 'requested' AND" +
+	rows, err := db.Query("SELECT id, address, closingTime, feePercent, tokenAddress, name, symbol, status, locAddress FROM ico WHERE status = 'requested' AND"+
 		" id IN (SELECT icoID FROM icoAuditors WHERE auditorID = $1)", auditor.ID)
 	if err != nil {
 		log.Println(err)

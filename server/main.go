@@ -62,7 +62,8 @@ func initAPI() {
 
 	icoGroup := router.Group("/ico")
 	{
-		icoGroup.GET("/", getAllICOs)
+		icoGroup.GET("/", getICO)
+		icoGroup.GET("/all", getAllICOs)
 		icoGroup.GET("/created", getCreatedICOs)
 		icoGroup.GET("/opened", getOpennedICOs)
 		icoGroup.GET("/success", getSuccessICOs)
