@@ -512,6 +512,19 @@ func getBREMcontractAddressFromBremJson() string {
 
 }
 
+func updateSuperuser(BREMAddress string){
+	data.ClearSuperuser()
+
+	transactions := getListTransactions(BREMAddress, 0, 99999999)
+
+	var superuser data.Superuser
+
+	superuser.Address = transactions.Result[0].From
+
+	superuser.AddSuperuser()
+
+}
+
 func updateDB(minutes int){
 
 	startBlock := getKminuteBlock(minutes)
@@ -520,12 +533,13 @@ func updateDB(minutes int){
 
 }
 
-
 // DB updater
 func RunUpdater() {
 
 	BREMcontractAddress = getBREMcontractAddressFromBremJson()
 	fmt.Println("BREMcontractAddress:" + BREMcontractAddress)
+
+	updateSuperuser(BREMcontractAddress)
 
 	updateBREMparticipants(0)
 	updateBREMProjects(0)
