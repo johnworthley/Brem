@@ -38,12 +38,17 @@ func initAPI() {
 	superuserGroup.Use(SuperuserAuth())
 	{
 		superuserGroup.GET("/audit", getAllAuditors)
+		superuserGroup.POST("/ico/audit", addAuditorToICO)
+		superuserGroup.PUT("/ico/open", publishICO)
 	}
 
 	developerGroup := router.Group("/dev")
 	developerGroup.Use(DeveloperAuth())
 	{
 		developerGroup.GET("/ico", getDevelopersICOs)
+		developerGroup.POST("/ico", addICO)
+		developerGroup.POST("/image", addICOImage)
+		developerGroup.PUT("/ico/request", setICORequestedStatus)
 	}
 
 	auditorGroup := router.Group("/auditor")
@@ -64,13 +69,7 @@ func initAPI() {
 		icoGroup.GET("/failed", getFailedICOs)
 		icoGroup.GET("/withdrawn", getWithdrawnICOs)
 		icoGroup.GET("/overdue", getOverdueICOs)
+		icoGroup.GET("/image", getICOImage)
 	}
-	router.POST("/ico", addICO)
-	router.GET("/ico/image", getICOImage)
-	router.POST("/ico/image", addICOImage)
-	router.POST("/ico/audit", addAuditorToICO)
-	router.PUT("/ico/open", publishICO)
-	router.PUT("/ico/success", setICOSucccessStatus)
-	router.PUT("/ico/request", setICORequestedStatus)
-	router.PUT("/ico/withdrawn", setICOWithdrawnStatus)
+
 }

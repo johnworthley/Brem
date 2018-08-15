@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"github.com/pkg/errors"
 	"log"
+	"strings"
 	"time"
 )
 
@@ -22,6 +23,15 @@ type ICO struct {
 	LocAddress   string
 }
 
+const (
+	CREATED   = "created"
+	OPENED    = "opened"
+	SUCCESS   = "success"
+	FAILED    = "failed"
+	WITHDRAWN = "withdrawn"
+	OVERDUE   = "overdue"
+)
+
 // AddICO inserts new ICO to db
 func (ico *ICO) AddICO() (err error) {
 	statement := "INSERT INTO ico (address, developerID, closingTime, feePercent, tokenAddress, name, symbol, status) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id"
@@ -32,6 +42,19 @@ func (ico *ICO) AddICO() (err error) {
 	}
 	defer stmt.Close()
 	err = stmt.QueryRow(ico.Address, ico.Developer.ID, ico.ClosingTime, ico.FeePercent, ico.TokenAddress, ico.Name, ico.Symbol, "created").Scan(&ico.ID)
+	return
+}
+
+// CreateICO from request
+func (ico *ICO) CreateICO() (err error) {
+	statement := "INSERT INTO ico (address, developerID, description, closingTime, feePercent, tokenAddress, name, symbol, status, location, locAddress) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id"
+	stmt, err := db.Prepare(statement)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	defer stmt.Close()
+	err = stmt.QueryRow(ico.Address, ico.Developer.ID, ico.ClosingTime, ico.FeePercent, ico.TokenAddress, ico.Name, ico.Symbol, CREATED, ico.Location, ico.LocAddress).Scan(&ico.ID)
 	return
 }
 
@@ -88,15 +111,6 @@ func GetAllICOs(page int) (icos []ICO, err error) {
 	}
 	return
 }
-
-const (
-	CREATED   = "created"
-	OPENED    = "opened"
-	SUCCESS   = "success"
-	FAILED    = "failed"
-	WITHDRAWN = "withdrawn"
-	OVERDUE   = "overdue"
-)
 
 // GetCreatedICOs show all ICOs with status "created"
 func GetCreatedICOs(page int) (icos []ICO, err error) {
@@ -278,6 +292,7 @@ func (ico *ICO) GetICOAuditors() (auditors []Auditor, err error) {
 
 // PublishICO change ICO status to "opened"
 func (ico *ICO) PublishICO() (err error) {
+	ico.Address = strings.ToLower(ico.Address)
 	statement := "UPDATE ico SET status = $1 WHERE address = $2"
 	stmt, err := db.Prepare(statement)
 	if err != nil {
@@ -285,7 +300,7 @@ func (ico *ICO) PublishICO() (err error) {
 		return
 	}
 	defer stmt.Close()
-	_, err = stmt.Exec("opened", ico.Address)
+	_, err = stmt.Exec(OPENED, ico.Address)
 	return
 }
 

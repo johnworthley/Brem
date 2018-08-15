@@ -13,9 +13,9 @@ import (
 	_ "image/jpeg"
 	_ "image/png"
 	"io/ioutil"
-	"log"
 	"os"
 	"strconv"
+	"strings"
 )
 
 const imagesDir = "./ico_images/"
@@ -61,7 +61,17 @@ func addICO(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
-	err = ico.AddICO()
+	iDeveloper, exists := c.Get("dev")
+	if !exists || iDeveloper == nil {
+		c.JSON(http.StatusUnauthorized, nil)
+		return
+	}
+	developer := iDeveloper.(data.Developer)
+	if strings.EqualFold(developer.Address, ico.Developer.Address) {
+		c.JSON(http.StatusUnauthorized, nil)
+		return
+	}
+	err = ico.CreateICO()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return
@@ -81,11 +91,20 @@ func addICOImage(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, nil)
 		return
 	}
-	log.Println(address)
 	ico := data.ICO{Address: address}
 	err = ico.GetICO()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+	iDeveloper, exists := c.Get("dev")
+	if !exists || iDeveloper == nil {
+		c.JSON(http.StatusUnauthorized, nil)
+		return
+	}
+	developer := iDeveloper.(data.Developer)
+	if developer.ID != ico.Developer.ID {
+		c.JSON(http.StatusNotAcceptable, nil)
 		return
 	}
 	// Resize file
@@ -340,28 +359,43 @@ func publishICO(c *gin.Context) {
 	c.JSON(http.StatusOK, nil)
 }
 
-// Change ICO status to success
-func setICOSucccessStatus(c *gin.Context) {
-	var ico data.ICO
-	err := c.BindJSON(&ico)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, err)
-		return
-	}
-	err = ico.SetSuccessStatus()
-	if err != nil {
-		c.JSON(http.StatusBadRequest, err)
-		return
-	}
-	c.JSON(http.StatusOK, nil)
-}
+//// Change ICO status to success
+//func setICOSucccessStatus(c *gin.Context) {
+//	var ico data.ICO
+//	err := c.BindJSON(&ico)
+//	if err != nil {
+//		c.JSON(http.StatusBadRequest, err)
+//		return
+//	}
+//	err = ico.SetSuccessStatus()
+//	if err != nil {
+//		c.JSON(http.StatusBadRequest, err)
+//		return
+//	}
+//	c.JSON(http.StatusOK, nil)
+//}
 
 // Change ICO status to requested
 func setICORequestedStatus(c *gin.Context) {
+	iDeveloper, exists := c.Get("dev")
+	if !exists || iDeveloper == nil {
+		c.JSON(http.StatusUnauthorized, nil)
+		return
+	}
+	developer := iDeveloper.(data.Developer)
 	var ico data.ICO
 	err := c.BindJSON(&ico)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+	err = ico.GetICO()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+	if developer.ID != ico.Developer.ID {
+		c.JSON(http.StatusNotAcceptable, nil)
 		return
 	}
 	err = ico.SetRequestedStatus()
@@ -372,18 +406,18 @@ func setICORequestedStatus(c *gin.Context) {
 	c.JSON(http.StatusOK, nil)
 }
 
-// Change ICO status to withdrawn
-func setICOWithdrawnStatus(c *gin.Context) {
-	var ico data.ICO
-	err := c.BindJSON(&ico)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, err)
-		return
-	}
-	err = ico.SetWithdrawnStatus()
-	if err != nil {
-		c.JSON(http.StatusBadRequest, err)
-		return
-	}
-	c.JSON(http.StatusOK, nil)
-}
+//// Change ICO status to withdrawn
+//func setICOWithdrawnStatus(c *gin.Context) {
+//	var ico data.ICO
+//	err := c.BindJSON(&ico)
+//	if err != nil {
+//		c.JSON(http.StatusBadRequest, err)
+//		return
+//	}
+//	err = ico.SetWithdrawnStatus()
+//	if err != nil {
+//		c.JSON(http.StatusBadRequest, err)
+//		return
+//	}
+//	c.JSON(http.StatusOK, nil)
+//}
