@@ -10,6 +10,11 @@ function web3Initialized(results) {
 }
 
 let getWeb3 = () => new Promise(function(resolve, reject) {
+  store.update({
+    web3Status: {
+      logged: 'pending'
+    }
+  })
   // Wait for loading completion to avoid race conditions with web3 injection timing.
   window.addEventListener('load', async () => {
     var results
@@ -28,12 +33,22 @@ let getWeb3 = () => new Promise(function(resolve, reject) {
       const init = web3Initialized(results)
       const instance = init.payload.web3Instance
       const accounts = await instance.eth.getAccounts()
-      const ethAmount = await instance.eth.getBalance(accounts[0])
-      resolve(store.update({
-        web3Init: init,
-        web3Instance: instance,
-        web3Account: accounts[0],
-        web3EthAmount: ethAmount
+      if(accounts.length) {
+        const ethAmount = await instance.eth.getBalance(accounts[0])
+        resolve(store.update({
+          web3Init: init,
+          web3Instance: instance,
+          web3Account: accounts[0],
+          web3EthAmount: ethAmount,
+          web3Status: {
+            logged: true
+          }
+        }))
+      }
+      else resolve(store.update({
+        web3Status: {
+          logged: false
+        }
       }))
     } else {
       // Fallback to localhost if no web3 injection. We've configured this to
