@@ -48,3 +48,33 @@ func ClearSuperuser() (err error) {
 	stmt.QueryRow()
 	return
 }
+
+func IsSuperuser(address string) (isSuperuser bool, err error) {
+	row, err := db.Query("SELECT * FROM superuser WHERE address = $1", address)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	defer row.Close()
+	isSuperuser = row.Next()
+	return
+}
+
+func GetSuperuserICOs() (icos []ICO, err error) {
+	rows, err := db.Query("SELECT id, address, closingTime, feePercent, tokenAddress, name, symbol, status, locAddress FROM ico WHERE status = 'created'")
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var ico ICO
+		err = rows.Scan(&ico.ID, &ico.Address, &ico.ClosingTime, &ico.FeePercent, &ico.TokenAddress, &ico.Name, &ico.Symbol, &ico.Status, &ico.LocAddress)
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		icos = append(icos, ico)
+	}
+	return
+}

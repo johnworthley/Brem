@@ -5,6 +5,10 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
+
+	_ "./docs"
+	"github.com/swaggo/gin-swagger"
+	"github.com/swaggo/gin-swagger/swaggerFiles"
 )
 
 var router *gin.Engine
@@ -25,6 +29,8 @@ func main() {
 	corsConfig.AllowOrigins = []string{"http://localhost:3000"}
 	router.Use(cors.New(corsConfig))
 
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
 	initAPI()
 
 	router.Run("127.0.0.1:8080")
@@ -37,6 +43,7 @@ func initAPI() {
 	superuserGroup := router.Group("/super")
 	superuserGroup.Use(SuperuserAuth())
 	{
+		superuserGroup.GET("/ico", getSuperusersICOs)
 		superuserGroup.GET("/audit", getAllAuditors)
 		superuserGroup.POST("/ico/audit", addAuditorToICO)
 		superuserGroup.PUT("/ico/open", publishICO)

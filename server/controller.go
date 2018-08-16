@@ -20,25 +20,13 @@ import (
 
 const imagesDir = "./ico_images/"
 
-// FILLING IN UPDATER
-// Add new auditor to db
-//func addAuditor(c *gin.Context) {
-//	var auditor data.Auditor
-//	err := c.BindJSON(&auditor)
-//	if err != nil {
-//		c.JSON(http.StatusBadRequest, err)
-//		return
-//	}
-//	err = auditor.AddAuditor()
-//	if err != nil {
-//		c.JSON(http.StatusInternalServerError, err)
-//		return
-//	}
-//
-//	c.JSON(http.StatusCreated, nil)
-//}
-
-// Get all BREM auditors
+// Get all registered BREM auditors
+// @Summary Список зарегистрированных аудиторов
+// @Tags superuser
+// @Description Получить всех зарегистрированных аудиторов
+// @Produce  json
+// @Success 200 {array} data.Auditor
+// @Router /super/audit [get]
 func getAllAuditors(c *gin.Context) {
 	auditors, err := data.GetAllAuditors()
 	if err != nil {
@@ -49,6 +37,13 @@ func getAllAuditors(c *gin.Context) {
 }
 
 // Add new ICO
+// @Summary Добавить ICO
+// @Description Добавить ICO
+// @Tags developer
+// @Accept  json
+// @Produce  json
+// @Param ico body data.ICO true "ICO (без Id)"
+// @Router /dev/ico [post]
 func addICO(c *gin.Context) {
 	var ico data.ICO
 	err := c.BindJSON(&ico)
@@ -80,6 +75,14 @@ func addICO(c *gin.Context) {
 }
 
 // Upload ICO image
+// @Summary Загрузить изображение ICO
+// @Description Загрузить изображение ICO
+// @Tags developer
+// @Accept  multipart/form-data
+// @Produce  json
+// @Param  address path string true "ICO address"
+// @Param file formData file true "account image"
+// @Router /dev/image [post]
 func addICOImage(c *gin.Context) {
 	file, _, err := c.Request.FormFile("image")
 	if err != nil {
@@ -131,6 +134,13 @@ func addICOImage(c *gin.Context) {
 }
 
 // Get ICO image
+// @Summary Получить изображение ICO
+// @Description Получить изображение ICO
+// @Tags common
+// @Accept  image/jpeg
+// @Produce  json
+// @Param  address path string true "ICO address"
+// @Router /ico/image [get]
 func getICOImage(c *gin.Context) {
 	var ico data.ICO
 	ico.Address = c.Query("address")
@@ -147,6 +157,15 @@ func getICOImage(c *gin.Context) {
 	c.Data(http.StatusOK, "image/jpeg", b)
 }
 
+// Get ICO info
+// @Summary Получить информацию об ICO
+// @Description Получить информацию об ICO
+// @Tags common
+// @Accept  json
+// @Produce  json
+// @Param  address path string true "ICO address"
+// @Success 200 {object} data.ICO
+// @Router /ico [get]
 func getICO(c *gin.Context) {
 	var ico data.ICO
 	ico.Address = c.Query("address")
@@ -168,7 +187,31 @@ func getICO(c *gin.Context) {
 	c.JSON(http.StatusOK, ico)
 }
 
-// Get current developer's ICOs
+// Get ICOs info
+// @Summary Получить все ICO для открытия
+// @Description Получить все ICO для открытия
+// @Tags superuser
+// @Accept  json
+// @Produce  json
+// @Success 200 {array} data.ICO
+// @Router /super/ico [get]
+func getSuperusersICOs(c *gin.Context) {
+	icos, err := data.GetSuperuserICOs()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+	c.JSON(http.StatusOK, icos)
+}
+
+// Get ICOs info
+// @Summary Получить все ICO данного застройщика
+// @Description Получить все ICO данного застройщика
+// @Tags developer
+// @Accept  json
+// @Produce  json
+// @Success 200 {array} data.ICO
+// @Router /dev/ico [get]
 func getDevelopersICOs(c *gin.Context) {
 	iDeveloper, exists := c.Get("dev")
 	if iDeveloper == nil || !exists {
@@ -184,7 +227,14 @@ func getDevelopersICOs(c *gin.Context) {
 	c.JSON(http.StatusOK, icos)
 }
 
-// Get current auditor's ICO's
+// Get ICOs info
+// @Summary Получить все ICO аудитора для подстверждения вывода (с запросами на вывод)
+// @Description Получить все ICO аудитора для подстверждения вывода (с запросами на вывод)
+// @Tags auditor
+// @Accept  json
+// @Produce  json
+// @Success 200 {array} data.ICO
+// @Router /auditor/ico [get]
 func getAuditorICOs(c *gin.Context) {
 	iAuditor, exists := c.Get("auditor")
 	if iAuditor == nil || !exists {
@@ -204,6 +254,14 @@ func getAuditorICOs(c *gin.Context) {
 }
 
 // Get ICOs in page
+// @Summary Получить страницу ICO (6 ICO)
+// @Description Получить страницу ICO
+// @Tags common
+// @Accept  json
+// @Produce  json
+// @Param  page path int true "Page number"
+// @Success 200 {array} data.ICO
+// @Router /ico/all [get]
 func getAllICOs(c *gin.Context) {
 	page, err := strconv.Atoi(c.Query("page"))
 	if err != nil || page < 0 {
@@ -219,6 +277,14 @@ func getAllICOs(c *gin.Context) {
 }
 
 // Returns all ICOs with status created
+// @Summary Получить страницу ICO (статус created)
+// @Description Получить страницу ICO (статус created)
+// @Tags common
+// @Accept  json
+// @Produce  json
+// @Param  page path int true "Page number"
+// @Success 200 {array} data.ICO
+// @Router /ico/created [get]
 func getCreatedICOs(c *gin.Context) {
 	page, err := strconv.Atoi(c.Query("page"))
 	if err != nil || page < 0 {
@@ -234,6 +300,14 @@ func getCreatedICOs(c *gin.Context) {
 }
 
 // Returns ICOs with status opened
+// @Summary Получить страницу ICO (статус opened)
+// @Description Получить страницу ICO (статус opened)
+// @Tags common
+// @Accept  json
+// @Produce  json
+// @Param  page path int true "Page number"
+// @Success 200 {array} data.ICO
+// @Router /ico/opened [get]
 func getOpennedICOs(c *gin.Context) {
 	page, err := strconv.Atoi(c.Query("page"))
 	if err != nil || page < 0 {
@@ -249,6 +323,14 @@ func getOpennedICOs(c *gin.Context) {
 }
 
 // Returns ICOs with statuses success and requested
+// @Summary Получить страницу ICO (статус success и requested)
+// @Description Получить страницу ICO (статус success и requested)
+// @Tags common
+// @Accept  json
+// @Produce  json
+// @Param  page path int true "Page number"
+// @Success 200 {array} data.ICO
+// @Router /ico/success [get]
 func getSuccessICOs(c *gin.Context) {
 	page, err := strconv.Atoi(c.Query("page"))
 	if err != nil || page < 0 {
@@ -264,6 +346,14 @@ func getSuccessICOs(c *gin.Context) {
 }
 
 // Returns ICOs with status failed
+// @Summary Получить страницу ICO (статус failed)
+// @Description Получить страницу ICO (статус failed)
+// @Tags common
+// @Accept  json
+// @Produce  json
+// @Param  page path int true "Page number"
+// @Success 200 {array} data.ICO
+// @Router /ico/failed [get]
 func getFailedICOs(c *gin.Context) {
 	page, err := strconv.Atoi(c.Query("page"))
 	if err != nil || page < 0 {
@@ -279,6 +369,14 @@ func getFailedICOs(c *gin.Context) {
 }
 
 // Returns ICOs with status withdrawn
+// @Summary Получить страницу ICO (статус withdrawn)
+// @Description Получить страницу ICO (статус withdrawn)
+// @Tags common
+// @Accept  json
+// @Produce  json
+// @Param  page path int true "Page number"
+// @Success 200 {array} data.ICO
+// @Router /ico/withdrawn [get]
 func getWithdrawnICOs(c *gin.Context) {
 	page, err := strconv.Atoi(c.Query("page"))
 	if err != nil || page < 0 {
@@ -294,6 +392,14 @@ func getWithdrawnICOs(c *gin.Context) {
 }
 
 // Returns ICOs with status overdue
+// @Summary Получить страницу ICO (статус overdue)
+// @Description Получить страницу ICO (статус overdue)
+// @Tags common
+// @Accept  json
+// @Produce  json
+// @Param  page path int true "Page number"
+// @Success 200 {array} data.ICO
+// @Router /ico/overdue [get]
 func getOverdueICOs(c *gin.Context) {
 	page, err := strconv.Atoi(c.Query("page"))
 	if err != nil || page < 0 {
@@ -308,12 +414,21 @@ func getOverdueICOs(c *gin.Context) {
 	c.JSON(http.StatusOK, icos)
 }
 
+// Add auditor to ico request
+type Request struct {
+	ICO     data.ICO     `json:"ico"`
+	Auditor data.Auditor `json:"auditor"`
+}
+
 // Add auditor to ICO
+// @Summary Добавить аудитора к ICO
+// @Description Добавить аудитора к ICO
+// @Tags superuser
+// @Accept  json
+// @Produce  json
+// @Param req body Request true "REQ (только адреса ICO и аудитора)"
+// @Router /super/ico/audit [post]
 func addAuditorToICO(c *gin.Context) {
-	type Request struct {
-		ICO     data.ICO     `json:"ico"`
-		Auditor data.Auditor `json:"auditor"`
-	}
 	var req Request
 	err := c.BindJSON(&req)
 	if err != nil {
@@ -340,31 +455,14 @@ func addAuditorToICO(c *gin.Context) {
 	c.JSON(http.StatusOK, nil)
 }
 
-// Get current ICO auditors
-//func getICOAuditors(c *gin.Context) {
-//	var ico data.ICO
-//	ico.Address = c.Query("address")
-//	if len(ico.Address) == 0 {
-//		c.JSON(http.StatusBadRequest, nil)
-//		return
-//	}
-//	err := ico.GetICO()
-//	if err != nil {
-//		c.JSON(http.StatusInternalServerError, err)
-//		return
-//	}
-//	auditors, err := ico.GetICOAuditors()
-//	if err != nil {
-//		c.JSON(http.StatusInternalServerError, err)
-//		return
-//	}
-//	if auditors == nil {
-//		auditors = make([]data.Auditor, 0)
-//	}
-//	c.JSON(http.StatusOK, auditors)
-//}
-
 // Change ICO status to opened
+// @Summary Изменить статус ICO на opened
+// @Description Изменить статус ICO на opened
+// @Tags superuser
+// @Accept  json
+// @Produce  json
+// @Param ico body data.ICO true "ICO (только адрес)"
+// @Router /super/ico/open [post]
 func publishICO(c *gin.Context) {
 	var ico data.ICO
 	err := c.BindJSON(&ico)
@@ -380,23 +478,14 @@ func publishICO(c *gin.Context) {
 	c.JSON(http.StatusOK, nil)
 }
 
-//// Change ICO status to success
-//func setICOSucccessStatus(c *gin.Context) {
-//	var ico data.ICO
-//	err := c.BindJSON(&ico)
-//	if err != nil {
-//		c.JSON(http.StatusBadRequest, err)
-//		return
-//	}
-//	err = ico.SetSuccessStatus()
-//	if err != nil {
-//		c.JSON(http.StatusBadRequest, err)
-//		return
-//	}
-//	c.JSON(http.StatusOK, nil)
-//}
-
 // Change ICO status to requested
+// @Summary Изменить статус ICO на requested
+// @Description Изменить статус ICO на requested
+// @Tags developer
+// @Accept  json
+// @Produce  json
+// @Param ico body data.ICO true "ICO (только адрес)"
+// @Router /dev/ico/request [post]
 func setICORequestedStatus(c *gin.Context) {
 	iDeveloper, exists := c.Get("dev")
 	if !exists || iDeveloper == nil {
@@ -426,19 +515,3 @@ func setICORequestedStatus(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, nil)
 }
-
-//// Change ICO status to withdrawn
-//func setICOWithdrawnStatus(c *gin.Context) {
-//	var ico data.ICO
-//	err := c.BindJSON(&ico)
-//	if err != nil {
-//		c.JSON(http.StatusBadRequest, err)
-//		return
-//	}
-//	err = ico.SetWithdrawnStatus()
-//	if err != nil {
-//		c.JSON(http.StatusBadRequest, err)
-//		return
-//	}
-//	c.JSON(http.StatusOK, nil)
-//}

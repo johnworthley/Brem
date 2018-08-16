@@ -36,6 +36,13 @@ func validate(address string, sign string) (res bool, err error) {
 }
 
 // Register new developer
+// @Summary Зарегистрировать застройщика
+// @Description Зарегистрировать застройщика
+// @Tags auth
+// @Accept  json
+// @Produce  json
+// @Param ico body data.Developer true "Dev"
+// @Router /signup [post]
 func addDeveloper(c *gin.Context) {
 	var developer data.Developer
 	err := c.BindJSON(&developer)
@@ -74,6 +81,15 @@ func addDeveloper(c *gin.Context) {
 }
 
 // Developer login
+// Register new developer
+// @Summary Вход для застройщика
+// @Description Вход для застройщика
+// @Tags auth
+// @Accept  json
+// @Produce  json
+// @Param ico body data.Developer true "Dev"
+// @Success 200 {object} data.Developer
+// @Router /login [post]
 func login(c *gin.Context) {
 	var developer data.Developer
 	err := c.BindJSON(&developer)
