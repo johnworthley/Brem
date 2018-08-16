@@ -5,3 +5,4 @@ package-lock.json
 db.json
 server/ico_images
 .DS_Store
+package-lock.json

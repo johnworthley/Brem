@@ -32,13 +32,13 @@ let getWeb3 = () => new Promise(function(resolve, reject) {
       console.log("Web3 is successfully injected.")
       const init = web3Initialized(results)
       const instance = init.payload.web3Instance
-      const accounts = await instance.eth.getAccounts()
-      if(accounts.length) {
-        const ethAmount = await instance.eth.getBalance(accounts[0])
+      const account = await instance.eth.getCoinbase()
+      if(account) {
+        const ethAmount = instance.utils.fromWei(await instance.eth.getBalance(account), "ether")
         resolve(store.update({
           web3Init: init,
           web3Instance: instance,
-          web3Account: accounts[0],
+          web3Account: account,
           web3EthAmount: ethAmount,
           web3Status: {
             logged: true
@@ -63,11 +63,11 @@ let getWeb3 = () => new Promise(function(resolve, reject) {
 
       const init = web3Initialized(results)
       const instance = init.payload.web3Instance
-      const accounts = await instance.eth.getAccounts()
+      const account = await instance.eth.getCoinbase()
       resolve(store.update({
         web3Init: init,
         web3Instance: instance,
-        web3Account: accounts[0]
+        web3Account: account
       }))
     }
   })
