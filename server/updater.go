@@ -539,6 +539,8 @@ func RunUpdater() {
 	BREMcontractAddress = getBREMcontractAddressFromBremJson()
 	fmt.Println("BREMcontractAddress:" + BREMcontractAddress)
 
+	data.ForcedRepairIcoTable()
+	data.ForcedRepairIcoAuditorsTable()
 	updateSuperuser(BREMcontractAddress)
 
 	updateBREMparticipants(0)
