@@ -456,6 +456,10 @@ func getTimeFromKBlock(K int64) int64 {
 		json.Unmarshal([]byte(contents), &blockTime)
 	}
 
+	if len(blockTime.Result.Timestamp) < 2 {
+		log.Println("Error: len(blockTime.Result.Timestamp) < 2")
+		return 0
+	}
 	result, err := strconv.ParseInt(blockTime.Result.Timestamp[2:], 16, 64)
 	if err != nil{
 		log.Println(err)
@@ -470,12 +474,16 @@ func getKminuteBlock(K int) int64{
 	wantedTime  := currentTime - int64( K * 60 )
 
 	numLastBlock := getNumLastBlock()
+	if numLastBlock == 0 {
+		return 0
+	}
 
 	numBlock := numLastBlock - int64(int64(K)*int64(blocksPerMinute))
-	if numLastBlock == 0 {
-		numBlock = 0
-	}
+	
 	time := getTimeFromKBlock(numBlock)
+	if time == 0 {
+		return 0
+	}
 	if time < wantedTime {
 		return numBlock
 	}
@@ -483,6 +491,9 @@ func getKminuteBlock(K int) int64{
 	for {
 		numBlock := numBlock - int64(int64(K/10)*int64(blocksPerMinute))
 		time := getTimeFromKBlock(numBlock)
+		if time == 0 {
+			return 0
+		}
 		if time < wantedTime {
 			return numBlock
 		}
