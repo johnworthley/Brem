@@ -7,3 +7,4 @@ server/ico_images
 .DS_Store
 package-lock.json
 server/docs
+server/logger/brem.log

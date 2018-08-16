@@ -3,9 +3,10 @@ package data
 import (
 	"database/sql"
 	"github.com/pkg/errors"
-	"log"
 	"strings"
 	"time"
+
+	"../../server/logger"
 )
 
 type ICO struct {
@@ -39,7 +40,7 @@ func (ico *ICO) AddICO() (err error) {
 	statement := "INSERT INTO ico (address, developerID, closingTime, feePercent, tokenAddress, name, symbol, status) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id"
 	stmt, err := db.Prepare(statement)
 	if err != nil {
-		log.Println(err)
+		logger.Info(err)
 		return
 	}
 	defer stmt.Close()
@@ -54,7 +55,7 @@ func (ico *ICO) CreateICO() (err error) {
 	statement := "INSERT INTO ico (address, developerID, description, closingTime, feePercent, tokenAddress, name, symbol, status, location, locAddress) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id"
 	stmt, err := db.Prepare(statement)
 	if err != nil {
-		log.Println(err)
+		logger.Info(err)
 		return
 	}
 	defer stmt.Close()
@@ -68,7 +69,7 @@ func (ico *ICO) GetICO() (err error) {
 	ico.TokenAddress = strings.ToLower(ico.TokenAddress)
 	row, err := db.Query("SELECT * FROM ico WHERE address = $1", ico.Address)
 	if err != nil {
-		log.Println(err)
+		logger.Info(err)
 		return
 	}
 	defer row.Close()
@@ -100,7 +101,7 @@ func GetAllICOs(page int) (icos []ICO, err error) {
 	rows, err := db.Query("SELECT id, address, developerid, closingtime, tokenaddress, name, symbol, status, location, locaddress FROM ico  ORDER BY id DESC LIMIT $1 OFFSET $2",
 		ICOs_AMOUNT_IN_PAGE, start)
 	if err != nil {
-		log.Println(err)
+		logger.Info(err)
 		return
 	}
 	defer rows.Close()
@@ -124,7 +125,7 @@ func GetCreatedICOs(page int) (icos []ICO, err error) {
 	rows, err := db.Query("SELECT id, address, developerid, closingtime, tokenaddress, name, symbol, status, location, locaddress FROM ico WHERE status = $1 ORDER BY id DESC LIMIT $2 OFFSET $3",
 		CREATED, ICOs_AMOUNT_IN_PAGE, start)
 	if err != nil {
-		log.Println(err)
+		logger.Info(err)
 		return
 	}
 	defer rows.Close()
@@ -148,7 +149,7 @@ func GetOpenedICOs(page int) (icos []ICO, err error) {
 	rows, err := db.Query("SELECT id, address, developerid, closingtime, tokenaddress, name, symbol, status, location, locaddress FROM ico WHERE status = $1 ORDER BY id DESC LIMIT $2 OFFSET $3",
 		OPENED, ICOs_AMOUNT_IN_PAGE, start)
 	if err != nil {
-		log.Println(err)
+		logger.Info(err)
 		return
 	}
 	defer rows.Close()
@@ -172,7 +173,7 @@ func GetSuccessICOs(page int) (icos []ICO, err error) {
 	rows, err := db.Query("SELECT id, address, developerid, closingtime, tokenaddress, name, symbol, status, location, locaddress FROM ico WHERE status = $1 ORDER BY id DESC LIMIT $2 OFFSET $3",
 		SUCCESS, ICOs_AMOUNT_IN_PAGE, start)
 	if err != nil {
-		log.Println(err)
+		logger.Info(err)
 		return
 	}
 	defer rows.Close()
@@ -196,7 +197,7 @@ func GetFailedICOs(page int) (icos []ICO, err error) {
 	rows, err := db.Query("SELECT id, address, developerid, closingtime, tokenaddress, name, symbol, status, location, locaddress FROM ico WHERE status = $1 ORDER BY id DESC LIMIT $2 OFFSET $3",
 		FAILED, ICOs_AMOUNT_IN_PAGE, start)
 	if err != nil {
-		log.Println(err)
+		logger.Info(err)
 		return
 	}
 	defer rows.Close()
@@ -220,7 +221,7 @@ func GetWithdrawnICOs(page int) (icos []ICO, err error) {
 	rows, err := db.Query("SELECT id, address, developerid, closingtime, tokenaddress, name, symbol, status, location, locaddress FROM ico WHERE status = $1 ORDER BY id DESC LIMIT $2 OFFSET $3",
 		WITHDRAWN, ICOs_AMOUNT_IN_PAGE, start)
 	if err != nil {
-		log.Println(err)
+		logger.Info(err)
 		return
 	}
 	defer rows.Close()
@@ -244,7 +245,7 @@ func GetOverdueICOs(page int) (icos []ICO, err error) {
 	rows, err := db.Query("SELECT id, address, developerid, closingtime, tokenaddress, name, symbol, status, location, locaddress FROM ico WHERE status = $1 ORDER BY id DESC LIMIT $2 OFFSET $3",
 		OVERDUE, ICOs_AMOUNT_IN_PAGE, start)
 	if err != nil {
-		log.Println(err)
+		logger.Info(err)
 		return
 	}
 	defer rows.Close()
@@ -267,7 +268,7 @@ func (ico *ICO) AddAuditorToICO(auditor Auditor) (err error) {
 	statement := "INSERT INTO icoAuditors (icoID, auditorID) VALUES ($1, $2)"
 	stmt, err := db.Prepare(statement)
 	if err != nil {
-		log.Println(err)
+		logger.Info(err)
 		return
 	}
 	defer stmt.Close()
@@ -280,7 +281,7 @@ func (ico *ICO) GetICOAuditors() (auditors []Auditor, err error) {
 	rows, err := db.Query("SELECT * FROM auditors WHERE id IN "+
 		"(SELECT auditorID FROM icoAuditors WHERE icoID = $1)", ico.ID)
 	if err != nil {
-		log.Println(err)
+		logger.Info(err)
 		return
 	}
 	defer rows.Close()
@@ -288,7 +289,7 @@ func (ico *ICO) GetICOAuditors() (auditors []Auditor, err error) {
 		var auditor Auditor
 		err = rows.Scan(&auditor.ID, &auditor.Address)
 		if err != nil {
-			log.Println(err)
+			logger.Info(err)
 			return
 		}
 		auditors = append(auditors, auditor)
@@ -302,7 +303,7 @@ func (ico *ICO) PublishICO() (err error) {
 	statement := "UPDATE ico SET status = $1 WHERE address = $2"
 	stmt, err := db.Prepare(statement)
 	if err != nil {
-		log.Println(err)
+		logger.Info(err)
 		return
 	}
 	defer stmt.Close()
@@ -315,7 +316,7 @@ func (ico *ICO) SetRequestedStatus() (err error) {
 	statement := "UPDATE ico SET status = $1 WHERE address = $2"
 	stmt, err := db.Prepare(statement)
 	if err != nil {
-		log.Println(err)
+		logger.Info(err)
 		return
 	}
 	defer stmt.Close()
@@ -328,7 +329,7 @@ func (ico *ICO) SetSuccessStatus() (err error) {
 	statement := "UPDATE ico SET status = $1 WHERE address = $2"
 	stmt, err := db.Prepare(statement)
 	if err != nil {
-		log.Println(err)
+		logger.Info(err)
 		return
 	}
 	defer stmt.Close()
@@ -341,7 +342,7 @@ func (ico *ICO) SetWithdrawnStatus() (err error) {
 	statement := "UPDATE ico SET status = $1 WHERE address = $2"
 	stmt, err := db.Prepare(statement)
 	if err != nil {
-		log.Println(err)
+		logger.Info(err)
 		return
 	}
 	defer stmt.Close()
@@ -354,7 +355,7 @@ func (ico *ICO) SetStatusICO(status string) (err error) {
 	statement := "UPDATE ico SET status = $1 WHERE address = $2"
 	stmt, err := db.Prepare(statement)
 	if err != nil {
-		log.Println(err)
+		logger.Info(err)
 		return
 	}
 	defer stmt.Close()

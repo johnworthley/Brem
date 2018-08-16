@@ -1,8 +1,9 @@
 package data
 
 import (
-	"log"
 	"strings"
+
+	"../../server/logger"
 )
 
 type Superuser struct {
@@ -15,7 +16,7 @@ func (superuser *Superuser) AddSuperuser() (err error) {
 	statement := "INSERT INTO superuser (address) VALUES ($1) RETURNING id"
 	stmt, err := db.Prepare(statement)
 	if err != nil {
-		log.Println(err)
+		logger.Info(err)
 		return
 	}
 	defer stmt.Close()
@@ -26,7 +27,7 @@ func (superuser *Superuser) AddSuperuser() (err error) {
 func (superuser *Superuser) GetSuperuser() (err error) {
 	row, err := db.Query("SELECT * FROM superuser WHERE LOWER(address) = LOWER($1)", superuser.Address)
 	if err != nil {
-		log.Println(err)
+		logger.Info(err)
 		return
 	}
 	defer row.Close()
@@ -41,7 +42,7 @@ func ClearSuperuser() (err error) {
 	statement := "DELETE FROM superuser"
 	stmt, err := db.Prepare(statement)
 	if err != nil {
-		log.Println(err)
+		logger.Info(err)
 		return
 	}
 	defer stmt.Close()
@@ -52,7 +53,7 @@ func ClearSuperuser() (err error) {
 func IsSuperuser(address string) (isSuperuser bool, err error) {
 	row, err := db.Query("SELECT * FROM superuser WHERE address = $1", address)
 	if err != nil {
-		log.Println(err)
+		logger.Info(err)
 		return
 	}
 	defer row.Close()
@@ -63,7 +64,7 @@ func IsSuperuser(address string) (isSuperuser bool, err error) {
 func GetSuperuserICOs() (icos []ICO, err error) {
 	rows, err := db.Query("SELECT id, address, closingTime, feePercent, tokenAddress, name, symbol, status, locAddress FROM ico WHERE status = 'created'")
 	if err != nil {
-		log.Println(err)
+		logger.Info(err)
 		return
 	}
 	defer rows.Close()
@@ -71,7 +72,7 @@ func GetSuperuserICOs() (icos []ICO, err error) {
 		var ico ICO
 		err = rows.Scan(&ico.ID, &ico.Address, &ico.ClosingTime, &ico.FeePercent, &ico.TokenAddress, &ico.Name, &ico.Symbol, &ico.Status, &ico.LocAddress)
 		if err != nil {
-			log.Println(err)
+			logger.Info(err)
 			return
 		}
 		icos = append(icos, ico)

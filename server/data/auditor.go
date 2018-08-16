@@ -3,8 +3,9 @@ package data
 import (
 	"database/sql"
 	"errors"
-	"log"
 	"strings"
+
+	"../../server/logger"
 )
 
 // Auditor structure represents brem ico auditor
@@ -20,7 +21,7 @@ func (auditor *Auditor) AddAuditor() (err error) {
 	statement := "INSERT INTO auditors (address) VALUES ($1) RETURNING id"
 	stmt, err := db.Prepare(statement)
 	if err != nil {
-		log.Println(err)
+		logger.Info(err)
 		return
 	}
 	defer stmt.Close()
@@ -32,7 +33,7 @@ func (auditor *Auditor) AddAuditor() (err error) {
 func (auditor *Auditor) GetAuditor() (err error) {
 	row, err := db.Query("SELECT * FROM auditors WHERE LOWER(address) = LOWER($1)", auditor.Address)
 	if err != nil {
-		log.Println(err)
+		logger.Info(err)
 		return
 	}
 	defer row.Close()
@@ -52,7 +53,7 @@ func (auditor *Auditor) GetAuditor() (err error) {
 func GetAllAuditors() (auditors []Auditor, err error) {
 	rows, err := db.Query("SELECT * FROM auditors WHERE LENGTH(username) > 0")
 	if err != nil {
-		log.Println(err)
+		logger.Info(err)
 		return
 	}
 	defer rows.Close()
@@ -60,7 +61,7 @@ func GetAllAuditors() (auditors []Auditor, err error) {
 		var auditor Auditor
 		err = rows.Scan(&auditor.ID, &auditor.Address, &auditor.Username)
 		if err != nil {
-			log.Println(err)
+			logger.Info(err)
 			return
 		}
 		auditors = append(auditors, auditor)
@@ -73,7 +74,7 @@ func (auditor *Auditor) GetICOs() (icos []ICO, err error) {
 	rows, err := db.Query("SELECT id, address, closingTime, feePercent, tokenAddress, name, symbol, status, locAddress FROM ico WHERE status = 'requested' AND"+
 		" id IN (SELECT icoID FROM icoAuditors WHERE auditorID = $1)", auditor.ID)
 	if err != nil {
-		log.Println(err)
+		logger.Info(err)
 		return
 	}
 	defer rows.Close()
@@ -81,7 +82,7 @@ func (auditor *Auditor) GetICOs() (icos []ICO, err error) {
 		var ico ICO
 		err = rows.Scan(&ico.ID, &ico.Address, &ico.ClosingTime, &ico.FeePercent, &ico.TokenAddress, &ico.Name, &ico.Symbol, &ico.Status, &ico.LocAddress)
 		if err != nil {
-			log.Println(err)
+			logger.Info(err)
 			return
 		}
 		icos = append(icos, ico)

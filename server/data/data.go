@@ -7,6 +7,8 @@ import (
 	"log"
 	"os"
 
+	"../../server/logger"
+
 	_ "github.com/lib/pq"
 )
 
@@ -35,7 +37,7 @@ func init() {
 
 	db, err = sql.Open("postgres", connection)
 	if err != nil {
-		log.Println(err)
+		logger.Info(err)
 		os.Exit(1)
 	}
 }
