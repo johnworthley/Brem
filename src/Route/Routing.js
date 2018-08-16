@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
 import { css, StyleSheet } from 'aphrodite/no-important'
 import store from 'Store'
 
-
+import Cabinet from '../Pages/Cabinet'
 import Page from '../Components/Page'
 
 
@@ -27,7 +27,7 @@ class Routing extends Component {
         <Route render={({ location }) => (
           <div className={css(style.main)}>
             <Page>
-
+				<Route exact path="/cabinet" component={Cabinet} />
             </Page>
           </div>
         )} />
