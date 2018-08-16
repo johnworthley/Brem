@@ -3,69 +3,69 @@ package main
 import (
 	"log"
 
-	"net/http"
-	"io/ioutil"
-	"encoding/json"
 	"encoding/hex"
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"math/big"
+	"net/http"
 	"strconv"
 	"time"
-	"fmt"
 
 	"../server/data"
 
-	"github.com/ethereum/go-ethereum/crypto/sha3"
-	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/crypto/sha3"
 	"github.com/ethereum/go-ethereum/ethclient"
+)
 
-	)
+var BREMcontractAddress = ""
 
-var   BREMcontractAddress	= ""
-const etherscanApiKey       = "194M4NC49RXX52KMM1W5U91Y6UK2RM5WUW"
-const intervalInMinutes		= 1
-const etherscanApiUrl		= "api-rinkeby.etherscan.io"
-const infuraApiUrl			= "rinkeby.infura.io"
+const etherscanApiKey = "194M4NC49RXX52KMM1W5U91Y6UK2RM5WUW"
+const intervalInMinutes = 1
+const etherscanApiUrl = "api-rinkeby.etherscan.io"
+const infuraApiUrl = "rinkeby.infura.io"
 
-type JsonTransaction struct{
-	BlockNumber 		int64 	`json:"blockNumber"`
-	TimeStamp			int64 	`json:"timeStamp"`
-	Hash				string	`json:"hash"`
-	Nonce				string	`json:"nonce"`
-	BlockHash			string	`json:"blockHash"`
-	TransactionIndex	int64	`json:"transactionIndex"`
-	From				string	`json:"from"`
-	To					string	`json:"to"`
-	Value				string	`json:"value"`
-	Gas					string	`json:"gas"`
-	GasPrice			string	`json:"gasPrice"`
-	IsError				string	`json:"isError"`
-	TxReceipt_status	string	`json:"txReceipt_status"`
-	Input				string	`json:"input"`
-	ContractAddress		string	`json:"contractAddress"`
-	CumulativeGasUsed	string	`json:"cumulativeGasUsed"`
-	GasUsed				string	`json:"gasUsed"`
-	Confirmations		int64	`json:"confirmations"`
+type JsonTransaction struct {
+	BlockNumber       int64  `json:"blockNumber"`
+	TimeStamp         int64  `json:"timeStamp"`
+	Hash              string `json:"hash"`
+	Nonce             string `json:"nonce"`
+	BlockHash         string `json:"blockHash"`
+	TransactionIndex  int64  `json:"transactionIndex"`
+	From              string `json:"from"`
+	To                string `json:"to"`
+	Value             string `json:"value"`
+	Gas               string `json:"gas"`
+	GasPrice          string `json:"gasPrice"`
+	IsError           string `json:"isError"`
+	TxReceipt_status  string `json:"txReceipt_status"`
+	Input             string `json:"input"`
+	ContractAddress   string `json:"contractAddress"`
+	CumulativeGasUsed string `json:"cumulativeGasUsed"`
+	GasUsed           string `json:"gasUsed"`
+	Confirmations     int64  `json:"confirmations"`
 }
 
 type JsonListTransactions struct {
-	Status		int64				`json:"status"`
-	Message		string				`json:"message"`
-	Result		[]JsonTransaction	`json:"result"`
+	Status  int64             `json:"status"`
+	Message string            `json:"message"`
+	Result  []JsonTransaction `json:"result"`
 }
 
 type JsonNumLastBlock struct {
-	Result				string	`json:"result"`
+	Result string `json:"result"`
 }
 type JsonBlockTimeResult struct {
-	Timestamp 			string	`json:"timestamp"`
+	Timestamp string `json:"timestamp"`
 }
 type JsonBlockTime struct {
-	Result 				JsonBlockTimeResult	`json:"result"`
+	Result JsonBlockTimeResult `json:"result"`
 }
 
 func getAddressFromBytes32(bts string) string {
-	for i, r := range bts{
+	for i, r := range bts {
 		c := string(r)
 		if c != "0" {
 			bts = bts[i:]
@@ -76,16 +76,16 @@ func getAddressFromBytes32(bts string) string {
 	if len(bts) == 40 {
 		bts = "0x" + bts
 	}
-	if len(bts) == 41 {	//
+	if len(bts) == 41 { //
 		bts = "0" + bts
 	}
 	return bts
 }
 
 func getListTransactions(address string, startBlock int64, endBlock int64) JsonListTransactions {
-	resp, err := http.Get("http://"+etherscanApiUrl+"/api?module=account&action=txlist&address="+address+"&startblock="+strconv.FormatInt(startBlock, 16)+"&endblock="+strconv.FormatInt(endBlock, 16)+"&sort=asc&apikey="+etherscanApiKey)
+	resp, err := http.Get("http://" + etherscanApiUrl + "/api?module=account&action=txlist&address=" + address + "&startblock=" + strconv.FormatInt(startBlock, 16) + "&endblock=" + strconv.FormatInt(endBlock, 16) + "&sort=asc&apikey=" + etherscanApiKey)
 	var transactions JsonListTransactions
-	if err != nil{
+	if err != nil {
 		log.Println(err)
 	} else {
 		defer resp.Body.Close()
@@ -121,7 +121,7 @@ func getHashSignatureFunction(signatureFunction string) string {
 	return "0x" + res[0:8]
 }
 
-func BREMaddAuditor(auditorAddress string){
+func BREMaddAuditor(auditorAddress string) {
 
 	var auditor data.Auditor
 
@@ -136,7 +136,7 @@ func BREMaddAuditor(auditorAddress string){
 		auditor.AddAuditor()
 	}
 }
-func BREMaddDeveloper(devAddress string){
+func BREMaddDeveloper(devAddress string) {
 
 	var dev data.Developer
 
@@ -152,7 +152,7 @@ func BREMaddDeveloper(devAddress string){
 	}
 }
 
-func BREMICOaddAuditor(icoAddress string, auditorAddress string){
+func BREMICOaddAuditor(icoAddress string, auditorAddress string) {
 
 	var ico data.ICO
 
@@ -170,7 +170,7 @@ func BREMICOaddAuditor(icoAddress string, auditorAddress string){
 	}
 
 	currentAuditors, _ := ico.GetICOAuditors()
-	for i := range currentAuditors{
+	for i := range currentAuditors {
 		if currentAuditors[i].Address == auditor.Address {
 			return
 		}
@@ -180,30 +180,30 @@ func BREMICOaddAuditor(icoAddress string, auditorAddress string){
 
 }
 
-func BREMresolveTransaction(act JsonTransaction){
+func BREMresolveTransaction(act JsonTransaction) {
 
-	fn := getFunctionByHashSignature(act.Input[0:10]);
+	fn := getFunctionByHashSignature(act.Input[0:10])
 
 	switch fn {
-		case "addAuditor" :
-			BREMaddAuditor(getAddressFromBytes32(act.Input[10:]))
-//		case "addDeveloper" :
-//			BREMaddDeveloper(getAddressFromBytes32(act.From))
-//		case "signUp" :
-//			BREMaddDeveloper(getAddressFromBytes32(act.From))
+	case "addAuditor":
+		BREMaddAuditor(getAddressFromBytes32(act.Input[10:]))
+		//		case "addDeveloper" :
+		//			BREMaddDeveloper(getAddressFromBytes32(act.From))
+		//		case "signUp" :
+		//			BREMaddDeveloper(getAddressFromBytes32(act.From))
 	}
 }
-func BREMICOresolveTransaction(act JsonTransaction){
+func BREMICOresolveTransaction(act JsonTransaction) {
 
-	fn := getFunctionByHashSignature(act.Input[0:10]);
+	fn := getFunctionByHashSignature(act.Input[0:10])
 
-	switch fn{
-		case "addAuditor" :
-			BREMICOaddAuditor(getAddressFromBytes32(act.To), getAddressFromBytes32(act.Input[10:]))
+	switch fn {
+	case "addAuditor":
+		BREMICOaddAuditor(getAddressFromBytes32(act.To), getAddressFromBytes32(act.Input[10:]))
 	}
 }
 
-func updateBREMparticipants(startBlock int64){
+func updateBREMparticipants(startBlock int64) {
 
 	transactions := getListTransactions(BREMcontractAddress, startBlock, 99999999)
 
@@ -217,7 +217,7 @@ func updateBREMparticipants(startBlock int64){
 		BREMresolveTransaction(transactions.Result[i])
 	}
 }
-func updateAuditorsIco(icoAddress string, startBlock int64){
+func updateAuditorsIco(icoAddress string, startBlock int64) {
 
 	transactions := getListTransactions(icoAddress, startBlock, 99999999)
 
@@ -232,7 +232,7 @@ func updateAuditorsIco(icoAddress string, startBlock int64){
 	}
 }
 
-func getBREMICOstatus(contract *BREMICO) string{
+func getBREMICOstatus(contract *BREMICO) string {
 
 	var status string
 
@@ -302,7 +302,7 @@ func getBREMICOstatus(contract *BREMICO) string{
 
 	return status
 }
-func checkIco(icoAddress string, client bind.ContractBackend, startBlock int64){
+func checkIco(icoAddress string, client bind.ContractBackend, startBlock int64) {
 
 	contract, err := NewBREMICO(common.HexToAddress(icoAddress), client)
 	if err != nil {
@@ -319,7 +319,7 @@ func checkIco(icoAddress string, client bind.ContractBackend, startBlock int64){
 			log.Println(err)
 		}
 
-//		BREMaddDeveloper("0x" + hex.EncodeToString(devAddress[:]))
+		//		BREMaddDeveloper("0x" + hex.EncodeToString(devAddress[:]))
 
 		var dev data.Developer
 		dev.Address = "0x" + hex.EncodeToString(devAddress[:])
@@ -352,7 +352,6 @@ func checkIco(icoAddress string, client bind.ContractBackend, startBlock int64){
 		}
 		ico.TokenAddress = "0x" + hex.EncodeToString(tokenAddress[:])
 
-
 		tokenContract, err := NewBREMToken(common.HexToAddress(ico.TokenAddress), client)
 		if err != nil {
 			log.Println(err)
@@ -373,10 +372,7 @@ func checkIco(icoAddress string, client bind.ContractBackend, startBlock int64){
 		ico.AddICO()
 	}
 
-
-	status := getBREMICOstatus(contract)	//
-
-
+	status := getBREMICOstatus(contract) //
 
 	res, err := contract.AuditorsAmount(&bind.CallOpts{})
 	if err != nil {
@@ -389,11 +385,10 @@ func checkIco(icoAddress string, client bind.ContractBackend, startBlock int64){
 		updateAuditorsIco(icoAddress, startBlock)
 	}
 
-
 	ico.SetStatusICO(status)
 
 }
-func updateBREMProjects(startBlock int64){
+func updateBREMProjects(startBlock int64) {
 
 	client, err := ethclient.Dial("https://" + infuraApiUrl)
 	if err != nil {
@@ -406,18 +401,18 @@ func updateBREMProjects(startBlock int64){
 	}
 
 	projectsAmount, _ := BREMcontract.ProjectsAmount(&bind.CallOpts{})
-	for i := big.NewInt(0); i.Cmp(projectsAmount) < 0; i.Add(i, big.NewInt(1)){
+	for i := big.NewInt(0); i.Cmp(projectsAmount) < 0; i.Add(i, big.NewInt(1)) {
 
 		BREMICOcontractAddress, _ := BREMcontract.GetProject(&bind.CallOpts{}, i)
 
-		checkIco("0x" + hex.EncodeToString(BREMICOcontractAddress[:]), client, startBlock)
+		checkIco("0x"+hex.EncodeToString(BREMICOcontractAddress[:]), client, startBlock)
 	}
 }
 
 func getNumLastBlock() int64 {
-	resp, err := http.Get("https://"+etherscanApiUrl+"/api?module=proxy&action=eth_blockNumber&apikey="+etherscanApiKey)
+	resp, err := http.Get("https://" + etherscanApiUrl + "/api?module=proxy&action=eth_blockNumber&apikey=" + etherscanApiKey)
 	var numLastBlock JsonNumLastBlock
-	if err != nil{
+	if err != nil {
 		log.Println(err)
 	} else {
 		defer resp.Body.Close()
@@ -436,15 +431,15 @@ func getNumLastBlock() int64 {
 		return 0
 	}
 	result, err := strconv.ParseInt(numLastBlock.Result[2:], 16, 64)
-	if err != nil{
+	if err != nil {
 		log.Println(err)
 	}
 	return result
 }
 func getTimeFromKBlock(K int64) int64 {
-	resp, err := http.Get("https://"+etherscanApiUrl+"/api?module=proxy&action=eth_getBlockByNumber&tag="+strconv.FormatInt(K, 16)+"&boolean=true&apikey="+etherscanApiKey)
+	resp, err := http.Get("https://" + etherscanApiUrl + "/api?module=proxy&action=eth_getBlockByNumber&tag=" + strconv.FormatInt(K, 16) + "&boolean=true&apikey=" + etherscanApiKey)
 	var blockTime JsonBlockTime
-	if err != nil{
+	if err != nil {
 		log.Println(err)
 	} else {
 		defer resp.Body.Close()
@@ -461,17 +456,18 @@ func getTimeFromKBlock(K int64) int64 {
 		return 0
 	}
 	result, err := strconv.ParseInt(blockTime.Result.Timestamp[2:], 16, 64)
-	if err != nil{
+	if err != nil {
 		log.Println(err)
 	}
 	return result
 }
+
 //get the block by age K minutes
-func getKminuteBlock(K int) int64{
+func getKminuteBlock(K int) int64 {
 	const blocksPerMinute = 5
 
 	currentTime := (time.Now()).Unix()
-	wantedTime  := currentTime - int64( K * 60 )
+	wantedTime := currentTime - int64(K*60)
 
 	numLastBlock := getNumLastBlock()
 	if numLastBlock == 0 {
@@ -479,7 +475,7 @@ func getKminuteBlock(K int) int64{
 	}
 
 	numBlock := numLastBlock - int64(int64(K)*int64(blocksPerMinute))
-	
+
 	time := getTimeFromKBlock(numBlock)
 	if time == 0 {
 		return 0
@@ -503,14 +499,15 @@ func getKminuteBlock(K int) int64{
 }
 
 type JsonBremAddress struct {
-	Address			string	`json:"address"`
+	Address string `json:"address"`
 }
 type JsonBremNetwork struct {
-	Network			JsonBremAddress	`json:"4"`		//!!!
+	Network JsonBremAddress `json:"4"` //!!!
 }
 type JsonBremJson struct {
-	Networks		JsonBremNetwork	`json:"networks"`
+	Networks JsonBremNetwork `json:"networks"`
 }
+
 func getBREMcontractAddressFromBremJson() string {
 	file, err := ioutil.ReadFile("./../build/contracts/BREM.json")
 	if err != nil {
@@ -523,7 +520,7 @@ func getBREMcontractAddressFromBremJson() string {
 
 }
 
-func updateSuperuser(BREMAddress string){
+func updateSuperuser(BREMAddress string) {
 	data.ClearSuperuser()
 
 	transactions := getListTransactions(BREMAddress, 0, 99999999)
@@ -536,7 +533,7 @@ func updateSuperuser(BREMAddress string){
 
 }
 
-func updateDB(minutes int){
+func updateDB(minutes int) {
 
 	startBlock := getKminuteBlock(minutes)
 	updateBREMparticipants(startBlock)
