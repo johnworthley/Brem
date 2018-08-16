@@ -7,8 +7,8 @@ export default class Cabinet extends Component {
 	state = {
 		struct: {
 			data : new Map([
-				['a', [1,2,3]],
-				['b', [10,'33',30]]
+				['First row', ['Row 1 first value','Second one','And last']],
+				['Second row', [10,'33',30]]
 			])
 		}
 	}
