@@ -46,7 +46,7 @@ func validate(address string, sign string) (res bool, err error) {
 func addDeveloper(c *gin.Context) {
 	var developer data.Developer
 	err := c.BindJSON(&developer)
-	if err != nil || len(developer.Username) == 0 || len(developer.Sign) == 0 {
+	if err != nil || len(developer.Username) <= 4 || len(developer.Sign) == 0 {
 		c.JSON(http.StatusBadRequest, err)
 		return
 	}
@@ -127,6 +127,6 @@ func login(c *gin.Context) {
 	session := sessions.Default(c)
 	session.Set("address", developer.Address)
 	session.Set("sign", developer.Sign)
-
+	session.Save()
 	c.JSON(http.StatusOK, developer)
 }

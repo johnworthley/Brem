@@ -13,9 +13,9 @@ export default async () => {
   const brem = contract(BREMContract);
   brem.setProvider(currentProvider)
   const coinbase = await eth.getCoinbase()
-  web3Instance.defaultAccount = web3Account
+  // web3Instance.defaultAccount = web3Account
   // eth.sign('DATE', web3Account)
-  console.log(web3Instance)
+  // console.log(web3Instance)
 
 
   currentProvider.sendAsync({
@@ -24,9 +24,8 @@ export default async () => {
       from: coinbase
     }, async (err, res) => {
       if(err) return console.log(err)
-      const { result: sign } = res
+      const { result: sign } = res.result;
       const bremInstance = await brem.deployed()
-
 
       const signup = async name => {
         bremInstance.signUp(name, {from: coinbase}).then(name => {
@@ -39,7 +38,7 @@ export default async () => {
       }
 
       const login = async name => {
-
+      
       }
 
         // Checking for superuser address
