@@ -59,10 +59,14 @@ func GetAllAuditors() (auditors []Auditor, err error) {
 	defer rows.Close()
 	for rows.Next() {
 		var auditor Auditor
-		err = rows.Scan(&auditor.ID, &auditor.Address, &auditor.Username)
+		var username sql.NullString
+		err = rows.Scan(&auditor.ID, &auditor.Address, &username)
 		if err != nil {
 			logger.Info(err)
 			return
+		}
+		if username.Valid {
+			auditor.Username = username.String
 		}
 		auditors = append(auditors, auditor)
 	}

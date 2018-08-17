@@ -59,7 +59,7 @@ func (ico *ICO) CreateICO() (err error) {
 		return
 	}
 	defer stmt.Close()
-	err = stmt.QueryRow(ico.Address, ico.Developer.ID, ico.ClosingTime, ico.FeePercent, ico.TokenAddress, ico.Name, ico.Symbol, CREATED, ico.Location, ico.LocAddress).Scan(&ico.ID)
+	err = stmt.QueryRow(ico.Address, ico.Developer.ID, ico.Description, ico.ClosingTime, ico.FeePercent, ico.TokenAddress, ico.Name, ico.Symbol, CREATED, ico.Location, ico.LocAddress).Scan(&ico.ID)
 	return
 }
 
@@ -81,6 +81,9 @@ func (ico *ICO) GetICO() (err error) {
 	var location_string sql.NullString
 	var locAddress_string sql.NullString
 	err = row.Scan(&ico.ID, &ico.Address, &ico.Developer.ID, &description_string, &ico.ClosingTime, &ico.FeePercent, &ico.TokenAddress, &ico.Name, &ico.Symbol, &ico.Status, &location_string, &locAddress_string)
+	if err != nil {
+		logger.Info(err)
+	}
 	if description_string.Valid {
 		ico.Description = description_string.String
 	}
@@ -89,6 +92,11 @@ func (ico *ICO) GetICO() (err error) {
 	}
 	if locAddress_string.Valid {
 		ico.LocAddress = locAddress_string.String
+	}
+	err = ico.Developer.GetDeveloperById()
+	if err != nil {
+		logger.Info(err)
+		return
 	}
 	return
 }
@@ -109,12 +117,22 @@ func GetAllICOs(page int) (icos []ICO, err error) {
 		var ico ICO
 		var location, locAddress sql.NullString
 		err = rows.Scan(&ico.ID, &ico.Address, &ico.Developer.ID, &ico.ClosingTime, &ico.TokenAddress, &ico.Name, &ico.Symbol, &ico.Status, &location, &locAddress)
+		if err != nil {
+			logger.Info(err)
+			return
+		}
 		if location.Valid {
 			ico.Location = location.String
 		}
 		if locAddress.Valid {
 			ico.LocAddress = locAddress.String
 		}
+		err = ico.Developer.GetDeveloperById()
+		if err != nil {
+			logger.Info(err)
+			return
+		}
+		icos = append(icos, ico)
 	}
 	return
 }
@@ -139,6 +157,12 @@ func GetCreatedICOs(page int) (icos []ICO, err error) {
 		if locAddress.Valid {
 			ico.LocAddress = locAddress.String
 		}
+		err = ico.Developer.GetDeveloperById()
+		if err != nil {
+			logger.Info(err)
+			return
+		}
+		icos = append(icos, ico)
 	}
 	return
 }
@@ -163,6 +187,12 @@ func GetOpenedICOs(page int) (icos []ICO, err error) {
 		if locAddress.Valid {
 			ico.LocAddress = locAddress.String
 		}
+		err = ico.Developer.GetDeveloperById()
+		if err != nil {
+			logger.Info(err)
+			return
+		}
+		icos = append(icos, ico)
 	}
 	return
 }
@@ -187,6 +217,12 @@ func GetSuccessICOs(page int) (icos []ICO, err error) {
 		if locAddress.Valid {
 			ico.LocAddress = locAddress.String
 		}
+		err = ico.Developer.GetDeveloperById()
+		if err != nil {
+			logger.Info(err)
+			return
+		}
+		icos = append(icos, ico)
 	}
 	return
 }
@@ -211,6 +247,12 @@ func GetFailedICOs(page int) (icos []ICO, err error) {
 		if locAddress.Valid {
 			ico.LocAddress = locAddress.String
 		}
+		err = ico.Developer.GetDeveloperById()
+		if err != nil {
+			logger.Info(err)
+			return
+		}
+		icos = append(icos, ico)
 	}
 	return
 }
@@ -235,6 +277,12 @@ func GetWithdrawnICOs(page int) (icos []ICO, err error) {
 		if locAddress.Valid {
 			ico.LocAddress = locAddress.String
 		}
+		err = ico.Developer.GetDeveloperById()
+		if err != nil {
+			logger.Info(err)
+			return
+		}
+		icos = append(icos, ico)
 	}
 	return
 }
@@ -259,6 +307,12 @@ func GetOverdueICOs(page int) (icos []ICO, err error) {
 		if locAddress.Valid {
 			ico.LocAddress = locAddress.String
 		}
+		err = ico.Developer.GetDeveloperById()
+		if err != nil {
+			logger.Info(err)
+			return
+		}
+		icos = append(icos, ico)
 	}
 	return
 }

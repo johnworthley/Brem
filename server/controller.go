@@ -62,7 +62,7 @@ func addICO(c *gin.Context) {
 		return
 	}
 	developer := iDeveloper.(data.Developer)
-	if strings.EqualFold(developer.Address, ico.Developer.Address) {
+	if !strings.EqualFold(developer.Address, ico.Developer.Address) {
 		c.JSON(http.StatusUnauthorized, nil)
 		return
 	}
@@ -175,11 +175,6 @@ func getICO(c *gin.Context) {
 	}
 	ico.Address = strings.ToLower(ico.Address)
 	err := ico.GetICO()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, err)
-		return
-	}
-	err = ico.Developer.GetDeveloper()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return

@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"../../server/logger"
+	"database/sql"
 )
 
 type Superuser struct {
@@ -70,10 +71,14 @@ func GetSuperuserICOs() (icos []ICO, err error) {
 	defer rows.Close()
 	for rows.Next() {
 		var ico ICO
-		err = rows.Scan(&ico.ID, &ico.Address, &ico.ClosingTime, &ico.FeePercent, &ico.TokenAddress, &ico.Name, &ico.Symbol, &ico.Status, &ico.LocAddress)
+		var locAddress sql.NullString
+		err = rows.Scan(&ico.ID, &ico.Address, &ico.ClosingTime, &ico.FeePercent, &ico.TokenAddress, &ico.Name, &ico.Symbol, &ico.Status, &locAddress)
 		if err != nil {
 			logger.Info(err)
 			return
+		}
+		if locAddress.Valid {
+			ico.LocAddress = locAddress.String
 		}
 		icos = append(icos, ico)
 	}

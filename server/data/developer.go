@@ -56,6 +56,20 @@ func (dev *Developer) GetDeveloper() (err error) {
 	return
 }
 
+// GetDeveloperByID
+func (dev *Developer) GetDeveloperById() (err error) {
+	statement := "SELECT * FROM developers WHERE id = $1"
+	row, err := db.Query(statement, dev.ID)
+	if err != nil {
+		logger.Info(err)
+		return
+	}
+	defer row.Close()
+	row.Next()
+	err = row.Scan(&dev.ID, &dev.Address, &dev.Username)
+	return
+}
+
 // GetICOs return all developer's icos
 func (dev *Developer) GetICOs() (icos []ICO, err error) {
 	statement := "SELECT id, address, closingTime, feePercent, tokenAddress, name, symbol, status, locAddress FROM ico WHERE developerID = $1 ORDER BY id DESC"
