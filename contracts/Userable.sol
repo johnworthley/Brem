@@ -265,6 +265,10 @@ contract Userable is Auditable {
         return users[msg.sender].name;
     }
     
+    function isSignUp() public view returns(bool) {
+        return (bytes(users[msg.sender].name).length > 0);
+    }
+
     function login()
         view
         public

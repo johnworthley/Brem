@@ -34,6 +34,16 @@ contract BREMFactory is Userable{
         return projects[index];    
     }
     
+    function isValidName(string _name) public view returns(bool) {
+        require(bytes(_name).length > 0);
+        bytes32 nameHash = keccak256(bytes(_name));
+        if (nameHash == firtProjectNameHash) {
+            return false;
+        }
+
+        return indexes[_name] == 0;
+    }
+
     event BREMICOCreated(
         address indexed creator,
         address indexed icoAddress,
