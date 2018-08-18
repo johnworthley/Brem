@@ -7,7 +7,8 @@ const style = StyleSheet.create({
     width: '100%',
     maxWidth: config.pageWidth,
     margin: '50px auto',
-    padding: '0 20px'
+    padding: '0 20px',
+	boxSizing: 'border-box'
   }
 })
 
