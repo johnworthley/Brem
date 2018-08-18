@@ -2,13 +2,13 @@ package main
 
 import (
 	"../server/data"
-	"strconv"
-	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/common/hexutil"
-	"strings"
+	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"github.com/gin-contrib/sessions"
+	"strconv"
+	"strings"
 )
 
 func validate(address string, sign string) (res bool, err error) {
@@ -81,7 +81,6 @@ func addDeveloper(c *gin.Context) {
 }
 
 // Developer login
-// Register new developer
 // @Summary Вход для застройщика
 // @Description Вход для застройщика
 // @Tags auth
@@ -129,4 +128,41 @@ func login(c *gin.Context) {
 	session.Set("sign", developer.Sign)
 	session.Save()
 	c.JSON(http.StatusOK, developer)
+}
+
+// Write cookies for superuser and auditor
+// @Summary Запись cookie для суперюзера
+// @Description Запись cookie для суперюзера
+// @Tags auth
+// @Accept  json
+// @Produce  json
+// @Param ico body data.Developer true "Dev"
+// @Router /login [post]
+func writeCookies(c *gin.Context) {
+	type Worker struct {
+		Address string `json:"address"`
+		Sign    string `json:"sign"`
+	}
+	var worker Worker
+	err := c.BindJSON(&worker)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+	// Validate sign
+	isValid, err := validate(worker.Address, worker.Sign)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+	if !isValid {
+		c.JSON(http.StatusNotAcceptable, nil)
+		return
+	}
+	// Set up session
+	session := sessions.Default(c)
+	session.Set("address", worker.Address)
+	session.Set("sign", worker.Sign)
+	session.Save()
+	c.JSON(http.StatusOK, nil)
 }
