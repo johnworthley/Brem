@@ -2,16 +2,24 @@ import React, { Component } from 'react'
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
 import { css, StyleSheet } from 'aphrodite/no-important'
 import store from 'Store'
+import config from 'Config'
 
 import Login from '../Pages/Login'
 import Cabinet from '../Pages/Cabinet'
+import ProjectCreate from '../Pages/Project/Create'
+
+
 import Page from '../Components/Page'
 
 
 
 const style = StyleSheet.create({
   main: {
-    minHeight: 'calc(100vh - 290px)'
+    minHeight: 'calc(100vh - 290px)',
+    maxWidth: config.pageWidth,
+    boxSizing: 'border-box',
+    padding: '0 20px',
+    margin: '0 auto'
   }
 })
 
@@ -31,7 +39,8 @@ class Routing extends Component {
       <Router>
         <Route render={({ location }) => (
           <div className={css(style.main)}>
-            <Login />
+            {/* <Login /> */}
+            <Route exact path="/project/new" component={ProjectCreate} />
             {/* <Page>
 				      <Route exact path="/cabinet" component={Cabinet} />
             </Page> */}
