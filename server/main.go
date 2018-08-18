@@ -39,6 +39,7 @@ func main() {
 func initAPI() {
 	router.POST("/signup", addDeveloper)
 	router.POST("/login", login)
+	router.POST("/session", writeCookies)
 
 	superuserGroup := router.Group("/super")
 	superuserGroup.Use(SuperuserAuth())
