@@ -250,6 +250,8 @@ contract Userable is Auditable {
     function signUp(string _name) 
         public 
         onlyValidName(_name)
+        onlySuperuser
+        onlyAuditor
     returns (string)
     {
         if (bytes(users[msg.sender].name).length == 0) {
