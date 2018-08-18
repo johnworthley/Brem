@@ -6,6 +6,7 @@ import axios from 'axios'
 import BREMContract from "../../build/contracts/BREM.json"
 
 export default async () => {
+  console.log('login started')
   const { host } = config
   await getWebThree()
   const { web3Instance, web3Account } = store
@@ -13,18 +14,23 @@ export default async () => {
   const brem = contract(BREMContract);
   brem.setProvider(currentProvider)
   const coinbase = await eth.getCoinbase()
+  store.update({
+    web3Coinbase: coinbase
+  })
   // web3Instance.defaultAccount = web3Account
   // eth.sign('DATE', web3Account)
   // console.log(web3Instance)
-
 
   currentProvider.sendAsync({
       method: "personal_sign",
       params: [utils.utf8ToHex(coinbase), coinbase],
       from: coinbase
     }, async (err, res) => {
+      console.log('currentProvider started', res)
+      console.log('coinbase', coinbase)
       if(err) return console.log(err)
-      const { result: sign } = res.result;
+      const { result: sign } = res
+      console.log('sign', sign)
       const bremInstance = await brem.deployed()
 
       const signup = async name => {
@@ -37,22 +43,36 @@ export default async () => {
         })
       }
 
-      const login = async name => {
-      
+      const loginSuperAuditor = async name => {
+        console.log('login')
+        try {
+          var data = await bremInstance.login({from: coinbase})
+        }
+        catch(e) {
+          console.log('Error loginSuperAuditor', e)
+          console.log('register')
+          store.setState({
+            needToShowSignup: true
+          })
+        }
       }
 
         // Checking for superuser address
         const isSuperUser = await bremInstance.isSuperuser(coinbase)
-        if(isSuperUser) {
-          let name
-          bremInstance.signUp(name, {from: coinbase}).then(name => {
-            console.log(name)
-            return
-          })
-          .catch(err => {
-            console.error(err)
-            signup(name)
-          })
+        if(true) {
+          console.log('super')
+          try {
+            var data = await bremInstance.login.call(this, {from: coinbase})
+          }
+          catch(e) {
+            console.log(data)
+            console.log('Error loginSuperAuditor', e)
+            console.log('register')
+            store.setState({
+              needToShowSignup: true
+            })
+          }
+
           return
         }
 
