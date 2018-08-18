@@ -26,9 +26,7 @@ module.exports = {
       },
       rinkeby: {
         provider: () => new HDWalletProvider(MNEMONIC, "https://rinkeby.infura.io/" + INFURA_API_KEY),
-        network_id: 4,
-        gas: 4612388,
-        gasPrice: 2000000000
+        network_id: 4
       },
       // main ethereum network(mainnet)
       main: {
