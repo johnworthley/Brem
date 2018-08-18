@@ -17,77 +17,103 @@ export default async () => {
   store.update({
     web3Coinbase: coinbase
   })
-  // web3Instance.defaultAccount = web3Account
-  // eth.sign('DATE', web3Account)
-  // console.log(web3Instance)
+
+  const name = "usernameZZZ"
 
   currentProvider.sendAsync({
       method: "personal_sign",
       params: [utils.utf8ToHex(coinbase), coinbase],
       from: coinbase
     }, async (err, res) => {
-      console.log('currentProvider started', res)
-      console.log('coinbase', coinbase)
-      if(err) return console.log(err)
+      if(err) return console.error(err)
       const { result: sign } = res
-      console.log('sign', sign)
       const bremInstance = await brem.deployed()
 
       const signup = async name => {
-        bremInstance.signUp(name, {from: coinbase}).then(name => {
-          console.log(name)
+        // Checking for valid username
+        const isValidUsername = await bremInstance.isValidUsername(name)
+        if (!isValidUsername) {
+          console.log("Not valid username")
           return
+        }
+        // Sign up and login
+        bremInstance.signUp(name, {from: coinbase}).then(txRes => {
+          alert(txRes.tx) // Show tx hash
+          return txRes.receipt.status === "0x1" // Return tx status
         })
         .catch(err => {
           console.error(err)
         })
       }
 
-      const loginSuperAuditor = async name => {
-        console.log('login')
-        try {
-          var data = await bremInstance.login({from: coinbase})
-        }
-        catch(e) {
-          console.log('Error loginSuperAuditor', e)
-          console.log('register')
-          store.setState({
-            needToShowSignup: true
-          })
-        }
+      const loginSuperAuditor = async function() {
+          return await bremInstance.login({from: coinbase})
+      }
+        
+      const loginDeveloper = async developer => {
+        axios.post(host + "login", developer)
+        .then()
       }
 
-        // Checking for superuser address
-        const isSuperUser = await bremInstance.isSuperuser(coinbase)
-        if(true) {
-          console.log('super')
-          try {
-            var data = await bremInstance.login.call(this, {from: coinbase})
-          }
-          catch(e) {
-            console.log(data)
-            console.log('Error loginSuperAuditor', e)
-            console.log('register')
-            store.setState({
-              needToShowSignup: true
-            })
-          }
+      const signupDeveloper = async developer => {
+        axios.post(host + "signup", developer)
+        .then()
+      }
 
-          return
+      const isSuperUser = await bremInstance.isSuperuser(coinbase)
+      const isAuditor = await bremInstance.isAuditor(coinbase)
+      if(isSuperUser || isAuditor) {
+        // Checking for sign up
+        const isSignUp = await bremInstance.isSignUp({from: coinbase})
+
+        if (!isSignUp) {
+          const isSuccess = await signup(name)
+          if (!isSuccess) {
+            alert("Ошибка записи в блокчейн")
+            return
+          }
         }
+       
+        const username = await loginSuperAuditor()
+        console.log(username)
 
-
-        const isAuditor = await bremInstance.isAuditor(coinbase)
-        console.log(isSuperUser, isAuditor)
-        return
-        const developer = {
+        // Write cookies
+        axios.post(host + "session", {
           address: coinbase,
-          username: name,
+          sign: sign
+        })
+        .then(res => console.log(res))
+        .catch(err => console.error(err))
+
+      } else {
+        let developer = {
+          address: coinbase,
           sign: sign
         }
-        const signupRes = await axios.post(host + "/signup", developer)
+        // Login developer
+        axios.post(host + "login", developer)
+        .then(res => {
+          developer = res.data
+          console.log(developer)
+        })
+        .catch(err => {
+          // Sign up developer
+          developer.username = name
+          axios.post(host + "signup", developer)
+          .then(res => {
+            console.log(res)
+            axios.post(host + "login", developer)
+            .then(res => {
+              developer = res.data
+              console.log(developer)
+            })
+          })
+          .catch(err => console.log(err))
+        })
+        
+      }
+       
     })
-  // const req = await fetch(`http://${host}/login`)
 
 }
 

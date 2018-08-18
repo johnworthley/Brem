@@ -236,9 +236,12 @@ contract Userable is Auditable {
     }
     
     mapping(address => User) users;
+
+    mapping(string => address) usernames;
     
     modifier onlyValidName(string _name) {
         require(bytes(_name).length > 0);
+        require(usernames[_name] == address(0));
         _;
     }
     
@@ -250,10 +253,9 @@ contract Userable is Auditable {
     function signUp(string _name) 
         public 
         onlyValidName(_name)
-        onlySuperuser
-        onlyAuditor
     returns (string)
     {
+        require(isSuperuser(msg.sender) || isAuditor(msg.sender));
         if (bytes(users[msg.sender].name).length == 0) {
             users[msg.sender].name = _name;
         }
@@ -263,6 +265,10 @@ contract Userable is Auditable {
         // }
         
         return users[msg.sender].name;
+    }
+
+    function isValidUsername(string _name) public view returns(bool) {
+        return (bytes(_name).length > 0 && usernames[_name] == address(0));
     }
     
     function isSignUp() public view returns(bool) {
