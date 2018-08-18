@@ -6,7 +6,6 @@ const style = StyleSheet.create({
     borderCollapse: 'collapse',
 	boxSizing: 'border-box',
 	width: '100%',
-	fontFamily: 'OpenSans',
 	fontSize: 14
   },
   th : {
@@ -25,7 +24,13 @@ const style = StyleSheet.create({
 	boxSizing: 'border-box',
 	textAlign: 'left',
 	height: 31,
-	padding: '0 20px'
+	padding: '0 20px',
+	':first-child': {
+		borderLeftWidth: 1
+	},
+	':last-child': {
+		borderRightWidth: 1
+	}
   },
   tdRight : {
 	textAlign: 'right'
@@ -33,9 +38,16 @@ const style = StyleSheet.create({
   tdRed : {
 	color: '#ff0000'
   },
-  tdEven : {
+  tr: {
+	background: '#ffffff',
+	':hover': {
+	  background: 'rgba(240, 114, 59, 0.5)'
+	}
+  },
+  trEven : {
 	backgroundColor: '#f8f8f8'
-  }
+  },
+  
 })
 
 export default class Table extends Component {
@@ -74,16 +86,18 @@ export default class Table extends Component {
 					</tr>
 					{
 						rows.map((item,rowNum) => (
-							<tr key={'TableRow' + rowNum}>
+							<tr key={'TableRow' + rowNum} className={css(
+							style.tr,
+							(rowNum % 2 === 0) ? style.trEven : ''
+							)}>
 								{
 									item.map((item,cellNum) => (
 										<td key={ 'TableCell' + cellNum + rowNum} className={css(
 										style.td, 
 										(typeof(item) === 'number') ? style.tdRight : '',
-										(rowNum % 2 === 0) ? style.tdEven : '',
 										(columns[headers[cellNum]] && columns[headers[cellNum]].red) ? style.tdRed : '',
 										)}>
-											{item}
+											{(typeof(item) === 'number') ? item.toLocaleString() : item}
 										</td>
 									))
 				

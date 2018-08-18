@@ -16,7 +16,7 @@ export default class Cabinet extends Component {
 			data : new Map([
 				['First row', ['Row 1 first value','Second one','And last']],
 				['Second row', [10,33,30]],
-				['Last row', [101,444,'550']]
+				['Last row', [1101.786,44444.99,'550.2']]
 			])
 		}
 	}
