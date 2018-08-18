@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
 import { css, StyleSheet } from 'aphrodite/no-important'
 import store from 'Store'
 
+import Login from '../Pages/Login'
 import Cabinet from '../Pages/Cabinet'
 import Page from '../Components/Page'
 
@@ -15,20 +16,25 @@ const style = StyleSheet.create({
 })
 
 class Routing extends Component {
-  componentWillMount = () => store.watchState(this, ['loginStatus'])
   state = {
-
+    web3Status: {
+      logged: false
+    }
   }
 
-  render = () => {
+  componentWillMount = () => store.watchState(this, ['loginStatus', 'web3Status'])
 
+  render = () => {
+    const { loginStatus, web3Status } = this.state
+    console.log(loginStatus, web3Status)
     return (
       <Router>
         <Route render={({ location }) => (
           <div className={css(style.main)}>
-            <Page>
-				<Route exact path="/cabinet" component={Cabinet} />
-            </Page>
+            <Login />
+            {/* <Page>
+				      <Route exact path="/cabinet" component={Cabinet} />
+            </Page> */}
           </div>
         )} />
       </Router>
