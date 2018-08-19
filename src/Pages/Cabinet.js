@@ -30,11 +30,59 @@ export default class Cabinet extends Component {
 				['Last row', [1101.786,44444.99,'550.2']]
 			])
 		}
-	}
+  }
+  
+  withdrawFees = async e => {
+    e.preventDefault()
+    const withdrawValue = this.withdrawFees.value; // Значение в Ether
+
+    await getWebThree()
+    const { web3Instance, web3Account } = store
+    const { currentProvider, utils, eth } = web3Instance
+    const brem = contract(BREMContract)
+    brem.setProvider(currentProvider)
+
+    const coinbase = await eth.getCoinbase()
+    // TODO: check coinbase with state
+
+    const bremInstance = await brem.deployed()
+    const isSuperuser = await bremInstance.isSuperuser(coinbase)
+    if (!isSuperuser) {
+      // Ошибка, пользователь не админ
+      return
+    }
+
+    const withdrawValueInWei = utils.toWei(withdrawValue, "ether")
+
+    // Check for contract's balance
+    const currentBalanceBN = await eth.getBalance(brem.address)
+    const currentBalance = currentBalanceBN.toNumber()
+    if (withdrawValueInWei > currentBalance) {
+      // Нет такой суммы на контракте
+      return
+    }
+    // Withdraw collected fee
+    try {
+      const txRes = await bremInstance.setWithdrawFeePercent(fee, {from: coinbase})
+      const tx = txRes.tx
+      const status = txRes.receipt.status
+      if (status === "0x1") {
+        alert(tx)
+        // Можно обновить текущее значение из web3
+      } else{
+        alert("Error tx")
+      }
+    } catch(err) {
+      console.error(err)
+    }
+  }
 
 	changeFee = async e => {
 		e.preventDefault()
-		const fee = this.fee.value
+    const fee = this.fee.value
+    if (fee < 0 || fee > 100) {
+      return alert('Error')
+    }
     
     await getWebThree()
     const { web3Instance, web3Account } = store
@@ -45,18 +93,18 @@ export default class Cabinet extends Component {
     const coinbase = await eth.getCoinbase()
     // TODO: check coinbase with state
 
-    // Check for contract's current fee value
-    const currentFee = await eth.getBalance(brem.address)
-    if (currentFee === fee) {
-      // Значение уже установлено
-      return
-    }
-
     const bremInstance = await brem.deployed()
     const isSuperuser = await bremInstance.isSuperuser(coinbase)
     if (!isSuperuser) {
       // Ошибка, пользователь не админ
       return
+    }
+    // Check for contract's current fee value
+    const currentFeeBN = await bremInstance.withdrawFeePercent()
+    const currentFee = currentFeeBN.toNumber()
+    if (currentFee === fee) {
+        // Значение уже установлено
+        return
     }
     // Change fee
     try {
