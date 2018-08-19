@@ -399,3 +399,233 @@ async function changeWithdrawFee(feePercent) {
   return alert(res.tx);
         
 }
+
+
+async function addNewIcoAuditor(contractAddress, auditorAddress) { //not tested
+  console.log('addNewIcoAuditor');
+  const { host } = config
+  const { web3Instance, web3Account } = store
+  const { currentProvider, utils, eth } = web3Instance
+  const brem = contract(BREMContract);
+  brem.setProvider(currentProvider)
+  const ico = contract(BREMICOcontract);
+  ico.setProvider(currentProvider)
+  const coinbase = await eth.getCoinbase()
+  store.update({
+    web3Coinbase: coinbase
+  })
+  
+  const bremInstance = await brem.deployed();
+  const instance = await ico.at(contractAddress);
+
+  if (contractAddress.length == 0){
+    alert('Invalid contract address');
+    return;
+  }
+  if (auditorAddress.length == 0){
+    alert('Invalid aduditor address');
+    return;
+  }
+
+  const isSuperuser = await bremInstance.isSuperuser(coinbase);
+  if(!isSuperuser){
+    alert('Only for superuser');
+    return;
+  }
+
+  const isBremAuditor = await bremInstance.isAuditor(auditorAddress);
+  if (!isBremAuditor) {
+    alert(address + " is not brem auditor");
+    return;
+  }
+
+  const isAuditor = await instance.isAuditor(auditorAddress);
+  if (isAuditor) {
+    alert(address + " is already auditor");
+    return;
+  }
+
+  const isAuditSelected = await instance.auditSelected();
+  if (isAuditSelected) {
+    alert("Audit selected");
+    return;
+  }
+
+  const ishasClosed = await instance.hasClosed();
+  if (ishasClosed) {
+    alert("Has closed");
+    return;
+  }
+
+
+  instance.addAuditor(auditorAddress, { from: coinbase }).then(async txRes => {
+    try {
+      const icoAuditor = {
+        ico: {
+              address: contractAddress
+        },
+        address: auditorAddress
+      };
+    
+      let res = await axios.post(host + "ico/audit", icoAuditor);
+      console.log(res);
+      
+      const status = txRes.receipt.status;
+      if (status === "0x1") {
+        alert("Success. TX: " + txRes.tx);
+        // Success
+      } else{
+        alert("Error tx")
+      }
+
+    } catch(err){
+      console.log(err);
+    }
+  });
+  
+}
+
+async function publishProject(contractAddress) { //not tested
+  console.log('publishProject');
+  const { host } = config
+  const { web3Instance, web3Account } = store
+  const { currentProvider, utils, eth } = web3Instance
+  const brem = contract(BREMContract);
+  brem.setProvider(currentProvider)
+  const ico = contract(BREMICOcontract);
+  ico.setProvider(currentProvider)
+  const coinbase = await eth.getCoinbase()
+  store.update({
+    web3Coinbase: coinbase
+  })
+  
+  const bremInstance = await brem.deployed();
+  const instance = await ico.at(contractAddress);
+
+  if (contractAddress.length == 0){
+    alert('Invalid address');
+    return;
+  }
+
+  const isSuperuser = await bremInstance.isSuperuser(coinbase);
+  if(!isSuperuser){
+    alert('Only for superuser');
+    return;
+  }
+
+  const isAuditSelected = await instance.auditSelected();
+  if (isAuditSelected) {
+    alert("Audit selected");
+    return;
+  }
+
+  const hasClosed = await instance.hasClosed();
+  if (hasClosed) {
+    alert("Has closed");
+    return;
+  }
+
+  const auditorsAmount = await instance.auditorsAmount();
+  if (auditorsAmount == 0) {
+    alert("auditorsAmount = 0");
+    return;
+  }
+
+
+  instance.finishAuditSelection({ from: coinbase }).then(async txRes => {
+    try {
+      const ico = {
+        address: contractAddress
+      };
+      
+      const status = txRes.receipt.status;
+      if (status === "0x1") {
+        alert("Success. TX: " + txRes.tx);
+        // Success
+        let res = await axios.put(host + "ico/open", ico);
+        console.log(res);
+      } else{
+        alert("Error tx")
+      }
+
+    } catch(err){
+      console.log(err);
+    }
+  });
+  
+}
+
+
+async function confirmWithdraw(contractAddress) { //not tested
+  console.log('confirmWithdraw');
+  const { host } = config
+  const { web3Instance, web3Account } = store
+  const { currentProvider, utils, eth } = web3Instance
+  const brem = contract(BREMContract);
+  brem.setProvider(currentProvider)
+  const ico = contract(BREMICOcontract);
+  ico.setProvider(currentProvider)
+  const coinbase = await eth.getCoinbase()
+  store.update({
+    web3Coinbase: coinbase
+  })
+  
+  const bremInstance = await brem.deployed();
+  const instance = await ico.at(contractAddress);
+
+  if (contractAddress.length == 0){
+    alert('Invalid address');
+    return;
+  }
+
+  const isAuditor = await bremInstance.isAuditor(coinbase);
+  if(!isAuditor){
+    alert('Only for auditors');
+    return;
+  }
+
+  const hasClosed = await instance.hasClosed();
+  if (!hasClosed) {
+    alert("Ico didn't close");
+    return;
+  }
+
+  const isAuditSelected = await instance.auditSelected();
+  if (!isAuditSelected) {
+    alert("Audit not selected");
+    return;
+  }
+
+  const isCapReached = await instance.capReached();
+  if (!isCapReached) {
+    alert("Error: ico failed");
+    return;
+  }
+
+  const isRequested = await instance.isRequested();
+  if (!isRequested) {
+    alert("No requests");
+    return;
+  }
+
+  const isConfirmed = await instance.isConfirmed(coinbase);
+  if (isConfirmed) {
+    alert("You aldready confirmed");
+    return;
+  }
+
+
+  instance.confirmWithdraw({ from: coinbase }).then(async txRes => {
+    
+    const status = txRes.receipt.status;
+    const tx = txRes.tx;
+    if (status === "0x1") {
+      alert("Success. TX: " + tx);
+      // Success
+    } else{
+      alert("Error tx" + tx)
+    }
+
+  });
+  
+}
