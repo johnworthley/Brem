@@ -7,6 +7,7 @@ import config from 'Config'
 import Login from '../Pages/Login'
 import Cabinet from '../Pages/Cabinet'
 import ProjectCreate from '../Pages/Project/Create'
+import ProjectView from '../Pages/Project/View'
 
 
 import Page from '../Components/Page'
@@ -34,6 +35,7 @@ class Routing extends Component {
 
   render = () => {
     const { loginStatus, web3Status } = this.state
+    const { logged } = web3Status
     console.log(loginStatus, web3Status)
     return (
       <Router>
@@ -43,6 +45,7 @@ class Routing extends Component {
             <Page>
               <Route exact path="/project/new" component={ProjectCreate} />
 				      <Route exact path="/cabinet" component={Cabinet} />
+              <Route path="/project/:id" component={ProjectView} />
             </Page>
           </div>
         )} />
