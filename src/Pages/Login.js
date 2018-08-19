@@ -30,9 +30,15 @@ class Login extends Component {
 
   render() {
     const { tabs, needToShowSignup } = this.state
+    const tabsToRender = tabs.map(tab => {
+      if(needToShowSignup && tab.name === 'Register') return {...tab, default: true}
+      else if(needToShowSignup) return {...tab, default: false}
+      else if(!needToShowSignup && tab.name === 'Login') return {...tab, default: true}
+      else return {...tab, default: false}
+    })
     return (
       <div>
-        <Tabs data={needToShowSignup ? tabs.map(tab => tab.name === 'Register' ? {...tab, default: true} : {...tab, default: false}) : tabs} />
+        <Tabs data={tabsToRender} />
       </div>
     )
   }

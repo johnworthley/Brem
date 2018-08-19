@@ -9,6 +9,7 @@ export default async () => {
   console.log('login started')
   const { host } = config
   await getWebThree()
+  console.log('logged')
   const { web3Instance, web3Account } = store
   const { currentProvider, utils, eth } = web3Instance
   const brem = contract(BREMContract);
@@ -17,7 +18,6 @@ export default async () => {
   store.update({
     web3Coinbase: coinbase
   })
-
   const name = "usernameZZZ"
 
   currentProvider.sendAsync({
@@ -49,7 +49,7 @@ export default async () => {
       const loginSuperAuditor = async function() {
           return await bremInstance.login({from: coinbase})
       }
-        
+
       const loginDeveloper = async developer => {
         axios.post(host + "login", developer)
         .then()
@@ -67,14 +67,30 @@ export default async () => {
         const isSignUp = await bremInstance.isSignUp({from: coinbase})
 
         if (!isSignUp) {
+          const { regName } = store
+          if(!regName) return store.update({
+            web3Status: {
+              logged: false,
+              instance: true,
+            },
+            needToShowSignup: true,
+            accountType: 'unregistered'
+          })
           const isSuccess = await signup(name)
           if (!isSuccess) {
-            alert("Ошибка записи в блокчейн")
+            alert("Blockchain error. Try reloading the page")
             return
           }
         }
-       
+
         const username = await loginSuperAuditor()
+        store.update({
+          web3Status: {
+            logged: true,
+            instance: true
+          },
+          accountType: isSuperUser ? 'super' : 'auditor'
+        })
         console.log(username)
 
         // Write cookies
@@ -94,9 +110,25 @@ export default async () => {
         axios.post(host + "login", developer)
         .then(res => {
           developer = res.data
+          store.update({
+            web3Status: {
+              logged: true,
+              instance: true
+            },
+            accountType: 'developer'
+          })
           console.log(developer)
         })
         .catch(err => {
+          const { regName } = store
+          if(!regName) return store.update({
+            web3Status: {
+              logged: false,
+              instance: true,
+            },
+            needToShowSignup: true,
+            accountType: 'unregistered'
+          })
           // Sign up developer
           developer.username = name
           axios.post(host + "signup", developer)
@@ -105,14 +137,21 @@ export default async () => {
             axios.post(host + "login", developer)
             .then(res => {
               developer = res.data
+              store.update({
+                web3Status: {
+                  logged: true,
+                  instance: true
+                },
+                accountType: 'developer'
+              })
               console.log(developer)
             })
           })
           .catch(err => console.log(err))
         })
-        
+
       }
-       
+
     })
 
 }

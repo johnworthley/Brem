@@ -3,6 +3,7 @@ import Routing from './Route/Routing'
 import Header from './Components/Header'
 import Footer from './Components/Footer'
 
+import store from 'Store'
 
 
 import login from './util/login'
@@ -21,6 +22,15 @@ class App extends Component {
   )
 }
 
-export default App
+export default App;
 
-login()
+//Testing no-internet fumction
+(() => {
+  store.update({
+    web3Status: {
+      logged: true
+    }
+  })
+})()
+
+//login()

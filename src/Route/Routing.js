@@ -10,7 +10,7 @@ import ProjectCreate from '../Pages/Project/Create'
 import ProjectView from '../Pages/Project/View'
 import ProjectList from '../Pages/Project/List'
 
-
+import Alert from '../Components/Alert'
 import Page from '../Components/Page'
 
 
@@ -36,21 +36,42 @@ class Routing extends Component {
 
   render = () => {
     const { loginStatus, web3Status } = this.state
-    const { logged } = web3Status
-    console.log(loginStatus, web3Status)
+    const { logged, instance } = web3Status
+    console.log('routing login:', logged)
     return (
       <Router>
         <Route render={({ location }) => (
           <div className={css(style.main)}>
-            {/* <Login /> */}
-            <Page>
-			  <Switch location={location}>
-			    <Route exact path="/project/list" component={ProjectList} /> 
-                <Route exact path="/project/new" component={ProjectCreate} />
-				<Route exact path="/cabinet" component={Cabinet} />
-              <Route path="/project/:id" component={ProjectView} />
-			  </Switch>
-            </Page>
+            {
+              logged === 'pending' ? (
+                <Page>
+                  <h3>Loading...</h3>
+                </Page>
+
+              ) : (
+                logged ? (
+                  <Page>
+                    <Switch location={location}>
+                      <Route exact path="/project/list" component={ProjectList} />
+                      <Route exact path="/project/new" component={ProjectCreate} />
+                      <Route exact path="/cabinet" component={Cabinet} />
+                      <Route path="/project/:id" component={ProjectView} />
+                    </Switch>
+                  </Page>
+                ) : (
+                  <div>
+                    <Login />
+                    {
+                      instance ? '' : (
+                        <Alert heading="Plugin error" text="No MetaMask session or plugin presented. Please use latest version of Chrome with MetaMask plugin installed and with an active MetaMask session." />
+                      )
+                    }
+                  </div>
+                )
+              )
+            }
+
+
           </div>
         )} />
       </Router>
