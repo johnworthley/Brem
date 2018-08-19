@@ -535,16 +535,15 @@ async function publishProject(contractAddress) { //not tested
   instance.finishAuditSelection({ from: coinbase }).then(async txRes => {
     try {
       const ico = {
-        address: auditorAddress
+        address: contractAddress
       };
-    
-      let res = await axios.put(host + "ico/open", ico);
-      console.log(res);
       
       const status = txRes.receipt.status;
       if (status === "0x1") {
         alert("Success. TX: " + txRes.tx);
         // Success
+        let res = await axios.put(host + "ico/open", ico);
+        console.log(res);
       } else{
         alert("Error tx")
       }
@@ -552,81 +551,6 @@ async function publishProject(contractAddress) { //not tested
     } catch(err){
       console.log(err);
     }
-  });
-  
-}
-
-
-async function makeWithdrawRequest(contractAddress, value) { //not tested
-  console.log('makeWithdrawRequest');
-  const { host } = config
-  const { web3Instance, web3Account } = store
-  const { currentProvider, utils, eth } = web3Instance
-  const brem = contract(BREMContract);
-  brem.setProvider(currentProvider)
-  const ico = contract(BREMICOcontract);
-  ico.setProvider(currentProvider)
-  const coinbase = await eth.getCoinbase()
-  store.update({
-    web3Coinbase: coinbase
-  })
-  
-  const bremInstance = await brem.deployed();
-  const instance = await ico.at(contractAddress);
-
-  if (contractAddress.length == 0){
-    alert('Invalid address');
-    return;
-  }
-
-  const wallet = await instance.wallet();
-  if(wallet !== coinbase){
-    alert('Error: your address is not address of ICO wallet');
-    return;
-  }
-
-
-  const isWithdrawn = await instance.isWithdrawn();
-  if (isWithdrawn) {
-    alert("Ico is finished");
-    return;
-  }
-
-  const hasClosed = await instance.hasClosed();
-  if (!hasClosed) {
-    alert("Ico didn't close");
-    return;
-  }
-
-  const isAuditSelected = await instance.auditSelected();
-  if (!isAuditSelected) {
-    alert("Audit not selected");
-    return;
-  }
-
-  const isCapReached = await instance.capReached();
-  if (!isCapReached) {
-    alert("Error: ico failed");
-    return;
-  }
-
-  const isRequested = await instance.isRequested();
-  if (isRequested) {
-    alert("You made request aldready");
-    return;
-  }
-
-
-  instance.withdraw(utils.toWei(value, "ether", { from: coinbase }).then(async txRes => {
-      
-    const status = txRes.receipt.status;
-    if (status === "0x1") {
-      alert("Success. TX: " + txRes.tx);
-      // Success
-    } else{
-      alert("Error tx")
-    }
-
   });
   
 }
@@ -655,7 +579,7 @@ async function confirmWithdraw(contractAddress) { //not tested
   }
 
   const isAuditor = await bremInstance.isAuditor(coinbase);
-  if(!isSuperuser){
+  if(!isAuditor){
     alert('Only for auditors');
     return;
   }
@@ -694,11 +618,12 @@ async function confirmWithdraw(contractAddress) { //not tested
   instance.confirmWithdraw({ from: coinbase }).then(async txRes => {
     
     const status = txRes.receipt.status;
+    const tx = txRes.tx;
     if (status === "0x1") {
-      alert("Success. TX: " + txRes.tx);
+      alert("Success. TX: " + tx);
       // Success
     } else{
-      alert("Error tx")
+      alert("Error tx" + tx)
     }
 
   });
