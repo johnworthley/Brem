@@ -9,6 +9,13 @@ import 'react-datepicker/dist/react-datepicker.css';
 import moment from 'moment'
 import { withScriptjs, withGoogleMap, GoogleMap, Marker } from 'react-google-maps'
 
+import getWebThree from './../../util/getweb3'
+import store from 'Store'
+import config from 'Config'
+import contract from 'truffle-contract'
+import axios from 'axios'
+import BREMContract from "../../../build/contracts/BREM.json"
+import ipfs from "../../Config/ipfs";
 
 
 import Alert from '../../Components/Alert'
@@ -51,6 +58,135 @@ const FormRow = ({ setRef, label, required, placeholder}) => (
     <input className={css(style.input)} required={required} ref={setRef} type="text" placeholder={placeholder} name={label}/>
   </div>
 )
+
+async function createNewBREMICO(
+  name,
+  symbol,
+  rate,
+  cap,
+  closingTime,
+  description,
+  files,
+  image,
+  location,
+  locAddress
+) {
+  console.log('createNewBREMICO');
+  const { host } = config
+  const { web3Instance, web3Account } = store
+  const { currentProvider, utils, eth } = web3Instance
+  const brem = contract(BREMContract);
+  brem.setProvider(currentProvider)
+  const coinbase = await eth.getCoinbase()
+  store.update({
+    web3Coinbase: coinbase
+  })
+  
+  const bremInstance = await brem.deployed();
+
+  const isSuperuser = await bremInstance.isSuperuser(coinbase);
+  const isAuditor   = await bremInstance.isAuditor(coinbase);
+
+  if(isSuperuser || isAuditor){
+    alert('Not for superuser or auditor');
+    return;
+  }
+
+  if(cap < 100){
+    alert('Invalid cap');
+    return;
+  }
+  if(name.length == 0){
+    alert('Invalid name');
+    return;
+  }
+  if(symbol.length == 0){
+    alert('Invalid symbol');
+    return;
+  }
+
+  const isValidName = await bremInstance.isValidName(name);
+  if (!isValidName){
+    alert('Name already exists');
+    return;
+  }
+
+  const feePercent = await bremInstance.withdrawFeePercent();
+
+
+  ipfs.files.add(files, (error, result) => {
+    if (error) {
+      console.log(error);
+      return;
+    }
+    const docHash = result[result.length - 1].hash;
+
+
+    bremInstance
+      .createBREMICO(
+        name,
+        symbol,
+        rate,
+        utils.toWei(cap.toString(), "ether"),
+        closingTime.toString(),
+        docHash,
+        { from: coinbase }
+      )
+      .then(async TXres => {
+        try {
+          const ico = {
+            address: TXres.logs[0].args.icoAddress,
+            developer: {
+              address: coinbase
+            },
+            description: description,
+            closing_time: closingTime, //format?
+            fee_percent: feePercent,
+            token_address: TXres.logs[0].args.tokenAddress,
+            name: name,
+            symbol: symbol,
+            location: location,
+            loc_address: locAddress
+          };
+          let res = await axios.post(host + "dev/ico", ico);  //add authorization
+          console.log(res);
+
+          let formData = new FormData();
+          formData.append(
+            "address",
+            TXres.logs[0].args.icoAddress
+          );
+          formData.append("image", image);
+          const config = {
+            headers: {
+              "content-type": "multipart/form-data"
+            }
+          };
+          axios.post(                                         //add authorization
+                  host + "dev/image",
+                  formData,
+                  config
+                );
+
+        } catch(err){
+          console.log(err);
+        }
+            
+
+        alert(
+          "TX: " +
+          TXres.tx +
+          " ICO: " +
+          TXres.logs[0].args.icoAddress +
+          " Token: " +
+          TXres.logs[0].args.tokenAddress
+        );
+
+      });
+                               
+    });
+    
+}
 
 class Create extends Component {
   state = {
