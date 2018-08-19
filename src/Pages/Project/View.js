@@ -510,7 +510,7 @@ class View extends Component {
       return
     }
     
-    // Add auditor to current ico
+    // Open ICO
     try {
       const txRes = await icoInstance.finishAuditorSelection({from: coinbase})
       const isSuccessTX = txRes.receipt.status === "0x1"
