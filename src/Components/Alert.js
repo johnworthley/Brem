@@ -35,7 +35,7 @@ const style = StyleSheet.create({
   }
 })
 
-export default ({ buttonText = 'Got it!', heading = 'Heading', text = 'Text', callback }) => (
+export default ({ buttonText = 'Got it!', heading = 'Heading', text = 'Text', callback, buttons = {} }) => (
   <div className={css(style.main)}>
     <div className={css(style.black)} />
     <div className={css(style.alert)}>
@@ -49,7 +49,11 @@ export default ({ buttonText = 'Got it!', heading = 'Heading', text = 'Text', ca
       <p style={{marginBottom: 15}}>
         { text }
       </p>
-      <button style={{alignSelf: 'flex-end'}} onClick={callback}>{ buttonText }</button>
+      {
+        callback ? (
+          <button style={{alignSelf: 'flex-end'}} onClick={callback}>{ buttonText }</button>
+        ) : ''
+      }
     </div>
   </div>
 )
