@@ -8,6 +8,7 @@ import Login from '../Pages/Login'
 import Cabinet from '../Pages/Cabinet'
 import ProjectCreate from '../Pages/Project/Create'
 import ProjectView from '../Pages/Project/View'
+import ProjectList from '../Pages/Project/List'
 
 
 import Page from '../Components/Page'
@@ -43,9 +44,12 @@ class Routing extends Component {
           <div className={css(style.main)}>
             {/* <Login /> */}
             <Page>
-              <Route exact path="/project/new" component={ProjectCreate} />
-				      <Route exact path="/cabinet" component={Cabinet} />
+			  <Switch location={location}>
+			    <Route exact path="/project/list" component={ProjectList} /> 
+                <Route exact path="/project/new" component={ProjectCreate} />
+				<Route exact path="/cabinet" component={Cabinet} />
               <Route path="/project/:id" component={ProjectView} />
+			  </Switch>
             </Page>
           </div>
         )} />
