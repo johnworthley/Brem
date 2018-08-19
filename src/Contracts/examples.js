@@ -418,8 +418,12 @@ async function addNewIcoAuditor(contractAddress, auditorAddress) { //not tested
   const bremInstance = await brem.deployed();
   const instance = await ico.at(contractAddress);
 
-  if (address.length == 0){
-    alert('Invalid address');
+  if (contractAddress.length == 0){
+    alert('Invalid contract address');
+    return;
+  }
+  if (auditorAddress.length == 0){
+    alert('Invalid aduditor address');
     return;
   }
 
@@ -429,13 +433,13 @@ async function addNewIcoAuditor(contractAddress, auditorAddress) { //not tested
     return;
   }
 
-  const isBremAuditor = await bremInstance.isAuditor(address);
+  const isBremAuditor = await bremInstance.isAuditor(auditorAddress);
   if (!isBremAuditor) {
     alert(address + " is not brem auditor");
     return;
   }
 
-  const isAuditor = await instance.isAuditor(address);
+  const isAuditor = await instance.isAuditor(auditorAddress);
   if (isAuditor) {
     alert(address + " is already auditor");
     return;
@@ -454,7 +458,7 @@ async function addNewIcoAuditor(contractAddress, auditorAddress) { //not tested
   }
 
 
-  instance.addAuditor(address, { from: coinbase }).then(async txRes => {
+  instance.addAuditor(auditorAddress, { from: coinbase }).then(async txRes => {
     try {
       const icoAuditor = {
         ico: {
@@ -464,6 +468,77 @@ async function addNewIcoAuditor(contractAddress, auditorAddress) { //not tested
       };
     
       let res = await axios.post(host + "ico/audit", icoAuditor);
+      console.log(res);
+      
+      const status = txRes.receipt.status;
+      if (status === "0x1") {
+        alert("Success. TX: " + txRes.tx);
+        // Success
+      } else{
+        alert("Error tx")
+      }
+
+    } catch(err){
+      console.log(err);
+    }
+  });
+  
+}
+
+async function publishProject(contractAddress) { //not tested
+  console.log('publishProject');
+  const { host } = config
+  const { web3Instance, web3Account } = store
+  const { currentProvider, utils, eth } = web3Instance
+  const brem = contract(BREMContract);
+  brem.setProvider(currentProvider)
+  const ico = contract(BREMICOcontract);
+  ico.setProvider(currentProvider)
+  const coinbase = await eth.getCoinbase()
+  store.update({
+    web3Coinbase: coinbase
+  })
+  
+  const bremInstance = await brem.deployed();
+  const instance = await ico.at(contractAddress);
+
+  if (contractAddress.length == 0){
+    alert('Invalid address');
+    return;
+  }
+
+  const isSuperuser = await bremInstance.isSuperuser(coinbase);
+  if(!isSuperuser){
+    alert('Only for superuser');
+    return;
+  }
+
+  const isAuditSelected = await instance.auditSelected();
+  if (isAuditSelected) {
+    alert("Audit selected");
+    return;
+  }
+
+  const ishasClosed = await instance.hasClosed();
+  if (ishasClosed) {
+    alert("Has closed");
+    return;
+  }
+
+  const auditorsAmount = await instance.auditorsAmount();
+  if (auditorsAmount == 0) {
+    alert("auditorsAmount = 0");
+    return;
+  }
+
+
+  instance.finishAuditSelection({ from: coinbase }).then(async txRes => {
+    try {
+      const ico = {
+        address: auditorAddress
+      };
+    
+      let res = await axios.put(host + "ico/open", ico);
       console.log(res);
       
       const status = txRes.receipt.status;
