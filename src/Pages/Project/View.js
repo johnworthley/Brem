@@ -199,9 +199,16 @@ class View extends Component {
     }
 
     if (this.state.isSuccess && isDeveloper) {
-      const withdrawFeePercent = icoInstance.withdrawFeePercent()
+      const withdrawFeePercent = await icoInstance.withdrawFeePercent()
       this.setState({
         currentICOFee: withdrawFeePercent.toNumber() // Показывать при запросе вывода застройщиком
+      })
+    }
+
+    if (isAuditor) {
+      const isConfirmed = await icoInstance.isConfirmed(coinbase)
+      this.setState({
+        isConfirmed: isConfirmed
       })
     }
   }
@@ -291,7 +298,48 @@ class View extends Component {
   }
 
   auditorConfirmRequest = async e => {
+    // Кнопка доступна только если isReqeusted && !isConfirmed
+    e.preventDefault()
 
+    await getWeb3
+    const { web3Instance, web3Account } = store
+    const { currentProvider, utils, eth } = web3Instance
+
+    const coinbase = await eth.getCoinbase()
+
+    const ico = contract(ICOContract)
+    ico.setProvider(currentProvider)
+    const icoInstance = await ico.at(this.state.projectId)
+
+    // Check for auditor
+    const isAuditor = await icoInstance.isAuditor(coinbase)
+    if (!isAuditor) {
+      // Ошибка
+       return
+    }
+
+    // Check for status
+    const isRequested = await icoInstance.isRequested()
+    const isConfirmed = await icoInstance.isConfirmed(coinbase)
+    if (!isRequested || isConfirmed) {
+      // Ошибка, нельзя купить
+      return
+    }
+    
+    // Confirm 
+    try {
+      const txRes = await icoInstance.confirmWithdraw({from: coinbase})
+      const isSuccessTX = txRes.receipt.status === "0x1"
+      const tx = txRes.tx;
+      if (isSuccessTX) {
+        // Все ок, можно посмотреть на etherscan https://rinkeby.etherscan.io/tx/ + tx
+        // Предложить добавить адрус токена в metamask
+      } else {
+        // Ошибка, можно посмотреть на etherscan https://rinkeby.etherscan.io/tx/ + tx
+      }
+    } catch(err) {
+      console.error(err)
+    }
   }
 
   devWithdrawETH = async e => {
@@ -346,9 +394,128 @@ class View extends Component {
         }
   }
 
-  superAddAuditor = () => {
+  superAddAuditor = async () => {
     const auditorKey = this.newAuditorName.value
     console.log(auditorKey)
+
+    await getWeb3
+    const { host } = config
+    const { web3Instance, web3Account } = store
+    const { currentProvider, utils, eth } = web3Instance
+
+    const coinbase = await eth.getCoinbase()
+
+    if (!utils.isAddress(auditorKey)) {
+      // Ошибка
+      return
+    }
+
+    const brem = contract(BREMContract);
+    brem.setProvider(currentProvider)
+    const bremInstance = await brem.deployed()
+
+    // Check for superuse
+    const isSuperuser = await bremInstance.isSuperuser(coinbase)
+    if (!isSuperuser) {
+      // TODO
+      return
+    }
+
+    // Check for global auditor
+    const isAuditor = await bremInstance.isAuditor(auditorKey)
+    if (!isAuditor) {
+      // Ошибка
+      return
+    }
+
+    const ico = contract(ICOContract)
+    ico.setProvider(currentProvider)
+    const icoInstance = await ico.at(this.state.projectId)
+
+    // Check for status
+    const hasClosed = await icoInstance.hasClosed()
+    const isCurrentAuditor = await icoInstance.isAuditor(auditorKey)
+    if (hasClosed || isAuditor) {
+      // Ошибка
+      return
+    }
+    
+    // Add auditor to current ico
+    try {
+      const txRes = await icoInstance.addAuditor(auditorKey, {from: coinbase})
+      const isSuccessTX = txRes.receipt.status === "0x1"
+      const tx = txRes.tx;
+      if (isSuccessTX) {
+        // Все ок, можно посмотреть на etherscan https://rinkeby.etherscan.io/tx/ + tx
+        // Предложить добавить адрус токена в metamask
+        const res = await axios.post(host + '/super/ico/audit', {
+          ico: {
+            address: ico.address
+          },
+          auditor: {
+            address: auditorKey
+          }
+        })
+        console.log(res)
+      } else {
+        // Ошибка, можно посмотреть на etherscan https://rinkeby.etherscan.io/tx/ + tx
+      }
+    } catch(err) {
+      console.error(err)
+    }
+  }
+
+  superOpenICO = async e => {
+    e.preventDefault()
+
+    await getWeb3
+    const { host } = config
+    const { web3Instance, web3Account } = store
+    const { currentProvider, utils, eth } = web3Instance
+
+    const coinbase = await eth.getCoinbase()
+
+    const brem = contract(BREMContract);
+    brem.setProvider(currentProvider)
+    const bremInstance = await brem.deployed()
+
+    // Check for superuser
+    const isSuperuser = await bremInstance.isSuperuser(coinbase)
+    if (!isSuperuser) {
+      // TODO
+      return
+    }
+
+    const ico = contract(ICOContract)
+    ico.setProvider(currentProvider)
+    const icoInstance = await ico.at(this.state.projectId)
+
+    // Check for status
+    const hasClosed = await icoInstance.hasClosed()
+    const auditorsAmount = await icoInstance.auditorsAmount()
+    if (hasClosed || auditorsAmount === 0) {
+      // Ошибка
+      return
+    }
+    
+    // Add auditor to current ico
+    try {
+      const txRes = await icoInstance.finishAuditorSelection({from: coinbase})
+      const isSuccessTX = txRes.receipt.status === "0x1"
+      const tx = txRes.tx;
+      if (isSuccessTX) {
+        // Все ок, можно посмотреть на etherscan https://rinkeby.etherscan.io/tx/ + tx
+        // Предложить добавить адрус токена в metamask
+        const res = await axios.put(host + 'super/ico/open', {
+          address: ico.address
+        })
+        console.log(res)
+      } else {
+        // Ошибка, можно посмотреть на etherscan https://rinkeby.etherscan.io/tx/ + tx
+      }
+    } catch(err) {
+      console.error(err)
+    }
   }
 
   render() {
