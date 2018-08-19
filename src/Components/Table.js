@@ -4,65 +4,65 @@ import { css, StyleSheet } from 'aphrodite/no-important'
 const style = StyleSheet.create({
   table : {
     borderCollapse: 'collapse',
-	boxSizing: 'border-box',
-	width: '100%',
-	fontSize: 14
+	  boxSizing: 'border-box',
+	  width: '100%',
+	  fontSize: 14
   },
   th : {
-	height: 51,
-	boxSizing: 'border-box',
-	backgroundColor: '#f0723b',
-	color: '#ffffff',
-	textAlign: 'left',
-	padding: '0 20px',
-	fontWeight: 'normal'
+  	height: 51,
+  	boxSizing: 'border-box',
+  	backgroundColor: '#f0723b',
+  	color: '#ffffff',
+  	textAlign: 'left',
+  	padding: '0 20px',
+  	fontWeight: 'normal'
   },
   td : {
     borderColor: '#e5e5e5',
-	borderStyle: 'solid',
-	borderWidth: '1px 0',
-	boxSizing: 'border-box',
-	textAlign: 'left',
-	height: 31,
-	padding: '0 20px',
-	':first-child': {
-		borderLeftWidth: 1
-	},
-	':last-child': {
-		borderRightWidth: 1
-	}
+  	borderStyle: 'solid',
+  	borderWidth: '1px 0',
+  	boxSizing: 'border-box',
+  	textAlign: 'left',
+  	height: 31,
+  	padding: '0 20px',
+  	':first-child': {
+  		borderLeftWidth: 1
+  	},
+  	':last-child': {
+  		borderRightWidth: 1
+  	}
   },
   tdRight : {
-	textAlign: 'right'
+  	textAlign: 'right'
   },
   tdRed : {
-	color: '#ff0000'
+  	color: '#ff0000'
   },
   tr: {
-	background: '#ffffff',
-	':hover': {
-	  background: 'rgba(240, 114, 59, 0.5)'
-	}
+	  background: '#ffffff',
+	  ':hover': {
+	    background: 'rgba(240, 114, 59, 0.5)'
+    }
   },
   trEven : {
-	backgroundColor: '#f8f8f8'
+    backgroundColor: '#f8f8f8'
   },
-  
+
 })
 
 export default class Table extends Component {
 	render = () => {
 		const { struct = {} } = this.props
 		const { options = {} } = struct
-		const { columns = {} } = options 
+		const { columns = {} } = options
 		const headers = []
 		const rows = []
-		let colNum = 0;
-		
+		let colNum = 0
+
 		struct.data.forEach(((column,key) => {
 			headers.push(key)
-			column.map((value,rowNum) => {
-				rows[rowNum] ? false : rows[rowNum]=[]
+			column.forEach((value,rowNum) => {
+				rows[rowNum] = rows[rowNum] || []
 				rows[rowNum][colNum] = value
 			})
 			colNum++
@@ -71,7 +71,7 @@ export default class Table extends Component {
 		return (
 		<div>
 			{
-			struct && struct.data ? 
+			struct && struct.data ?
 
 				<table className={css(style.table)}>
 				<tbody>
@@ -93,21 +93,21 @@ export default class Table extends Component {
 								{
 									item.map((item,cellNum) => (
 										<td key={ 'TableCell' + cellNum + rowNum} className={css(
-										style.td, 
+										style.td,
 										(typeof(item) === 'number') ? style.tdRight : '',
 										(columns[headers[cellNum]] && columns[headers[cellNum]].red) ? style.tdRed : '',
 										)}>
 											{(typeof(item) === 'number') ? item.toLocaleString() : item}
 										</td>
 									))
-				
+
 								}
 							</tr>
 						))
 					}
 				</tbody>
-				</table>				
-			: 
+				</table>
+			:
 				'No data found'
 			}
 
