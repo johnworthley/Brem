@@ -144,7 +144,10 @@ export function signUpUser(name) {
     });
   };
 
-  export function createNewBREMICO(
+  
+
+
+async function createNewBREMICO(
   name,
   symbol,
   rate,
@@ -153,349 +156,246 @@ export function signUpUser(name) {
   description,
   files,
   image,
-  form
+  location,
+  locAddress
 ) {
-  let web3 = store.getState().web3.web3Instance;
+  console.log('createNewBREMICO');
+  const { host } = config
+  const { web3Instance, web3Account } = store
+  const { currentProvider, utils, eth } = web3Instance
+  const brem = contract(BREMContract);
+  brem.setProvider(currentProvider)
+  const coinbase = await eth.getCoinbase()
+  store.update({
+    web3Coinbase: coinbase
+  })
+  
+  const bremInstance = await brem.deployed();
 
-  // Double-check web3's status.
-  if (typeof web3 !== "undefined") {
-    return function() {
-      const brem = contract(BREMContract);
-      brem.setProvider(web3.currentProvider);
+  const isSuperuser = await bremInstance.isSuperuser(coinbase);
+  const isAuditor   = await bremInstance.isAuditor(coinbase);
 
-      const brmToken = contract(BRMTokenContract);
-      brmToken.setProvider(web3.currentProvider);
-
-      var bremInstance, brmTokenInstance, docHash;
-
-      web3.eth.getCoinbase((error, coinbase) => {
-        if (error) {
-          console.error(error);
-        }
-
-        brmToken
-          .deployed()
-          .then(instance => {
-            brmTokenInstance = instance;
-
-            brem.deployed().then(function(instance) {
-              bremInstance = instance;
-
-              ipfs.files.add(files, (error, result) => {
-                if (error) {
-                  console.log(error);
-                  return;
-                }
-                docHash = result[result.length - 1].hash;
-
-                // Get ICO creation price
-                bremInstance.icoCreationPrice({ from: coinbase }).then(res => {
-                  const factoryPrice = res;
-
-                  // Approve BRM token spend to BREM contract address
-                  if (form.state.price > 0) {
-                    brmTokenInstance
-                      .approve(brem.address, factoryPrice, { from: coinbase })
-                      .then(res => {
-                        bremInstance
-                          .createBREMICO(
-                            name,
-                            symbol,
-                            rate,
-                            web3.utils.toWei(cap, "ether"),
-                            closingTime.toString(),
-                            docHash,
-                            { from: coinbase }
-                          )
-                          .then(TXres => {
-                            const ico = {
-                              address: TXres.logs[0].args.icoAddress,
-                              developer: {
-                                address: coinbase
-                              }
-                            };
-                            axios
-                              .post("http://" + mHost + "/ico", ico)
-                              .then(res => {
-                                console.log(res);
-                                let formData = new FormData();
-                                formData.append(
-                                  "address",
-                                  TXres.logs[0].args.icoAddress
-                                );
-                                formData.append("image", image);
-                                const config = {
-                                  headers: {
-                                    "content-type": "multipart/form-data"
-                                  }
-                                };
-                                axios
-                                  .post(
-                                    "http://" + mHost + "/ico/image",
-                                    formData,
-                                    config
-                                  )
-                                  .then(res => {
-                                    axios
-                                      .get("http://" + mHost + "/ico/dev", {
-                                        params: {
-                                          address: coinbase
-                                        }
-                                      })
-                                      .then(res => {
-                                        console.log(res);
-
-                                        form.setState({ devICOs: res.data });
-                                        form.setState({ icoName: "" });
-                                        form.setState({ icoSymbol: "" });
-                                        form.setState({ icoRate: 0 });
-                                        form.setState({ icoCap: 0 });
-                                        form.setState({ icoDescription: "" });
-                                      });
-                                  });
-                              })
-                              .catch(err => console.log(err));
-                            alert(
-                              "TX: " +
-                                TXres.tx +
-                                " ICO: " +
-                                TXres.logs[0].args.icoAddress +
-                                " Token: " +
-                                TXres.logs[0].args.tokenAddress
-                            );
-                          })
-                          .catch(err => {
-                            console.error(err);
-                            // Reject approving of transfering of tokens
-                            brmTokenInstance
-                              .decreaseApproval(brem.address, factoryPrice, {
-                                from: coinbase
-                              })
-                              .then(res => {
-                                console.log(res);
-                              });
-                          });
-                      });
-                  } else {
-                    bremInstance
-                      .createBREMICO(
-                        name,
-                        symbol,
-                        rate,
-                        web3.utils.toWei(cap, "ether"),
-                        closingTime.toString(),
-                        docHash,
-                        { from: coinbase }
-                      )
-                      .then(TXres => {
-                        const ico = {
-                          address: TXres.logs[0].args.icoAddress,
-                          developer: {
-                            address: coinbase
-                          }
-                        };
-                        axios
-                          .post("http://" + mHost + "/ico", ico)
-                          .then(res => {
-                            console.log(res);
-                            let formData = new FormData();
-                            formData.append(
-                              "address",
-                              TXres.logs[0].args.icoAddress
-                            );
-                            formData.append("image", image);
-                            const config = {
-                              headers: {
-                                "content-type": "multipart/form-data"
-                              }
-                            };
-                            axios
-                              .post(
-                                "http://" + mHost + "/ico/image",
-                                formData,
-                                config
-                              )
-                              .then(res => {
-                                axios
-                                  .get("http://" + mHost + "/ico/dev", {
-                                    params: {
-                                      address: coinbase
-                                    }
-                                  })
-                                  .then(res => {
-                                    console.log(res);
-
-                                    form.setState({ devICOs: res.data });
-                                    form.setState({ icoName: "" });
-                                    form.setState({ icoSymbol: "" });
-                                    form.setState({ icoRate: 0 });
-                                    form.setState({ icoCap: 0 });
-                                    form.setState({ icoDescription: "" });
-                                  });
-                              });
-                          })
-                          .catch(err => console.log(err));
-                        alert(
-                          "TX: " +
-                            TXres.tx +
-                            " ICO: " +
-                            TXres.logs[0].args.icoAddress +
-                            " Token: " +
-                            TXres.logs[0].args.tokenAddress
-                        );
-                      });
-                  }
-                });
-              });
-            });
-          })
-          .catch(err => {
-            console.error(err);
-          });
-      });
-    };
-  } else {
-    console.error("Web3 is not initialized.");
+  if(isSuperuser || isAuditor){
+    alert('Not for superuser or auditor');
+    return;
   }
-}
+
+  if(cap < 100){
+    alert('Invalid cap');
+    return;
+  }
+  if(name.length == 0){
+    alert('Invalid name');
+    return;
+  }
+  if(symbol.length == 0){
+    alert('Invalid symbol');
+    return;
+  }
+
+  const isValidName = await bremInstance.isValidName(name);
+  if (!isValidName){
+    alert('Name already exists');
+    return;
+  }
+
+  const feePercent = await bremInstance.withdrawFeePercent();
 
 
+  ipfs.files.add(files, (error, result) => {
+    if (error) {
+      console.log(error);
+      return;
+    }
+    const docHash = result[result.length - 1].hash;
 
-export function addNewAuditor(address, form) {
-  let web3 = store.getState().web3.web3Instance;
 
-  if (typeof web3 !== "undefined") {
-    return function() {
-      const brem = contract(BREMContract);
-      brem.setProvider(web3.currentProvider);
+    bremInstance
+      .createBREMICO(
+        name,
+        symbol,
+        rate,
+        utils.toWei(cap.toString(), "ether"),
+        closingTime.toString(),
+        docHash,
+        { from: coinbase }
+      )
+      .then(async TXres => {
+        try {
+          const ico = {
+            address: TXres.logs[0].args.icoAddress,
+            developer: {
+              address: coinbase
+            },
+            description: description,
+            closing_time: closingTime, //format?
+            fee_percent: feePercent,
+            token_address: TXres.logs[0].args.tokenAddress,
+            name: name,
+            symbol: symbol,
+            location: location,
+            loc_address: locAddress
+          };
+          let res = await axios.post(host + "dev/ico", ico);  
+          console.log(res);
 
-      web3.eth.getCoinbase((err, coinbase) => {
-        if (err) {
-          console.error(err);
-          return;
-        }
-
-        brem.deployed().then(bremInstance => {
-          // Check for existing of auditor
-          bremInstance.isAuditor(address).then(res => {
-            if (res) {
-              alert(address + " is already auditor");
-              return;
+          let formData = new FormData();
+          formData.append(
+            "address",
+            TXres.logs[0].args.icoAddress
+          );
+          formData.append("image", image);
+          const config = {
+            headers: {
+              "content-type": "multipart/form-data"
             }
+          };
+          axios.post(
+                  host + "dev/image",
+                  formData,
+                  config
+                );
 
-            bremInstance.addAuditor(address, { from: coinbase }).then(txRes => {
-              const auditor = {
-                address: address
-              };
-              axios
-                .post("http://" + mHost + "/audit", auditor)
-                .then(res => {
-                  console.log(res);
-                  form.setState({ newAuditorAddress: "" });
-                  axios
-                    .get("http://" + mHost + "/audit")
-                    .then(res => {
-                      form.setState({ auditors: res.data });
-                      form.setState({ newAuditorAddress: "" });
-                    })
-                    .catch(err => {
-                      console.error(err);
-                    });
-                })
-                .catch(err => {
-                  console.error(err);
-                });
-              return alert("Success. TX: " + txRes.tx);
-            });
-          });
-        });
-      });
-    };
-  } else {
-    console.error("Web3 is not initialized.");
-  }
-}
-
-export function withdrawFees(withdrawAmount, form) {
-  let web3 = store.getState().web3.web3Instance;
-
-  // Double-check web3's status.
-  if (typeof web3 !== "undefined") {
-    return function() {
-      const brem = contract(BREMContract);
-      brem.setProvider(web3.currentProvider);
-
-      // Get current ethereum wallet.
-      web3.eth.getCoinbase((error, coinbase) => {
-        // Log errors, if any.
-        if (error) {
-          console.error(error);
+        } catch(err){
+          console.log(err);
         }
+            
 
-        brem.deployed().then(function(instance) {
-          instance
-            .withdrawFees(web3.utils.toWei(withdrawAmount, "ether"), {
-              from: coinbase
-            })
-            .then(res => {
-              form.setState({ withdrawValue: 0 });
-              web3.eth.getBalance(instance.address).then(balance => {
-                form.setState({
-                  bremBalance: web3.utils.fromWei(balance, "ether")
-                });
-              });
-              return alert(res.tx);
-            });
-        });
+        alert(
+          "TX: " +
+          TXres.tx +
+          " ICO: " +
+          TXres.logs[0].args.icoAddress +
+          " Token: " +
+          TXres.logs[0].args.tokenAddress
+        );
+
       });
-    };
-  } else {
-    console.error("Web3 is not initialized.");
-  }
+                               
+    });
+    
 }
 
-export function changeWithdrawFee(feePercent, form) {
+
+async function addNewAuditor(address) {
+  console.log('addNewAuditor');
+  const { host } = config
+  const { web3Instance, web3Account } = store
+  const { currentProvider, utils, eth } = web3Instance
+  const brem = contract(BREMContract);
+  brem.setProvider(currentProvider)
+  const coinbase = await eth.getCoinbase()
+  store.update({
+    web3Coinbase: coinbase
+  })
+  
+  const bremInstance = await brem.deployed();
+
+  if (address.length == 0){
+    alert('Invalid address');
+    return;
+  }
+
+  const isSuperuser = await bremInstance.isSuperuser(coinbase);
+  if(!isSuperuser){
+    alert('Only for superuser');
+    return;
+  }
+
+  const isAuditor = await bremInstance.isAuditor(address);
+  if (isAuditor) {
+    alert(address + " is already auditor");
+    return;
+  }
+
+  bremInstance.addAuditor(address, { from: coinbase }).then(async txRes => {
+    try {
+      const auditor = {
+        address: address
+      };
+    
+      let res = await axios.post(host + "audit", auditor) //Нету post/audit
+      console.log(res);
+      
+      
+      alert("Success. TX: " + txRes.tx);
+
+    } catch(err){
+      console.log(err);
+    }
+  });
+  
+}
+
+async function withdrawFees(withdrawAmount) { //not tested
+  console.log('withdrawFees');
+  const { host } = config
+  const { web3Instance, web3Account } = store
+  const { currentProvider, utils, eth } = web3Instance
+  const brem = contract(BREMContract);
+  brem.setProvider(currentProvider)
+  const coinbase = await eth.getCoinbase()
+  store.update({
+    web3Coinbase: coinbase
+  })
+
+  const bremInstance = await brem.deployed();
+  
+  const isSuperuser = await bremInstance.isSuperuser(coinbase);
+  if(!isSuperuser){
+    alert('Only for superuser');
+    return;
+  }
+
+  const balance = await eth.getBalance(bremInstance.address);
+  if(balance < utils.toWei(withdrawAmount, "ether")){
+    alert('Insufficient funds on the account');
+    return;    
+  }
+  
+          
+  let res = await bremInstance.withdrawFees(
+              utils.toWei(withdrawAmount, "ether"),
+              { from: coinbase }
+            );
+
+  alert(res.tx);
+
+}
+
+async function changeWithdrawFee(feePercent) {
+  console.log('withdrawFees');
+  const { host } = config
+  const { web3Instance, web3Account } = store
+  const { currentProvider, utils, eth } = web3Instance
+  const brem = contract(BREMContract);
+  brem.setProvider(currentProvider)
+  const coinbase = await eth.getCoinbase()
+  store.update({
+    web3Coinbase: coinbase
+  })
+
+  const bremInstance = await brem.deployed();
+  
   if (feePercent < 0 || feePercent > 100) {
     alert("WithdrawFeePercent must be between 0 and 100");
     return;
   }
-  
-  let web3 = store.getState().web3.web3Instance;
 
-  // Double-check web3's status.
-  if (typeof web3 !== "undefined") {
-    return function() {
-      const brem = contract(BREMContract);
-      brem.setProvider(web3.currentProvider);
-
-      // Get current ethereum wallet.
-      web3.eth.getCoinbase((error, coinbase) => {
-        // Log errors, if any.
-        if (error) {
-          console.error(error);
-        }
-
-        brem.deployed().then(function(instance) {
-          instance.withdrawFeePercent().then(currentWithdrawFeePercent => {
-            if (currentWithdrawFeePercent === feePercent) {
-              alert("WithdrawFeePercent is already " + feePercent);
-              return;
-            }
-
-            instance
-              .setWithdrawFeePercent(feePercent, { from: coinbase })
-              .then(res => {
-                form.setState({ newWithdrawFeePercent: 0 });
-                instance.withdrawFeePercent().then(fee => {
-                  form.setState({ withdrawFeePercent: 0 });
-                });
-                return alert(res.tx);
-              });
-            });
-        });
-      });
-    };
-  } else {
-    console.error("Web3 is not initialized.");
+  const isSuperuser = await bremInstance.isSuperuser(coinbase);
+  if(!isSuperuser){
+    alert('Only for superuser');
+    return;
   }
+  
+
+  const currentWithdrawFeePercent = await bremInstance.withdrawFeePercent();
+  if (currentWithdrawFeePercent == feePercent) {
+    alert("WithdrawFeePercent is already " + feePercent);
+    return;
+  }
+
+  let res = await bremInstance.setWithdrawFeePercent(feePercent, { from: coinbase });
+  return alert(res.tx);
+        
 }
