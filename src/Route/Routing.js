@@ -40,10 +40,10 @@ class Routing extends Component {
         <Route render={({ location }) => (
           <div className={css(style.main)}>
             {/* <Login /> */}
-            <Route exact path="/project/new" component={ProjectCreate} />
-            {/* <Page>
+            <Page>
+              <Route exact path="/project/new" component={ProjectCreate} />
 				      <Route exact path="/cabinet" component={Cabinet} />
-            </Page> */}
+            </Page>
           </div>
         )} />
       </Router>
