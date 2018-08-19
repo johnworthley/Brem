@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { css, StyleSheet } from 'aphrodite/no-important'
 
 import Table from '../Components/Table'
+import List from './Project/List'
 
 const style = StyleSheet.create({
 	main: {
@@ -24,6 +25,26 @@ export default class Cabinet extends Component {
 				['Second row', [10,33,30]],
 				['Last row', [1101.786,44444.99,'550.2']]
 			])
+		},
+		cards : {
+			showMore: true,
+			data: [{
+				name: 'Каждой сове по дуплу!',
+				company: 'ООО Ромашка',
+				adress: 'Москва, 1-й Красногвардейкий проезд, участок 17-18',
+				payment: 50000,
+				progress: 50,
+				limit: 500000,
+				imageUrl: 'https://avatars.mds.yandex.net/get-pdb/199965/9baf77ea-a933-45ac-9cbd-f820d8e77a96/s1200'
+			},{
+				name: 'abc',
+				company: 'Daisy Ltd',
+				adress: '10 Downing Street Westminster London',
+				payment: 100,
+				progress: 25,
+				limit: 1000,
+				imageUrl: 'https://avatars.mds.yandex.net/get-pdb/939428/27374061-ba26-4c33-8b64-7bb569349414/s1200'
+			}]
 		}
 	}
 
@@ -40,7 +61,7 @@ export default class Cabinet extends Component {
 
 	render = () => {
 		//const { struct } = this.props
-		const { struct } = this.state
+		const { struct, cards } = this.state
 		return (
 			<div className={css(style.main)}>
 				<h3>Cabinet</h3>
@@ -56,6 +77,8 @@ export default class Cabinet extends Component {
 				</div>
 
 				<Table struct={struct} />
+				
+				<List struct={cards} />
 			</div>
 		)
 	}

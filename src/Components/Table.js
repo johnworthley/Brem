@@ -20,7 +20,7 @@ const style = StyleSheet.create({
   td : {
     borderColor: '#e5e5e5',
   	borderStyle: 'solid',
-  	borderWidth: '1px 0',
+  	borderWidth: '0 0 1px 0',
   	boxSizing: 'border-box',
   	textAlign: 'left',
   	height: 31,
@@ -41,7 +41,7 @@ const style = StyleSheet.create({
   tr: {
 	  background: '#ffffff',
 	  ':hover': {
-	    background: 'rgba(240, 114, 59, 0.5)'
+	    background: 'rgba(255, 128, 59, 0.33)'
     }
   },
   trEven : {
