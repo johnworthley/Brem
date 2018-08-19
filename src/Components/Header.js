@@ -10,7 +10,9 @@ const style = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     width: '100%',
-    margin: '0 auto'
+    margin: '0 auto',
+    padding: '0 20px',
+    boxSizing: 'border-box'
   },
   main: {
     height: 70,
@@ -18,10 +20,9 @@ const style = StyleSheet.create({
     backgroundColor: '#fff',
     color: '#1e1e1e',
     marginBottom: 30,
-    padding: '0 20px'
+
   },
   left: {
-    marginLeft: 10,
     display: 'flex',
     alignItems: 'center',
   },

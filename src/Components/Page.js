@@ -5,10 +5,7 @@ import { css, StyleSheet } from 'aphrodite/no-important'
 const style = StyleSheet.create({
   main: {
     width: '100%',
-    maxWidth: config.pageWidth,
-    margin: '50px auto',
-    padding: '0 20px',
-	boxSizing: 'border-box'
+	  boxSizing: 'border-box'
   }
 })
 
