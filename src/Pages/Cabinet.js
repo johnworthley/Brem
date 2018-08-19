@@ -106,7 +106,7 @@ export default class Cabinet extends Component {
     }
     // Add audtor
     try {
-      const txRes = await bremInstance.addAutors(auditor, {from: coinbase})
+      const txRes = await bremInstance.addAuditor(auditor, {from: coinbase})
       const tx = txRes.tx
       const status = txRes.receipt.status
       if (status === "0x1") {
