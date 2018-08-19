@@ -399,3 +399,84 @@ async function changeWithdrawFee(feePercent) {
   return alert(res.tx);
         
 }
+
+
+async function addNewIcoAuditor(contractAddress, auditorAddress) { //not tested
+  console.log('addNewIcoAuditor');
+  const { host } = config
+  const { web3Instance, web3Account } = store
+  const { currentProvider, utils, eth } = web3Instance
+  const brem = contract(BREMContract);
+  brem.setProvider(currentProvider)
+  const ico = contract(BREMICOcontract);
+  ico.setProvider(currentProvider)
+  const coinbase = await eth.getCoinbase()
+  store.update({
+    web3Coinbase: coinbase
+  })
+  
+  const bremInstance = await brem.deployed();
+  const instance = await ico.at(contractAddress);
+
+  if (address.length == 0){
+    alert('Invalid address');
+    return;
+  }
+
+  const isSuperuser = await bremInstance.isSuperuser(coinbase);
+  if(!isSuperuser){
+    alert('Only for superuser');
+    return;
+  }
+
+  const isBremAuditor = await bremInstance.isAuditor(address);
+  if (!isBremAuditor) {
+    alert(address + " is not brem auditor");
+    return;
+  }
+
+  const isAuditor = await instance.isAuditor(address);
+  if (isAuditor) {
+    alert(address + " is already auditor");
+    return;
+  }
+
+  const isAuditSelected = await instance.auditSelected();
+  if (isAuditSelected) {
+    alert("Audit selected");
+    return;
+  }
+
+  const ishasClosed = await instance.hasClosed();
+  if (ishasClosed) {
+    alert("Has closed");
+    return;
+  }
+
+
+  instance.addAuditor(address, { from: coinbase }).then(async txRes => {
+    try {
+      const icoAuditor = {
+        ico: {
+              address: contractAddress
+        },
+        address: auditorAddress
+      };
+    
+      let res = await axios.post(host + "ico/audit", icoAuditor);
+      console.log(res);
+      
+      const status = txRes.receipt.status;
+      if (status === "0x1") {
+        alert("Success. TX: " + txRes.tx);
+        // Success
+      } else{
+        alert("Error tx")
+      }
+
+    } catch(err){
+      console.log(err);
+    }
+  });
+  
+}
