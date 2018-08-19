@@ -24,6 +24,7 @@ class App extends Component {
 
 export default App;
 
+
 //Testing no-internet fumction
 (() => {
   store.update({
@@ -31,6 +32,6 @@ export default App;
       logged: true
     }
   })
-})()
+})
 
-//login()
+login()
