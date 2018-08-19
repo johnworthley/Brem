@@ -63,12 +63,12 @@ export default class Cabinet extends Component {
     }
     // Withdraw collected fee
     try {
-      const txRes = await bremInstance.setWithdrawFeePercent(fee, {from: coinbase})
+      const txRes = await bremInstance.withdrawFees(withdrawValueInWei, {from: coinbase})
       const tx = txRes.tx
       const status = txRes.receipt.status
       if (status === "0x1") {
         alert(tx)
-        // Можно обновить текущее значение из web3
+        // Можно обновить текущее значение баланса контракта из web3d
       } else{
         alert("Error tx")
       }
