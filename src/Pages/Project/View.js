@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-<<<<<<< HEAD
 import { css, StyleSheet } from 'aphrodite/no-important'
 import moment from 'moment'
 import { withScriptjs, withGoogleMap, GoogleMap, Marker } from 'react-google-maps'
@@ -60,7 +59,6 @@ const style = StyleSheet.create({
     lineHeight: 1.4
   }
 })
-=======
 import getWeb3 from '../../util/getweb3'
 import store from 'Store'
 import config from 'Config'
@@ -69,7 +67,6 @@ import ICOContract from "../../../build/contracts/BREMICO.json"
 import TokenContract from "../../../build/contracts/BREMToken.json"
 import BREMContract from "../../../build/contracts/BREM.json"
 import axios from 'axios';
->>>>>>> a374d01682b2e6839029543606dccc34af797ca6
 
 class View extends Component {
   state = {
