@@ -48,10 +48,17 @@ class View extends Component {
     const symbol = await tokenInstance.symbol()
     const tokenBalance = await tokenInstance.balanceOf(coinbase)
 
+    const brem = contract(BREMContract)
+    brem.setProvider(currentProvider)
+    const bremInstance = await brem.deployed() 
+
+    const devName = await bremInstance.login(wallet)
+
     this.setState({
       name: name,
       tokenAddress: tokenAddress,
       icoBalance: utils.fromWei(icoBalance, "ether"),
+      devName: devName,
       wallet: wallet,
       rate: rate.toNumber(),
       weiRaised: utils.fromWei(weiRaised, "ether"),
@@ -80,10 +87,6 @@ class View extends Component {
       isWithdrawn: isWithdrawn,
       isOverdue: isOverdue
     })
-
-    const brem = contract(BREMContract)
-    brem.setProvider(currentProvider)
-    const bremInstance = await brem.deployed()
 
     // Read current auditors
     const auditorsAmount = icoInstance.auditorsAmount()
@@ -118,6 +121,13 @@ class View extends Component {
         requestedValue: requestedValue
       })
     }
+
+    if (this.state.isSuccess && isDeveloper) {
+      const withdrawFeePercent = icoInstance.withdrawFeePercent()
+      this.setState({
+        currentICOFee: withdrawFeePercent.toNumber() // Показывать при запросе вывода застройщиком
+      })
+    }
   }
 
   depositETH = async e => {
@@ -140,8 +150,8 @@ class View extends Component {
     const icoInstance = await ico.at(this.state.projectId)
 
     // Check for status
-    const hasClosed = icoInstance.hasClosed()
-    const auditSelected = icoInstance.auditSelected()
+    const hasClosed = await icoInstance.hasClosed()
+    const auditSelected = await icoInstance.auditSelected()
     if (!auditSelected || hasClosed) {
       // Ошибка, нельзя купить
       return
@@ -179,8 +189,8 @@ class View extends Component {
     const icoInstance = await ico.at(this.state.projectId)
 
     // Check for status
-    const hasClosed = icoInstance.hasClosed()
-    const capReached = icoInstance.capReached()
+    const hasClosed = await icoInstance.hasClosed()
+    const capReached = await icoInstance.capReached()
     const weiInvestedBN = await icoInstance.getBalance({from: coinbase})
     const weiInvested = weiInvestedBN.toNumber()
     if (hasClosed && !capReached && weiInvested <= 0) {
@@ -205,7 +215,7 @@ class View extends Component {
   }
 
   auditorConfirmRequest = async e => {
-    
+
   }
 
   devWithdrawETH = async e => {
@@ -226,13 +236,14 @@ class View extends Component {
         const icoInstance = await ico.at(this.state.projectId)
     
         // Check for status
-        const hasClosed = icoInstance.hasClosed()
-        const capReached = icoInstance.capReached()
-        const isRequested = icoInstance.isRequested()
-        const isWithdrawn = icoInstance.isWithdrawn()
+        const hasClosed = await icoInstance.hasClosed()
+        const capReached = await icoInstance.capReached()
+        const isRequested = await icoInstance.isRequested()
+        const isWithdrawn = await icoInstance.isWithdrawn()
+        const wallet = await icoInstance.wallet()
         let requestValue = utils.toWei(requestEthValue, "ether")
-        const contractBalance = eth.getBalance(ico.address)
-        if (!hasClosed || !capReached || isRequested || isWithdrawn || contractBalance < requestValue) {
+        const contractBalance = await eth.getBalance(ico.address)
+        if (!hasClosed || !capReached || isRequested || isWithdrawn || contractBalance < requestValue || coinbase !== wallet) {
           // Ошибка, нельзя сделать запрос
           return
         }
