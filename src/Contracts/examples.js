@@ -598,6 +598,12 @@ async function makeWithdrawRequest(contractAddress, value) { //not tested
     return;
   }
 
+  const isAuditSelected = await instance.auditSelected();
+  if (!isAuditSelected) {
+    alert("Audit not selected");
+    return;
+  }
+
   const isCapReached = await instance.capReached();
   if (!isCapReached) {
     alert("Error: ico failed");
@@ -613,6 +619,80 @@ async function makeWithdrawRequest(contractAddress, value) { //not tested
 
   instance.withdraw(utils.toWei(value, "ether", { from: coinbase }).then(async txRes => {
       
+    const status = txRes.receipt.status;
+    if (status === "0x1") {
+      alert("Success. TX: " + txRes.tx);
+      // Success
+    } else{
+      alert("Error tx")
+    }
+
+  });
+  
+}
+
+
+async function confirmWithdraw(contractAddress) { //not tested
+  console.log('confirmWithdraw');
+  const { host } = config
+  const { web3Instance, web3Account } = store
+  const { currentProvider, utils, eth } = web3Instance
+  const brem = contract(BREMContract);
+  brem.setProvider(currentProvider)
+  const ico = contract(BREMICOcontract);
+  ico.setProvider(currentProvider)
+  const coinbase = await eth.getCoinbase()
+  store.update({
+    web3Coinbase: coinbase
+  })
+  
+  const bremInstance = await brem.deployed();
+  const instance = await ico.at(contractAddress);
+
+  if (contractAddress.length == 0){
+    alert('Invalid address');
+    return;
+  }
+
+  const isAuditor = await bremInstance.isAuditor(coinbase);
+  if(!isSuperuser){
+    alert('Only for auditors');
+    return;
+  }
+
+  const hasClosed = await instance.hasClosed();
+  if (!hasClosed) {
+    alert("Ico didn't close");
+    return;
+  }
+
+  const isAuditSelected = await instance.auditSelected();
+  if (!isAuditSelected) {
+    alert("Audit not selected");
+    return;
+  }
+
+  const isCapReached = await instance.capReached();
+  if (!isCapReached) {
+    alert("Error: ico failed");
+    return;
+  }
+
+  const isRequested = await instance.isRequested();
+  if (!isRequested) {
+    alert("No requests");
+    return;
+  }
+
+  const isConfirmed = await instance.isConfirmed(coinbase);
+  if (isConfirmed) {
+    alert("You aldready confirmed");
+    return;
+  }
+
+
+  instance.confirmWithdraw({ from: coinbase }).then(async txRes => {
+    
     const status = txRes.receipt.status;
     if (status === "0x1") {
       alert("Success. TX: " + txRes.tx);
