@@ -2,6 +2,14 @@ import React, { Component } from 'react'
 import { css, StyleSheet } from 'aphrodite/no-important'
 import moment from 'moment'
 import { withScriptjs, withGoogleMap, GoogleMap, Marker } from 'react-google-maps'
+import getWeb3 from '../../util/getweb3'
+import store from 'Store'
+import config from 'Config'
+import contract from 'truffle-contract'
+import ICOContract from "../../../build/contracts/BREMICO.json"
+import TokenContract from "../../../build/contracts/BREMToken.json"
+import BREMContract from "../../../build/contracts/BREM.json"
+import axios from 'axios'
 
 const Maps = withScriptjs(withGoogleMap((props) =>
   <GoogleMap
@@ -59,6 +67,9 @@ const style = StyleSheet.create({
     lineHeight: 1.4
   }
 })
+<<<<<<< HEAD
+
+=======
 import getWeb3 from '../../util/getweb3'
 import store from 'Store'
 import config from 'Config'
@@ -67,6 +78,7 @@ import ICOContract from "../../../build/contracts/BREMICO.json"
 import TokenContract from "../../../build/contracts/BREMToken.json"
 import BREMContract from "../../../build/contracts/BREM.json"
 import axios from 'axios';
+>>>>>>> 6be69b7dc9a89c4957dc334f7a2b3fafaecb81c9
 
 class View extends Component {
   state = {
@@ -101,7 +113,7 @@ class View extends Component {
     const { currentProvider, utils, eth } = web3Instance
 
     const coinbase = await web3Instance.getCoinbase()
-    
+
     const ico = contract(ICOContract)
     ico.setProvider(currentProvider)
     const icoInstance = await ico.at(this.state.projectId)
@@ -115,11 +127,11 @@ class View extends Component {
     const docHash = await icoInstance.docHash()
     const closingTimeEpochs = await icoInstance.closingTime()
     const weiInvested = await icoInstance.getBalance(coinbase, {from: coinbase})
-    
+
     const token = contract(TokenContract)
     token.setProvider(currentProvider)
     const tokenInstance = await token.at(tokenAddress)
-    
+
     const name = await tokenInstance.name()
     const symbol = await tokenInstance.symbol()
     const tokenBalance = await tokenInstance.balanceOf(coinbase)
@@ -280,7 +292,7 @@ class View extends Component {
       // Ошибка, нельзя купить
       return
     }
-    
+
     // Refund Ether
     try {
       const txRes = await icoInstance.refund({from: coinbase})
@@ -352,13 +364,13 @@ class View extends Component {
         const { host } = config
         const { web3Instance, web3Account } = store
         const { currentProvider, utils, eth } = web3Instance
-    
+
         const coinbase = await eth.getCoinbase()
-    
+
         const ico = contract(ICOContract)
         ico.setProvider(currentProvider)
         const icoInstance = await ico.at(this.state.projectId)
-    
+
         // Check for status
         const hasClosed = await icoInstance.hasClosed()
         const capReached = await icoInstance.capReached()
@@ -375,7 +387,7 @@ class View extends Component {
         if (contractBalance - requestValue < 100) {
           requestValue = contractBalance; // При ввода значения для вывода сделать такую проверку
         }
-        
+
         // Make request
         try {
           const txRes = await icoInstance.withdraw(requestValue, {from: coinbase})
@@ -385,7 +397,7 @@ class View extends Component {
             // Все ок, можно посмотреть на etherscan https://rinkeby.etherscan.io/tx/ + tx
             // Предложить добавить адрус токена в metamask
             axios.put(host)
-            
+
           } else {
             // Ошибка, можно посмотреть на etherscan https://rinkeby.etherscan.io/tx/ + tx
           }

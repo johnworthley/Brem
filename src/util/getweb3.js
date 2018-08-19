@@ -27,7 +27,12 @@ let getWeb3 = () => new Promise((resolve, reject) => {
         web3 = new Web3(web3.currentProvider);
       }
       catch(e) {
-        return console.log('No MetaMask')
+        store.update({
+          web3Status: {
+            logged: false,
+            instance: false
+          }
+        })
       }
 
       results = {
@@ -39,7 +44,6 @@ let getWeb3 = () => new Promise((resolve, reject) => {
       const init = web3Initialized(results)
       const instance = init.payload.web3Instance
       const account = await instance.eth.getCoinbase()
-      console.log('logged')
       if(account) {
         const ethAmount = instance.utils.fromWei(await instance.eth.getBalance(account), "ether")
         resolve(store.update({
