@@ -67,18 +67,6 @@ const style = StyleSheet.create({
     lineHeight: 1.4
   }
 })
-<<<<<<< HEAD
-
-=======
-import getWeb3 from '../../util/getweb3'
-import store from 'Store'
-import config from 'Config'
-import contract from 'truffle-contract'
-import ICOContract from "../../../build/contracts/BREMICO.json"
-import TokenContract from "../../../build/contracts/BREMToken.json"
-import BREMContract from "../../../build/contracts/BREM.json"
-import axios from 'axios';
->>>>>>> 6be69b7dc9a89c4957dc334f7a2b3fafaecb81c9
 
 class View extends Component {
   state = {
