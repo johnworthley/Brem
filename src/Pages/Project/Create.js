@@ -172,15 +172,22 @@ async function createNewBREMICO(
           console.log(err);
         }
             
+        const status = TXres.receipt.status
+        if (status === "0x1") {
+          alert(
+            "TX: " +
+            TXres.tx +
+            " ICO: " +
+            TXres.logs[0].args.icoAddress +
+            " Token: " +
+            TXres.logs[0].args.tokenAddress
+          );
 
-        alert(
-          "TX: " +
-          TXres.tx +
-          " ICO: " +
-          TXres.logs[0].args.icoAddress +
-          " Token: " +
-          TXres.logs[0].args.tokenAddress
-        );
+          // Success
+
+        } else{
+          alert("Error tx")
+        }
 
       });
                                
