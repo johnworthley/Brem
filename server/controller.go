@@ -33,6 +33,9 @@ func getAllAuditors(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
+	if auditors == nil {
+		auditors = make([]data.Auditor, 0)
+	}
 	c.JSON(http.StatusOK, auditors)
 }
 
@@ -196,6 +199,9 @@ func getSuperusersICOs(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
+	if icos == nil {
+		icos = make([]data.ICO, 0)
+	}
 	c.JSON(http.StatusOK, icos)
 }
 
@@ -218,6 +224,9 @@ func getDevelopersICOs(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return
+	}
+	if icos == nil {
+		icos = make([]data.ICO, 0)
 	}
 	c.JSON(http.StatusOK, icos)
 }
@@ -245,6 +254,9 @@ func getAuditorICOs(c *gin.Context) {
 	if icos == nil {
 		icos = make([]data.ICO, 0)
 	}
+	if icos == nil {
+		icos = make([]data.ICO, 0)
+	}
 	c.JSON(http.StatusOK, icos)
 }
 
@@ -267,6 +279,9 @@ func getAllICOs(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return
+	}
+	if icos == nil {
+		icos = make([]data.ICO, 0)
 	}
 	c.JSON(http.StatusOK, icos)
 }
@@ -291,6 +306,9 @@ func getCreatedICOs(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
+	if icos == nil {
+		icos = make([]data.ICO, 0)
+	}
 	c.JSON(http.StatusOK, icos)
 }
 
@@ -313,6 +331,9 @@ func getOpennedICOs(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return
+	}
+	if icos == nil {
+		icos = make([]data.ICO, 0)
 	}
 	c.JSON(http.StatusOK, icos)
 }
@@ -337,6 +358,9 @@ func getSuccessICOs(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
+	if icos == nil {
+		icos = make([]data.ICO, 0)
+	}
 	c.JSON(http.StatusOK, icos)
 }
 
@@ -359,6 +383,9 @@ func getFailedICOs(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return
+	}
+	if icos == nil {
+		icos = make([]data.ICO, 0)
 	}
 	c.JSON(http.StatusOK, icos)
 }
@@ -383,6 +410,9 @@ func getWithdrawnICOs(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
+	if icos == nil {
+		icos = make([]data.ICO, 0)
+	}
 	c.JSON(http.StatusOK, icos)
 }
 
@@ -405,6 +435,9 @@ func getOverdueICOs(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return
+	}
+	if icos == nil {
+		icos = make([]data.ICO, 0)
 	}
 	c.JSON(http.StatusOK, icos)
 }

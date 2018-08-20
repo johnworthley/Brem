@@ -105,7 +105,7 @@ export default class Cabinet extends Component {
 
       // Get all auditors
       const res = await axios.get(host + 'super/audit', authConfig)
-      const auditors = res.data // can be null
+      const auditors = res.data 
     }
 
     const isAuditor = await bremInstance.isAuditor(coinbase)
@@ -119,7 +119,7 @@ export default class Cabinet extends Component {
     if (!isAuditor && !isSuperuser) {
       // Get current dev ico's
       const res = await axios.get(host + '/dev/ico')
-      const icos = res.data // Can be null. Read cap and raised for all icos (example in ico form)
+      const icos = res.data //  Read cap and raised for all icos (example in ico form)
     }
 }
 

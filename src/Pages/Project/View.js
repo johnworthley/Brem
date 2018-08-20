@@ -97,7 +97,7 @@ class View extends Component {
     this.setState({
       projectId: this.props.match.params.id
     })
-    return
+    
     // Get all data here and push it to state.project object
     await getWeb3();
     const { web3Instance, web3Account } = store
@@ -349,7 +349,7 @@ class View extends Component {
         const requestEthValue = this.state.devRequestValue
 
         await getWeb3
-        const { host } = config
+        const { host, authConfig } = config
         const { web3Instance, web3Account } = store
         const { currentProvider, utils, eth } = web3Instance
 
@@ -384,7 +384,9 @@ class View extends Component {
           if (isSuccessTX) {
             // Все ок, можно посмотреть на etherscan https://rinkeby.etherscan.io/tx/ + tx
             // Предложить добавить адрус токена в metamask
-            axios.put(host)
+            axios.put(host + '/ico/request', {
+              address: ico.address
+            }, authConfig)
 
           } else {
             // Ошибка, можно посмотреть на etherscan https://rinkeby.etherscan.io/tx/ + tx
@@ -399,7 +401,7 @@ class View extends Component {
     console.log(auditorKey)
 
     await getWeb3
-    const { host } = config
+    const { host, authConfig } = config
     const { web3Instance, web3Account } = store
     const { currentProvider, utils, eth } = web3Instance
 
@@ -455,7 +457,7 @@ class View extends Component {
           auditor: {
             address: auditorKey
           }
-        })
+        }, authConfig)
         console.log(res)
       } else {
         // Ошибка, можно посмотреть на etherscan https://rinkeby.etherscan.io/tx/ + tx
@@ -469,7 +471,7 @@ class View extends Component {
     e.preventDefault()
 
     await getWeb3
-    const { host } = config
+    const { host, authConfig } = config
     const { web3Instance, web3Account } = store
     const { currentProvider, utils, eth } = web3Instance
 
@@ -508,7 +510,7 @@ class View extends Component {
         // Предложить добавить адрус токена в metamask
         const res = await axios.put(host + 'super/ico/open', {
           address: ico.address
-        })
+        }, authConfig)
         console.log(res)
       } else {
         // Ошибка, можно посмотреть на etherscan https://rinkeby.etherscan.io/tx/ + tx
