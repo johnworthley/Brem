@@ -85,7 +85,7 @@ async function createNewBREMICO({
 
   const isSuperuser = await bremInstance.isSuperuser(coinbase);
   const isAuditor   = await bremInstance.isAuditor(coinbase);
-  
+
   if(isSuperuser || isAuditor){
     alert('Not for superuser or auditor');
     return;
@@ -219,9 +219,8 @@ class Create extends Component {
 
   handleProjectCreate = async e => {
     e.preventDefault()
-    const { state, name, thumbnail, files, street, token, cap, ratio } = this
-    const { marker = {}, editorState, selectedDate } = state
-    console.log(+selectedDate)
+    const { state, name, thumbnail, files, street, token, cap, ratio, selectedDate } = this
+    const { marker = {}, editorState } = state
     const { lat, lng } = marker
     const data = {
       name: name.value,
@@ -233,7 +232,7 @@ class Create extends Component {
       cap: cap.value,
       ratio: ratio.value,
       files: files.files,
-      closingTime: +selectedDate,
+      closingTime: new Date(selectedDate.value),
       location: {
         lat,
         lng
@@ -347,6 +346,7 @@ class Create extends Component {
             </label>
             <input
               type="datetime-local"
+              ref={elem => this.selectedDate = elem}
               className={css(style.input)}
               onChange={this.handleDateChange}
             />
