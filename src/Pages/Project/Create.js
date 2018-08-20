@@ -71,7 +71,7 @@ async function createNewBREMICO({
   locAddress
 }) {
   console.log('createNewBREMICO');
-  const { host } = config
+  const { host, authConfig } = config
   const { web3Instance } = store
   const { currentProvider, utils, eth } = web3Instance
   const brem = contract(BREMContract);
@@ -155,10 +155,7 @@ async function createNewBREMICO({
         };
 
         try {
-          let config = {
-            withCredentials: true
-          }
-          let res = await axios.post(host + "dev/ico", ico, config)
+          let res = await axios.post(host + "dev/ico", ico, authConfig)
           console.log(res)
 
           let formData = new FormData();
