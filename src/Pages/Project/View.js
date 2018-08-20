@@ -99,6 +99,30 @@ class View extends Component {
     this.setState({
       projectId: icoAddress
     })
+
+
+    // Get description, image, location, address and dev name
+    const { host } = config
+    console.log(host)
+    axios.get(host + 'ico/', {
+      params: {
+        address: icoAddress
+      }
+    }).then(res => {
+      console.log(res.data)
+      // get image
+      axios.get(host + 'ico/image', {
+        params:{
+          address: icoAddress,
+        },
+        responseType: "arraybuffer"
+      }).then(res => {
+          const base64 = Buffer.from(res.data, "binary").toString("base64");
+          this.setState({ img: "data:image/jpeg;base64," + base64 });
+        })
+        .catch(err => console.error(err))
+    })
+    .catch(err => console.error(err))
   
     // Get all data here and push it to state.project object
     const { web3Instance, web3Account } = store
