@@ -23,7 +23,6 @@ func main() {
 	router.Use(gin.Recovery())
 
 	store := cookie.NewStore([]byte("secret"))
-	store.Options(sessions.Options{Path: "/brem"})
 	router.Use(sessions.Sessions("brem", store))
 
 	corsConfig := cors.DefaultConfig()
