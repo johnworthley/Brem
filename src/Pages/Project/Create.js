@@ -81,26 +81,22 @@ async function createNewBREMICO({
     web3Coinbase: coinbase
   })
 
-  console.log('84');
   const bremInstance = await brem.deployed();
 
   const isSuperuser = await bremInstance.isSuperuser(coinbase);
   const isAuditor   = await bremInstance.isAuditor(coinbase);
-
+  
   if(isSuperuser || isAuditor){
     alert('Not for superuser or auditor');
     return;
   }
 
-  if(cap < 100){
-    alert('Invalid cap');
-    return;
-  }
   if(name.length === 0){
     alert('Invalid name');
     return;
   }
-  if(symbol.length === 0){
+
+  if(symbol.length !== 3){
     alert('Invalid symbol');
     return;
   }
@@ -121,15 +117,13 @@ async function createNewBREMICO({
     }
     const docHash = result[result.length - 1].hash;
 
-
-    console.log('125');
     bremInstance
       .createBREMICO(
         name,
         symbol,
         rate,
         utils.toWei(cap.toString(), "ether"),
-        closingTime.toString(),
+        closingTime.getTime() / 1000,
         docHash,
         { from: coinbase }
       )
@@ -142,7 +136,7 @@ async function createNewBREMICO({
               address: coinbase
             },
             description: description,
-            closing_time: closingTime, //format?
+            closing_time: closingTime.toISOString(),
             fee_percent: feePercent,
             token_address: TXres.logs[0].args.tokenAddress,
             name: name,
@@ -150,6 +144,7 @@ async function createNewBREMICO({
             location: location,
             loc_address: locAddress
           };
+          console.log(ico)
           let res = await axios.post(host + "dev/ico", ico);  //add authorization
           console.log(res);
 
@@ -208,14 +203,15 @@ class Create extends Component {
   setRef = name => elem => this[name] = elem
 
   handleDateChange = date => {
-    const min = moment().add(2, 'days')
-    const diffTime = date.diff(min, 'days')
-    if(diffTime < 0) return this.setState({
-      shouldAlert: {
-        text: `Please select date no less than 1 day more to the current date!`,
-        heading: 'Wrong date!'
-      }
-    })
+    // const min = moment().add(2, 'days')
+    // const diffTime = date.diff(min, 'days')
+    // if(diffTime < 0) return this.setState({
+    //   shouldAlert: {
+    //     text: `Please select date no less than 1 day more to the current date!`,
+    //     heading: 'Wrong date!'
+    //   }
+    // })
+    console.log(date)
     this.setState({
       selectedDate: date
     })
@@ -223,8 +219,9 @@ class Create extends Component {
 
   handleProjectCreate = async e => {
     e.preventDefault()
-    const { state, name, thumbnail, files, time, street, token, cap, ratio } = this
+    const { state, name, thumbnail, files, street, token, cap, ratio } = this
     const { marker = {}, editorState, selectedDate } = state
+    console.log(+selectedDate)
     const { lat, lng } = marker
     const data = {
       name: name.value,
@@ -348,9 +345,9 @@ class Create extends Component {
             <label className={css(style.label)}>
               Ending date<span style={{color: 'red'}}>*</span>
             </label>
-            <DatePicker
+            <input
+              type="datetime-local"
               className={css(style.input)}
-              selected={selectedDate}
               onChange={this.handleDateChange}
             />
           </div>
