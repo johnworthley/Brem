@@ -131,13 +131,10 @@ class View extends Component {
     brem.setProvider(currentProvider)
     const bremInstance = await brem.deployed()
 
-    const devName = await bremInstance.login(wallet)
-
     this.setState({
       name: name,
       tokenAddress: tokenAddress,
       icoBalance: utils.fromWei(icoBalance, "ether"),
-      devName: devName,
       wallet: wallet,
       rate: rate.toNumber(),
       weiRaised: utils.fromWei(weiRaised, "ether"),
