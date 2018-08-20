@@ -100,14 +100,14 @@ export default class Cabinet extends Component {
       console.log(collectedEth)
 
       const feePercentBN = await bremInstance.withdrawFeePercent()
-      const feePercent = feePercentBN.toNumber()
+      const feePercent = await feePercentBN.toNumber()
       console.log(feePercent)
 
       // Get all auditors
-      const res = axios.get(host + 'super/audit', {
+      const res = await axios.get(host + 'super/audit', {
         withCredentials: true
       })
-      console.log(res)
+      console.log(res.data)
     }
 }
 
