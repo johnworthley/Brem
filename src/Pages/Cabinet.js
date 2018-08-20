@@ -8,6 +8,8 @@ import getWebThree from '../util/getweb3'
 import store from 'Store'
 import contract from 'truffle-contract'
 import BREMContract from "../../build/contracts/BREM.json"
+import config from 'Config'
+import axios from 'axios';
 
 const style = StyleSheet.create({
 	main: {
@@ -71,9 +73,43 @@ export default class Cabinet extends Component {
 		}
   }
 
-	componentDidMount = () => store.update({
-		currentLocation: 'cabinet'
-	})
+	componentDidMount = async () => {
+    store.update({
+		  currentLocation: 'cabinet'
+    })
+
+    const { host } = config
+    const { web3Instance, web3Account } = store
+    const { currentProvider, utils, eth } = web3Instance
+    const brem = contract(BREMContract)
+    brem.setProvider(currentProvider)
+
+    const coinbase = await eth.getCoinbase()
+
+    const bremInstance = await brem.deployed()
+
+    const isSuperuser = await bremInstance.isSuperuser(coinbase)
+    console.log(isSuperuser)
+    if (isSuperuser) {
+      const factoryAddress = brem.address
+      console.log(factoryAddress)
+
+      const collectedWei = await eth.getBalance(brem.address)
+      console.log(collectedWei)
+      const collectedEth = utils.fromWei(collectedWei, "ether")
+      console.log(collectedEth)
+
+      const feePercentBN = await bremInstance.withdrawFeePercent()
+      const feePercent = feePercentBN.toNumber()
+      console.log(feePercent)
+
+      // Get all auditors
+      const res = axios.get(host + 'super/audit', {
+        withCredentials: true
+      })
+      console.log(res)
+    }
+}
 
   withdrawFees = async e => {
     e.preventDefault()

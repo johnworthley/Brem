@@ -23,10 +23,12 @@ func main() {
 	router.Use(gin.Recovery())
 
 	store := cookie.NewStore([]byte("secret"))
+	store.Options(sessions.Options{Path: "/brem"})
 	router.Use(sessions.Sessions("brem", store))
 
 	corsConfig := cors.DefaultConfig()
 	corsConfig.AllowOrigins = []string{"http://localhost:3000"}
+	corsConfig.AllowCredentials = true
 	router.Use(cors.New(corsConfig))
 
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

@@ -98,6 +98,8 @@ export default async () => {
         axios.post(host + "session", {
           address: coinbase,
           sign: sign
+        }, {
+          withCredentials: true
         })
         .then(res => console.log(res))
         .catch(err => console.error(err))
@@ -108,7 +110,9 @@ export default async () => {
           sign: sign
         }
         // Login developer
-        axios.post(host + "login", developer)
+        axios.post(host + "login", developer, {
+          withCredentials: true
+        })
         .then(res => {
           developer = res.data
           store.update({
