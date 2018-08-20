@@ -108,44 +108,54 @@ async function createNewBREMICO({
   }
 
   const feePercent = await bremInstance.withdrawFeePercent();
+  const closingTimeWeb3 = (closingTime.getTime() / 1000).toString();
+  const closingTimeISO = closingTime.toISOString()
+  const capWei = utils.toWei(cap, "ether")
 
+  console.log("Waiting for IPFS")
 
-  ipfs.files.add(files, (error, result) => {
+  ipfs.files.add(files, async (error, result) => {
     if (error) {
       console.log(error);
       return;
     }
     const docHash = result[result.length - 1].hash;
 
-    bremInstance
-      .createBREMICO(
-        name,
-        symbol,
-        rate,
-        utils.toWei(cap.toString(), "ether"),
-        closingTime.getTime() / 1000,
-        docHash,
-        { from: coinbase }
-      )
-      .then(async TXres => {
-        console.log('137');
+
+    const TXres = await bremInstance.createBREMICO(name, symbol, rate, capWei, closingTimeWeb3, docHash, { from: coinbase})
+    console.log(TXres)
+        const tx = TXres.tx;
+        const status = TXres.receipt.status === "0x1"
+        if (!status) {
+          console.log("Error, status " + TXres.receipt.status)
+          // Look in etherscan https://rinkeby.etherscan.io/tx/ + tx
+          return
+        }
+
+        const icoAddress = TXres.logs[0].args.tokenAddress
+        const tokenAddress = TXres.logs[0].args.tokenAddress
+        // TODO: message
+        console.log(icoAddress)
+        console.log(tokenAddress)
+        console.log(tx)
+
+        const ico = {
+          address: icoAddress,
+          developer: {
+            address: coinbase
+          },
+          description: description,
+          closing_time: closingTimeISO,
+          fee_percent: feePercent,
+          token_address: tokenAddress,
+          name: name,
+          symbol: symbol,
+          location: location,
+          loc_address: locAddress
+        };
+
         try {
-          const ico = {
-            address: TXres.logs[0].args.icoAddress,
-            developer: {
-              address: coinbase
-            },
-            description: description,
-            closing_time: closingTime.toISOString(),
-            fee_percent: feePercent,
-            token_address: TXres.logs[0].args.tokenAddress,
-            name: name,
-            symbol: symbol,
-            location: location,
-            loc_address: locAddress
-          };
-          console.log(ico)
-          let res = await axios.post(host + "dev/ico", ico);  //add authorization
+          let res = await axios.post(host + "dev/ico", ico)
           console.log(res);
 
           let formData = new FormData();
@@ -159,36 +169,17 @@ async function createNewBREMICO({
               "content-type": "multipart/form-data"
             }
           };
-          console.log('167');
-          axios.post(                                         //add authorization
+         
+          res = await axios.post(     
                   host + "dev/image",
                   formData,
                   config
                 );
+          console.log(res)
 
         } catch(err){
           console.log(err);
         }
-
-        const status = TXres.receipt.status
-        if (status === "0x1") {
-          alert(
-            "TX: " +
-            TXres.tx +
-            " ICO: " +
-            TXres.logs[0].args.icoAddress +
-            " Token: " +
-            TXres.logs[0].args.tokenAddress
-          );
-
-          // Success
-
-        } else{
-          alert("Error tx")
-        }
-
-      });
-
     });
 
 }
@@ -230,7 +221,7 @@ class Create extends Component {
       locaAddress: street.value,
       symbol: token.value,
       cap: cap.value,
-      ratio: ratio.value,
+      rate: ratio.value,
       files: files.files,
       closingTime: new Date(selectedDate.value),
       location: {
@@ -238,7 +229,6 @@ class Create extends Component {
         lng
       }
     }
-    console.log(data)
     if(data.description.length < 45 && data.description.includes('An actual description')) return this.setState({
       shouldAlert: {
         heading: 'Wow!',
