@@ -164,7 +164,7 @@ async function createNewBREMICO({
             TXres.logs[0].args.icoAddress
           );
           formData.append("image", image);
-          config = {
+          const reqConfig = {
             withCredentials: true,
             headers: {
               "content-type": "multipart/form-data"
@@ -174,7 +174,7 @@ async function createNewBREMICO({
           res = await axios.post(
                   host + "dev/image",
                   formData,
-                  config
+                  reqConfig
                 );
           console.log(res)
 
