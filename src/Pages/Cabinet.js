@@ -105,7 +105,21 @@ export default class Cabinet extends Component {
 
       // Get all auditors
       const res = await axios.get(host + 'super/audit', authConfig)
-      console.log(res)
+      const auditors = res.data // can be null
+    }
+
+    const isAuditor = await bremInstance.isAuditor(coinbase)
+    console.log(isAuditor)
+    if (isAuditor) {
+      // Get all to ico to confirm
+      const res = await axios.get(host + 'audit/ico')
+      // Check each for isConfirmed(coinbase) on ico instance
+    }
+
+    if (!isAuditor && !isSuperuser) {
+      // Get current dev ico's
+      const res = await axios.get(host + '/dev/ico')
+      const icos = res.data // Can be null. Read cap and raised for all icos (example in ico form)
     }
 }
 
