@@ -78,7 +78,7 @@ export default class Cabinet extends Component {
 		  currentLocation: 'cabinet'
     })
 
-    const { host } = config
+    const { host, authConfig } = config
     const { web3Instance, web3Account } = store
     const { currentProvider, utils, eth } = web3Instance
     const brem = contract(BREMContract)
@@ -104,10 +104,8 @@ export default class Cabinet extends Component {
       console.log(feePercent)
 
       // Get all auditors
-      const res = await axios.get(host + 'super/audit', {
-        withCredentials: true
-      })
-      console.log(res.data)
+      const res = await axios.get(host + 'super/audit', authConfig)
+      console.log(res)
     }
 }
 

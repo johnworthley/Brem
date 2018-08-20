@@ -36,7 +36,7 @@ func SuperuserAuth() gin.HandlerFunc {
 			c.AbortWithStatus(http.StatusInternalServerError)
 			return
 		}
-		if isSuperuser {
+		if !isSuperuser {
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}

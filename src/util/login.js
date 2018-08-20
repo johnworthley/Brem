@@ -8,7 +8,7 @@ import BREMContract from "../../build/contracts/BREM.json"
 export default async () => {
   console.log('login started')
   document.cookie = '__cfduid=; expires=Thu, 01 Jan 1970 00:00:01 GMT;'
-  const { host } = config
+  const { host, authConfig } = config
   const { web3Instance: testInstance } = store
   if(!testInstance) await getWebThree()
   const { web3Instance, web3Account } = store
@@ -53,7 +53,7 @@ export default async () => {
           address: coinbase,
           sign: sign
         }
-        axios.post(host + "login", acc)
+        await axios.post(host + 'session', acc)
         return await bremInstance.login({from: coinbase})
       }
 
@@ -101,7 +101,7 @@ export default async () => {
         console.log(username)
 
         // Write cookies
-        axios.post(host + "session", {
+        await axios.post(host + "session", {
           address: coinbase,
           sign: sign
         }, {
@@ -124,7 +124,7 @@ export default async () => {
           axios.post(host + "session", {
             address: coinbase,
             sign: sign
-          })
+          }, authConfig)
           developer = res.data
           store.update({
             web3Status: {
@@ -147,16 +147,16 @@ export default async () => {
           })
           // Sign up developer
           developer.username = name
-          axios.post(host + "signup", developer)
+          axios.post(host + "signup", developer, authConfig)
           .then(res => {
             console.log(res)
-            axios.post(host + "login", developer)
+            axios.post(host + "login", developer, authConfig)
             .then(res => {
               // Write cookies
               axios.post(host + "session", {
                 address: coinbase,
                 sign: sign
-              })
+              }, authConfig)
               developer = res.data
               store.update({
                 web3Status: {
