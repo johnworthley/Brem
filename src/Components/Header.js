@@ -102,6 +102,7 @@ class Header extends Component {
     if(web3) {
       amount = web3EthAmount.substring(0, 4)
     }
+    console.log(amount)
     return (
       <header className={css(style.main)}>
         <div className={css(style.holder)}>

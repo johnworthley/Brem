@@ -1,5 +1,6 @@
 import store from 'Store'
-import Web3 from "web3"
+import Web3 from 'web3'
+import login from './login'
 
 export const WEB3_INITIALIZED = "WEB3_INITIALIZED"
 function web3Initialized(results) {
@@ -24,7 +25,7 @@ let getWeb3 = () => new Promise((resolve, reject) => {
     if (typeof web3 !== "undefined") {
       // Use Mist/MetaMask's provider.
       try {
-        web3 = new Web3(web3.currentProvider);
+        web3 = new Web3(web3.currentProvider)
       }
       catch(e) {
         store.update({
@@ -44,6 +45,28 @@ let getWeb3 = () => new Promise((resolve, reject) => {
       const init = web3Initialized(results)
       const instance = init.payload.web3Instance
       const account = await instance.eth.getCoinbase()
+      instance.currentProvider.publicConfigStore.on('update', async ({ selectedAddress: address }) => {
+
+        const { web3Account: account } = store
+        console.log(await instance.eth.getBalance(account))
+        if(address !== account) {
+          const web3EthAmount = instance.utils.fromWei(await instance.eth.getBalance(account), "ether")
+          console.log(web3EthAmount)
+          store.update({
+            web3Account: address,
+            web3EthAmount,
+            web3Status: {
+              logged: 'pending',
+              instance: true
+            }
+          })
+          await login()
+          store.update({
+            web3Account: address,
+            web3EthAmount,
+          })
+        }
+      })
       if(account) {
         const ethAmount = instance.utils.fromWei(await instance.eth.getBalance(account), "ether")
         resolve(store.update({
