@@ -1,482 +1,404 @@
 {
-	"info": {
-		"_postman_id": "3b556db3-25b6-4898-a1ac-0a95be04494a",
-		"name": "BREM",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
-	},
-	"item": [
-		{
-			"name": "localhost:8080/signup",
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n\t\"address\": \"0xe20199cf61253efc880573e0eb8403603daf1645\",\n\t\"username\": \"developer\",\n\t\"sign\":\t\"0x78fc1f02b99a804c0216c2e88bbac9c50d97df07e725abb643d2b7a8e41c61a45479643909e7658f33e688292dd0d94cec270036ad6553867f0a70f9b814088f1b\"\n}"
-				},
-				"url": {
-					"raw": "localhost:8080/signup",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"signup"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "localhost:8080/login",
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n\t\"address\": \"0xe20199cf61253efc880573e0eb8403603daf1645\",\n\t\"sign\":\t\"0x78fc1f02b99a804c0216c2e88bbac9c50d97df07e725abb643d2b7a8e41c61a45479643909e7658f33e688292dd0d94cec270036ad6553867f0a70f9b814088f1b\"\n}"
-				},
-				"url": {
-					"raw": "localhost:8080/login",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"login"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "localhost:8080/dev/ico",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {},
-				"url": {
-					"raw": "localhost:8080/dev/ico",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"dev",
-						"ico"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "localhost:8080/dev/ico",
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n\t\"address\": \"0x811695756cF87DeaF5aB373526e5dd1d76e5822B\",\n\t\"developer\": {\n\t\t\"address\": \"0xe20199cf61253efc880573e0eb8403603daf1645\"\n\t},\n\t\"description\": \"AAA\",\n\t\"closing_time\": \"2018-09-01T15:04:05Z\",\n\t\"fee_percent\": 5,\n\t\"token_address\": \"0x811695756cF87DeaF5aB373526e5dd1d76e5822B\",\n\t\"name\": \"ICO NAME\",\n\t\"symbol\": \"TNK\",\n\t\"location\": \"MAP LOCATION\",\n\t\"loc_address\": \"ul Pushkina dom koolushkina\"\n}"
-				},
-				"url": {
-					"raw": "localhost:8080/dev/ico",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"dev",
-						"ico"
-					]
-				},
-				"description": "Add ICO"
-			},
-			"response": []
-		},
-		{
-			"name": "localhost:8080/dev/image",
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "multipart/form-data"
-					}
-				],
-				"body": {
-					"mode": "formdata",
-					"formdata": [
-						{
-							"key": "address",
-							"value": "0x811695756cf87deaf5ab373526e5dd1d76e5822b",
-							"sessionValue": "0x811695756cf87deaf5ab373526e5dd1d76e5822b",
-							"type": "text"
-						},
-						{
-							"key": "image",
-							"value": "",
-							"sessionValue": {
-								"0": {}
-							},
-							"type": "file"
-						}
-					]
-				},
-				"url": {
-					"raw": "localhost:8080/dev/image",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"dev",
-						"image"
-					]
-				},
-				"description": "Add ICO image"
-			},
-			"response": []
-		},
-		{
-			"name": "localhost:8080/ico/all?page=0",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {},
-				"url": {
-					"raw": "localhost:8080/ico/image?address=0x811695756cf87deaf5ab373526e5dd1d76e5822b",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"ico",
-						"image"
-					],
-					"query": [
-						{
-							"key": "address",
-							"value": "0x811695756cf87deaf5ab373526e5dd1d76e5822b"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "localhost:8080/ico/created?page=0",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {},
-				"url": {
-					"raw": "localhost:8080/ico/created?page=0",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"ico",
-						"created"
-					],
-					"query": [
-						{
-							"key": "page",
-							"value": "0"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "localhost:8080/ico/opened?page=0",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {},
-				"url": {
-					"raw": "localhost:8080/ico/opened?page=0",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"ico",
-						"opened"
-					],
-					"query": [
-						{
-							"key": "page",
-							"value": "0"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "localhost:8080/ico/success?page=0",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {},
-				"url": {
-					"raw": "localhost:8080/ico/success?page=0",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"ico",
-						"success"
-					],
-					"query": [
-						{
-							"key": "page",
-							"value": "0"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "localhost:8080/ico/failed?page=0",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {},
-				"url": {
-					"raw": "localhost:8080/ico/failed?page=0",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"ico",
-						"failed"
-					],
-					"query": [
-						{
-							"key": "page",
-							"value": "0"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "localhost:8080/ico/overdue?page=0",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {},
-				"url": {
-					"raw": "localhost:8080/ico/overdue?page=0",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"ico",
-						"overdue"
-					],
-					"query": [
-						{
-							"key": "page",
-							"value": "0"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "localhost:8080/ico?address=0x811695756cf87deaf5ab373526e5dd1d76e5822b",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {},
-				"url": {
-					"raw": "localhost:8080/ico?address=0x811695756cf87deaf5ab373526e5dd1d76e5822b",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"ico"
-					],
-					"query": [
-						{
-							"key": "address",
-							"value": "0x811695756cf87deaf5ab373526e5dd1d76e5822b"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "localhost:8080/super/ico",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {},
-				"url": {
-					"raw": "localhost:8080/super/ico",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"super",
-						"ico"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "localhost:8080/super/audit",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {},
-				"url": {
-					"raw": "localhost:8080/super/audit",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"super",
-						"audit"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "localhost:8080/super/ico/audit",
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n\t\"ico\": {\n\t\t\"address\": \"0x811695756cf87deaf5ab373526e5dd1d76e5822b\"\n\t},\n\t\"auditor\": {\n\t\t\"address\": \"0x2d4ab38e5a902e1aa1029e60ee5c8d8e08410874\"\n\t}\n}"
-				},
-				"url": {
-					"raw": "localhost:8080/super/ico/audit",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"super",
-						"ico",
-						"audit"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "localhost:8080/super/ico/open",
-			"request": {
-				"method": "PUT",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n\t\"address\": \"0x811695756cf87deaf5ab373526e5dd1d76e5822b\"\n}"
-				},
-				"url": {
-					"raw": "localhost:8080/super/ico/open",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"super",
-						"ico",
-						"open"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "localhost:8080/audit/ico",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {},
-				"url": {
-					"raw": "localhost:8080/audit/ico",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"audit",
-						"ico"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "localhost:8080/session",
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n\t\"address\": \"0xe20199cf61253efc880573e0eb8403603daf1645\",\n\t\"sign\":\t\"0x78fc1f02b99a804c0216c2e88bbac9c50d97df07e725abb643d2b7a8e41c61a45479643909e7658f33e688292dd0d94cec270036ad6553867f0a70f9b814088f1b\"\n}"
-				},
-				"url": {
-					"raw": "localhost:8080/session",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"session"
-					]
-				}
-			},
-			"response": []
-		}
-	]
+  "info": {
+    "_postman_id": "3b556db3-25b6-4898-a1ac-0a95be04494a",
+    "name": "BREM",
+    "schema":
+      "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "localhost:8080/signup",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw":
+            "{\n\t\"address\": \"0xe20199cf61253efc880573e0eb8403603daf1645\",\n\t\"username\": \"developer\",\n\t\"sign\":\t\"0x78fc1f02b99a804c0216c2e88bbac9c50d97df07e725abb643d2b7a8e41c61a45479643909e7658f33e688292dd0d94cec270036ad6553867f0a70f9b814088f1b\"\n}"
+        },
+        "url": {
+          "raw": "localhost:8080/signup",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["signup"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "localhost:8080/login",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw":
+            "{\n\t\"address\": \"0xe20199cf61253efc880573e0eb8403603daf1645\",\n\t\"sign\":\t\"0x78fc1f02b99a804c0216c2e88bbac9c50d97df07e725abb643d2b7a8e41c61a45479643909e7658f33e688292dd0d94cec270036ad6553867f0a70f9b814088f1b\"\n}"
+        },
+        "url": {
+          "raw": "localhost:8080/login",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["login"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "localhost:8080/dev/ico",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {},
+        "url": {
+          "raw": "localhost:8080/dev/ico",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["dev", "ico"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "localhost:8080/dev/ico",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw":
+            "{\n\t\"address\": \"0x811695756cF87DeaF5aB373526e5dd1d76e5822B\",\n\t\"developer\": {\n\t\t\"address\": \"0xe20199cf61253efc880573e0eb8403603daf1645\"\n\t},\n\t\"description\": \"AAA\",\n\t\"closing_time\": \"2018-09-01T15:04:05Z\",\n\t\"fee_percent\": 5,\n\t\"token_address\": \"0x811695756cF87DeaF5aB373526e5dd1d76e5822B\",\n\t\"name\": \"ICO NAME\",\n\t\"symbol\": \"TNK\",\n\t\"location\": \"MAP LOCATION\",\n\t\"loc_address\": \"ul Pushkina dom koolushkina\"\n}"
+        },
+        "url": {
+          "raw": "localhost:8080/dev/ico",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["dev", "ico"]
+        },
+        "description": "Add ICO"
+      },
+      "response": []
+    },
+    {
+      "name": "localhost:8080/dev/image",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "multipart/form-data"
+          }
+        ],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "address",
+              "value": "0x811695756cf87deaf5ab373526e5dd1d76e5822b",
+              "sessionValue": "0x811695756cf87deaf5ab373526e5dd1d76e5822b",
+              "type": "text"
+            },
+            {
+              "key": "image",
+              "value": "",
+              "sessionValue": {
+                "0": {}
+              },
+              "type": "file"
+            }
+          ]
+        },
+        "url": {
+          "raw": "localhost:8080/dev/image",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["dev", "image"]
+        },
+        "description": "Add ICO image"
+      },
+      "response": []
+    },
+    {
+      "name": "localhost:8080/ico/all?page=0",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {},
+        "url": {
+          "raw":
+            "localhost:8080/ico/image?address=0x811695756cf87deaf5ab373526e5dd1d76e5822b",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["ico", "image"],
+          "query": [
+            {
+              "key": "address",
+              "value": "0x811695756cf87deaf5ab373526e5dd1d76e5822b"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "localhost:8080/ico/created?page=0",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {},
+        "url": {
+          "raw": "localhost:8080/ico/created?page=0",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["ico", "created"],
+          "query": [
+            {
+              "key": "page",
+              "value": "0"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "localhost:8080/ico/opened?page=0",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {},
+        "url": {
+          "raw": "localhost:8080/ico/opened?page=0",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["ico", "opened"],
+          "query": [
+            {
+              "key": "page",
+              "value": "0"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "localhost:8080/ico/success?page=0",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {},
+        "url": {
+          "raw": "localhost:8080/ico/success?page=0",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["ico", "success"],
+          "query": [
+            {
+              "key": "page",
+              "value": "0"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "localhost:8080/ico/failed?page=0",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {},
+        "url": {
+          "raw": "localhost:8080/ico/failed?page=0",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["ico", "failed"],
+          "query": [
+            {
+              "key": "page",
+              "value": "0"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "localhost:8080/ico/overdue?page=0",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {},
+        "url": {
+          "raw": "localhost:8080/ico/overdue?page=0",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["ico", "overdue"],
+          "query": [
+            {
+              "key": "page",
+              "value": "0"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name":
+        "localhost:8080/ico?address=0x811695756cf87deaf5ab373526e5dd1d76e5822b",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {},
+        "url": {
+          "raw":
+            "localhost:8080/ico?address=0x811695756cf87deaf5ab373526e5dd1d76e5822b",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["ico"],
+          "query": [
+            {
+              "key": "address",
+              "value": "0x811695756cf87deaf5ab373526e5dd1d76e5822b"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "localhost:8080/super/ico",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {},
+        "url": {
+          "raw": "localhost:8080/super/ico",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["super", "ico"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "localhost:8080/super/audit",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {},
+        "url": {
+          "raw": "localhost:8080/super/audit",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["super", "audit"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "localhost:8080/super/ico/audit",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw":
+            "{\n\t\"ico\": {\n\t\t\"address\": \"0x811695756cf87deaf5ab373526e5dd1d76e5822b\"\n\t},\n\t\"auditor\": {\n\t\t\"address\": \"0x2d4ab38e5a902e1aa1029e60ee5c8d8e08410874\"\n\t}\n}"
+        },
+        "url": {
+          "raw": "localhost:8080/super/ico/audit",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["super", "ico", "audit"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "localhost:8080/super/ico/open",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw":
+            "{\n\t\"address\": \"0x811695756cf87deaf5ab373526e5dd1d76e5822b\"\n}"
+        },
+        "url": {
+          "raw": "localhost:8080/super/ico/open",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["super", "ico", "open"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "localhost:8080/audit/ico",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {},
+        "url": {
+          "raw": "localhost:8080/audit/ico",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["audit", "ico"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "localhost:8080/session",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw":
+            "{\n\t\"address\": \"0xe20199cf61253efc880573e0eb8403603daf1645\",\n\t\"sign\":\t\"0x78fc1f02b99a804c0216c2e88bbac9c50d97df07e725abb643d2b7a8e41c61a45479643909e7658f33e688292dd0d94cec270036ad6553867f0a70f9b814088f1b\"\n}"
+        },
+        "url": {
+          "raw": "localhost:8080/session",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["session"]
+        }
+      },
+      "response": []
+    }
+  ]
 }
