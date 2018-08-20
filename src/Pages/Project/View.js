@@ -70,10 +70,6 @@ const style = StyleSheet.create({
     lineHeight: 1.4
   }
 })
-<<<<<<< HEAD
-
-=======
->>>>>>> 802afc277782444d7ea022e0403e82120667a8e6
 
 class View extends Component {
   state = {
@@ -332,8 +328,8 @@ class View extends Component {
       // Ошибка, нельзя купить
       return
     }
-    
-    // Confirm 
+
+    // Confirm
     try {
       const txRes = await icoInstance.confirmWithdraw({from: coinbase})
       const isSuccessTX = txRes.receipt.status === "0x1"
@@ -446,7 +442,7 @@ class View extends Component {
       // Ошибка
       return
     }
-    
+
     // Add auditor to current ico
     try {
       const txRes = await icoInstance.addAuditor(auditorKey, {from: coinbase})
@@ -504,7 +500,7 @@ class View extends Component {
       // Ошибка
       return
     }
-    
+
     // Open ICO
     try {
       const txRes = await icoInstance.finishAuditorSelection({from: coinbase})
