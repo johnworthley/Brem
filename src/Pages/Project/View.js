@@ -94,27 +94,28 @@ class View extends Component {
   }
 
   componentDidMount = async () => {
+    const icoAddress = this.props.match.params.id;
+   
     this.setState({
-      projectId: this.props.match.params.id
+      projectId: icoAddress
     })
-    
+  
     // Get all data here and push it to state.project object
-    await getWeb3();
     const { web3Instance, web3Account } = store
     const { currentProvider, utils, eth } = web3Instance
 
-    const coinbase = await web3Instance.getCoinbase()
+    const coinbase = await eth.getCoinbase()
 
     const ico = contract(ICOContract)
     ico.setProvider(currentProvider)
     const icoInstance = await ico.at(this.state.projectId)
 
-    const icoBalance = await eth.betBalance(this.state.projectId)
+    const icoBalance = await eth.getBalance(this.state.projectId)
     const tokenAddress = await icoInstance.token()
     const wallet = await icoInstance.wallet()
     const rate = await icoInstance.rate()
     const weiRaised = await icoInstance.weiRaised()
-    const cap = await icoInstance.cap()
+    const capWei = await icoInstance.cap()
     const docHash = await icoInstance.docHash()
     const closingTimeEpochs = await icoInstance.closingTime()
     const weiInvested = await icoInstance.getBalance(coinbase, {from: coinbase})
@@ -122,14 +123,22 @@ class View extends Component {
     const token = contract(TokenContract)
     token.setProvider(currentProvider)
     const tokenInstance = await token.at(tokenAddress)
-
+  
     const name = await tokenInstance.name()
     const symbol = await tokenInstance.symbol()
-    const tokenBalance = await tokenInstance.balanceOf(coinbase)
+    const tokenBalanceRaw = await tokenInstance.balanceOf(coinbase)
 
     const brem = contract(BREMContract)
     brem.setProvider(currentProvider)
     const bremInstance = await brem.deployed()
+
+ 
+    // Convert values
+    const ethRaised = utils.fromWei(weiRaised.toFixed(), "ether")
+    const capEth = utils.fromWei(capWei.toFixed(), "ether")
+    const ethInvested = utils.fromWei(weiInvested.toFixed(), "ether")
+    const tokenBalance = utils.fromWei(tokenBalanceRaw.toFixed(), "ether")
+
 
     this.setState({
       name: name,
@@ -137,13 +146,13 @@ class View extends Component {
       icoBalance: utils.fromWei(icoBalance, "ether"),
       wallet: wallet,
       rate: rate.toNumber(),
-      weiRaised: utils.fromWei(weiRaised, "ether"),
-      cap: utils.fromWei(cap, "ether"),
+      ethRaised: ethRaised,
+      capEth: capEth,
       docsURL: 'https://ipfs.infura.io/ipfs/' + docHash,
       closingTime: new Date(closingTimeEpochs.toNumber() * 1000).toString(),
-      invested: utils.fromWei(weiInvested, "ether"),
+      ethInvested: ethInvested,
       symbol: symbol,
-      tokenBalance: utils.fromWei(tokenBalance, "ether")
+      tokenBalance: tokenBalance
     })
 
     // Read status
@@ -164,8 +173,9 @@ class View extends Component {
       isOverdue: isOverdue
     })
 
+
     // Read current auditors
-    const auditorsAmount = icoInstance.auditorsAmount()
+    const auditorsAmount = await icoInstance.auditorsAmount()
     const auditors = []
     for (let i = 0; i < auditorsAmount; i++) {
       const auditorAddress = await icoInstance.getAuditor(i)
@@ -175,6 +185,7 @@ class View extends Component {
         username: auditorUsername
       })
     }
+  
     this.setState({
       auditorsList: auditors
     })
