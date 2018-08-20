@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import Routing from './Route/Routing'
-import Header from './Components/Header'
-import Footer from './Components/Footer'
+
+import { BrowserRouter as Router } from 'react-router-dom'
 
 import store from 'Store'
 
@@ -14,11 +14,7 @@ import './App.css'
 
 class App extends Component {
   render = () => (
-    <div>
-      <Header />
-      <Routing />
-      <Footer />
-    </div>
+    <Routing />
   )
 }
 

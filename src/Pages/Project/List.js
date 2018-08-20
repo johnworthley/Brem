@@ -3,11 +3,14 @@ import { css, StyleSheet } from 'aphrodite/no-important'
 
 import ProjectCard from '../../Components/ProjectCard'
 
+import store from 'Store'
+
 const style = StyleSheet.create({
 	more: {
 		textAlign: 'center',
 		marginTop: 50,
-		marginBottom: 60
+		marginBottom: 60,
+		width: 944
 	},
 	moreButton: {
 		width: 232,
@@ -48,6 +51,10 @@ class List extends Component {
 		}
 	}
 
+	componentDidMount = () => store.update({
+		currentLocation: 'marketplace'
+	})
+
 	render() {
 	const { struct = {} } = this.state
     return (
@@ -57,7 +64,7 @@ class List extends Component {
 		{
 			struct.cards.map((item,num) => (<ProjectCard struct={item} key={'ProjectCard'+num} />))
 		}
-		
+
 		{struct.showMore ? (
 			<div className={css(style.more)}>
 				<button className={css(style.moreButton)}>СМОТРЕТЬ ВСЕ</button>

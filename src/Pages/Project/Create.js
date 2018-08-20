@@ -3,13 +3,12 @@ import { css, StyleSheet } from 'aphrodite/no-important'
 import { Editor } from 'react-draft-wysiwyg'
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
 import draftToHtml from 'draftjs-to-html'
-import { convertToRaw, convertFromRaw, EditorState } from 'draft-js'
+import { convertToRaw, EditorState } from 'draft-js'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css';
 import moment from 'moment'
 import { withScriptjs, withGoogleMap, GoogleMap, Marker } from 'react-google-maps'
 
-import getWebThree from './../../util/getweb3'
 import store from 'Store'
 import config from 'Config'
 import contract from 'truffle-contract'
@@ -59,7 +58,7 @@ const FormRow = ({ setRef, label, required, placeholder}) => (
   </div>
 )
 
-async function createNewBREMICO(
+async function createNewBREMICO({
   name,
   symbol,
   rate,
@@ -70,10 +69,10 @@ async function createNewBREMICO(
   image,
   location,
   locAddress
-) {
+}) {
   console.log('createNewBREMICO');
   const { host } = config
-  const { web3Instance, web3Account } = store
+  const { web3Instance } = store
   const { currentProvider, utils, eth } = web3Instance
   const brem = contract(BREMContract);
   brem.setProvider(currentProvider)
@@ -81,7 +80,8 @@ async function createNewBREMICO(
   store.update({
     web3Coinbase: coinbase
   })
-  
+
+  console.log('84');
   const bremInstance = await brem.deployed();
 
   const isSuperuser = await bremInstance.isSuperuser(coinbase);
@@ -96,11 +96,11 @@ async function createNewBREMICO(
     alert('Invalid cap');
     return;
   }
-  if(name.length == 0){
+  if(name.length === 0){
     alert('Invalid name');
     return;
   }
-  if(symbol.length == 0){
+  if(symbol.length === 0){
     alert('Invalid symbol');
     return;
   }
@@ -122,6 +122,7 @@ async function createNewBREMICO(
     const docHash = result[result.length - 1].hash;
 
 
+    console.log('125');
     bremInstance
       .createBREMICO(
         name,
@@ -133,6 +134,7 @@ async function createNewBREMICO(
         { from: coinbase }
       )
       .then(async TXres => {
+        console.log('137');
         try {
           const ico = {
             address: TXres.logs[0].args.icoAddress,
@@ -162,6 +164,7 @@ async function createNewBREMICO(
               "content-type": "multipart/form-data"
             }
           };
+          console.log('167');
           axios.post(                                         //add authorization
                   host + "dev/image",
                   formData,
@@ -171,7 +174,7 @@ async function createNewBREMICO(
         } catch(err){
           console.log(err);
         }
-            
+
         const status = TXres.receipt.status
         if (status === "0x1") {
           alert(
@@ -190,14 +193,14 @@ async function createNewBREMICO(
         }
 
       });
-                               
+
     });
-    
+
 }
 
 class Create extends Component {
   state = {
-    selectedDate: moment().add(1, 'days'),
+    selectedDate: moment().add(2, 'days'),
     shouldAlert: '',
     marker: '',
     editorState: EditorState.createEmpty()
@@ -205,7 +208,7 @@ class Create extends Component {
   setRef = name => elem => this[name] = elem
 
   handleDateChange = date => {
-    const min = moment().add(1, 'days')
+    const min = moment().add(2, 'days')
     const diffTime = date.diff(min, 'days')
     if(diffTime < 0) return this.setState({
       shouldAlert: {
@@ -218,52 +221,80 @@ class Create extends Component {
     })
   }
 
-  handleProjectCreate = e => {
+  handleProjectCreate = async e => {
     e.preventDefault()
     const { state, name, thumbnail, files, time, street, token, cap, ratio } = this
-    const { marker = {}, editorState } = state
+    const { marker = {}, editorState, selectedDate } = state
     const { lat, lng } = marker
     const data = {
       name: name.value,
       thumbnail: thumbnail.files[0],
-      desc: draftToHtml(convertToRaw(editorState.getCurrentContent())),
+      description: draftToHtml(convertToRaw(editorState.getCurrentContent())),
       // time: time.value,
-      street: street.value,
-      token: token.value,
+      locaAddress: street.value,
+      symbol: token.value,
       cap: cap.value,
       ratio: ratio.value,
       files: files.files,
-      lat,
-      lng
+      closingTime: +selectedDate,
+      location: {
+        lat,
+        lng
+      }
     }
-    console.log(data.desc.length)
-    if(data.desc.length < 45 && data.desc.includes('An actual description')) return this.setState({
+    console.log(data)
+    if(data.description.length < 45 && data.description.includes('An actual description')) return this.setState({
       shouldAlert: {
         heading: 'Wow!',
         text: 'Uhh that was smart. But it won\'t trick me anyways ;)'
       }
     })
-    if(data.desc.length < 200) return this.setState({
+    if(data.description.length < 200) return this.setState({
       shouldAlert: {
         heading: 'Description is too short!',
         text: 'Please write an actual description to your project!'
       }
     })
-    if(!data.lat || !data.lng) return this.setState({
+    if(!lat || !lng) return this.setState({
       shouldAlert: {
         heading: 'No address!',
         text: 'Please select valid address on the map!'
       }
     })
-    if(data.token.length !== 3) return this.setState({
+    if(data.symbol.length !== 3) return this.setState({
       shouldAlert: {
         heading: 'Wrong token name!',
         text: 'Token name have to contain three letters like this: "TKN"'
       }
     })
+    data.files = await Promise.all([...data.files].map(file => new Promise(resolve => {
+      const reader = new window.FileReader()
+      reader.readAsArrayBuffer(file)
+      reader.onloadend = () => {
+        resolve(Buffer(reader.result))
+      }
+    })))
+    data.thumbnail = await new Promise(resolve => {
+      const thumbnail= data.thumbnail
+      const reader = new window.FileReader()
+      reader.readAsArrayBuffer(thumbnail)
+      reader.onloadend = () => {
+        resolve(Buffer(reader.result))
+      }
+    })
     /*
-      SERVER AND CONTRACTS STUFF
+    name,
+    symbol,
+    rate,
+    cap,
+    closingTime,
+    description,
+    files,
+    image,
+    location,
+    locAddress
     */
+    createNewBREMICO(data)
   }
 
   onEditorStateChange = editorState => this.setState({

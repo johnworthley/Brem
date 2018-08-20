@@ -16,13 +16,9 @@ class Login extends Component {
     this.setState({
       tabs: [
         {
-          name: 'Login',
-          component: LoginTab,
-          default: true
-        },
-        {
           name: 'Register',
-          component: SignupTab
+          component: SignupTab,
+          default: true
         }
       ]
     })
@@ -30,15 +26,9 @@ class Login extends Component {
 
   render() {
     const { tabs, needToShowSignup } = this.state
-    const tabsToRender = tabs.map(tab => {
-      if(needToShowSignup && tab.name === 'Register') return {...tab, default: true}
-      else if(needToShowSignup) return {...tab, default: false}
-      else if(!needToShowSignup && tab.name === 'Login') return {...tab, default: true}
-      else return {...tab, default: false}
-    })
     return (
       <div>
-        <Tabs data={tabsToRender} />
+        <Tabs data={tabs} />
       </div>
     )
   }

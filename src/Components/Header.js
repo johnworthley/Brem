@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { css, StyleSheet } from 'aphrodite/no-important'
 import config from 'Config'
 import store from 'Store'
+import { Link } from 'react-router-dom'
 
 const style = StyleSheet.create({
   holder: {
@@ -109,9 +110,16 @@ class Header extends Component {
             <LeftPart orange="right" value={account} name="WALLET" delim />
           </div>
           <div className={css(style.right)}>
-            <button className={css(style.button)}>
-              Marketplace
-            </button>
+            <Link to="/cabinet">
+              <button style={{marginRight: 20}} className={css(style.button)}>
+                Cabinet
+              </button>
+            </Link>
+            <Link to="/">
+              <button className={css(style.button)}>
+                Marketplace
+              </button>
+            </Link>
           </div>
         </div>
       </header>

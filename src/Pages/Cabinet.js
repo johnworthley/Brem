@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
 import { css, StyleSheet } from 'aphrodite/no-important'
 
+import Tabs from '../Components/Tabs'
 import Table from '../Components/Table'
-import List from './Project/List'
 
 import getWebThree from '../util/getweb3'
 import store from 'Store'
@@ -12,6 +12,44 @@ import BREMContract from "../../build/contracts/BREM.json"
 const style = StyleSheet.create({
 	main: {
 		marginBottom: 75
+	},
+	settingsTop: {
+		display: 'flex',
+		justifyContent: 'space-between',
+		width: '100%'
+	},
+	settingsTopPart: {
+		width: 'calc(50% - 15px)',
+		minHeight: 150,
+		display: 'flex',
+		justifyContent: 'space-between',
+		flexDirection: 'column',
+	},
+	settingsTopLeft: {
+		border: 'solid 1px lightgray',
+		borderRadius: 4,
+		background: '#fff',
+		padding: 20
+	},
+	settingsTopForm: {
+		minHeight: 150,
+		display: 'flex',
+		justifyContent: 'space-between',
+		flexDirection: 'column',
+	},
+	input: {
+		height: 35,
+    borderRadius: 3,
+    border: 'solid 1px lightgray',
+    padding: '0 15px'
+	},
+	button: {
+		width: 150,
+		height: 35
+	},
+	projectsTop: {
+		display: 'flex',
+		marginBottom: 40
 	}
 })
 
@@ -30,9 +68,13 @@ export default class Cabinet extends Component {
 				['Second row', [10,33,30]],
 				['Last row', [1101.786,44444.99,'550.2']]
 			])
-		}		
+		}
   }
-  
+
+	componentDidMount = () => store.update({
+		currentLocation: 'cabinet'
+	})
+
   withdrawFees = async e => {
     e.preventDefault()
     const withdrawValue = this.withdrawFees.value; // Значение в Ether
@@ -84,7 +126,7 @@ export default class Cabinet extends Component {
     if (fee < 0 || fee > 100) {
       return alert('Error')
     }
-    
+
     await getWebThree()
     const { web3Instance, web3Account } = store
     const { currentProvider, utils, eth } = web3Instance
@@ -122,10 +164,19 @@ export default class Cabinet extends Component {
       console.error(err)
     }
 	}
+
+	addNewProject = async () => {
+
+	}
+
+	loadMoreProjects = async () => {
+
+	}
+
 	addAuditors = async e => {
 		e.preventDefault()
     const auditor = this.auditors.value
-    
+
     await getWebThree()
     const { web3Instance, web3Account } = store
     const { currentProvider, utils, eth } = web3Instance
@@ -171,24 +222,67 @@ export default class Cabinet extends Component {
 
 	render = () => {
 		//const { struct } = this.props
-		const { struct, cards } = this.state
+		const { struct } = this.state
+		const { accountType } = store
+		const data = [
+			{
+				name: 'Your projects',
+				default: true,
+				component: () => (
+					<div>
+						<div className={css(style.projectsTop)}>
+							<button className={css(style.button)} style={{marginRight: 25}} onClick={this.addNewProject}>
+								Add new
+							</button>
+							<button className={css(style.button)} onClick={this.loadMoreProjects}>
+								Load more
+							</button>
+						</div>
+						<Table struct={struct} />
+					</div>
+				)
+			}
+		]
+		if(accountType !== 'developer') data.push({
+			name: 'Settings',
+			component: () => (
+				<div>
+					<div className={css(style.settingsTop)} style={{marginBottom: 100}}>
+						<div className={css(style.settingsTopPart, style.settingsTopLeft)}>
+							<div>
+								<div>
+									Factory address
+								</div>
+								<div>
+									qwkeqlwkqlkwmelqwe
+								</div>
+							</div>
+							<div>
+								Ether collected 1000 ETH
+							</div>
+						</div>
+						<div className={css(style.settingsTopPart)}>
+							<div className={css(style.settingsTopForm)}>
+								<form onSubmit={this.changeFee} style={{marginBottom: 10}}>
+									<input className={css(style.input)} required ref={elem => this.fee = elem} type="text" placeholder="Fee" />
+									<button className={css(style.button)}>Change fee</button>
+								</form>
+								<form onSubmit={this.addAuditors}>
+									<input className={css(style.input)} required ref={elem => this.auditors = elem} type="text" placeholder="Auditors" />
+									<button className={css(style.button)}>Add auditors</button>
+								</form>
+							</div>
+						</div>
+					</div>
+
+					<Table struct={struct} />
+				</div>
+			)
+		})
 		return (
 			<div className={css(style.main)}>
 				<h3>Cabinet</h3>
-				<div style={{marginBottom: 100}}>
-					<form onSubmit={this.changeFee} style={{marginBottom: 10}}>
-						<input required ref={elem => this.fee = elem} type="text" placeholder="Fee" />
-						<button>Change fee</button>
-					</form>
-					<form onSubmit={this.addAuditors}>
-						<input required ref={elem => this.auditors = elem} type="text" placeholder="Auditors" />
-						<button>Add auditors</button>
-					</form>
-				</div>
-
-				<Table struct={struct} />
-				
-				<List struct={cards} />
+				<Tabs maxWidth="100%" data={data} />
 			</div>
 		)
 	}

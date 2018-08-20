@@ -51,12 +51,16 @@ let getWeb3 = () => new Promise((resolve, reject) => {
           web3Instance: instance,
           web3Account: account,
           web3EthAmount: ethAmount,
+          web3Status: {
+            logged: 'pending',
+            instance: true
+          }
         }))
       }
       else resolve(store.update({
         web3Status: {
           logged: false,
-          instance: true
+          instance: false
         }
       }))
     } else {

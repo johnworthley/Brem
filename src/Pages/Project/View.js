@@ -43,8 +43,11 @@ const style = StyleSheet.create({
   topRightInner: {
     display: 'flex',
     flexDirection: 'column',
+    ':active > span': { // fun hack
+      marginBottom: 15
+    },
     ':not(:active) > span': { // fun hack
-      marginBottom: 10
+      marginBottom: 15
     },
   },
   topLeft: {
@@ -58,7 +61,7 @@ const style = StyleSheet.create({
     overflow: 'hidden'
   },
   progress: {
-    backgroundColor: 'red',
+    backgroundColor: 'rgb(240, 114, 59)',
     height: '100%',
     width: '50%'
   },
@@ -67,18 +70,7 @@ const style = StyleSheet.create({
     lineHeight: 1.4
   }
 })
-<<<<<<< HEAD
 
-=======
-import getWeb3 from '../../util/getweb3'
-import store from 'Store'
-import config from 'Config'
-import contract from 'truffle-contract'
-import ICOContract from "../../../build/contracts/BREMICO.json"
-import TokenContract from "../../../build/contracts/BREMToken.json"
-import BREMContract from "../../../build/contracts/BREM.json"
-import axios from 'axios';
->>>>>>> 6be69b7dc9a89c4957dc334f7a2b3fafaecb81c9
 
 class View extends Component {
   state = {
@@ -106,7 +98,7 @@ class View extends Component {
     this.setState({
       projectId: this.props.match.params.id
     })
-
+    return
     // Get all data here and push it to state.project object
     await getWeb3();
     const { web3Instance, web3Account } = store
@@ -138,7 +130,7 @@ class View extends Component {
 
     const brem = contract(BREMContract)
     brem.setProvider(currentProvider)
-    const bremInstance = await brem.deployed() 
+    const bremInstance = await brem.deployed()
 
     const devName = await bremInstance.login(wallet)
 

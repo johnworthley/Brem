@@ -8,8 +8,8 @@ import BREMContract from "../../build/contracts/BREM.json"
 export default async () => {
   console.log('login started')
   const { host } = config
-  await getWebThree()
-  console.log('logged')
+  const { web3Instance: testInstance } = store
+  if(!testInstance) await getWebThree()
   const { web3Instance, web3Account } = store
   if(!web3Instance && !web3Account) return
   const { currentProvider, utils, eth } = web3Instance
@@ -19,7 +19,7 @@ export default async () => {
   store.update({
     web3Coinbase: coinbase
   })
-  const name = "usernameZZZ"
+
 
   currentProvider.sendAsync({
       method: "personal_sign",
@@ -34,7 +34,7 @@ export default async () => {
         // Checking for valid username
         const isValidUsername = await bremInstance.isValidUsername(name)
         if (!isValidUsername) {
-          console.log("Not valid username")
+          console.log("[dev]:Not valid username")
           return
         }
         // Sign up and login
@@ -68,8 +68,8 @@ export default async () => {
         const isSignUp = await bremInstance.isSignUp({from: coinbase})
 
         if (!isSignUp) {
-          const { regName } = store
-          if(!regName) return store.update({
+          const { regName: name } = store
+          if(!name) return store.update({
             web3Status: {
               logged: false,
               instance: true,
@@ -121,8 +121,8 @@ export default async () => {
           console.log(developer)
         })
         .catch(err => {
-          const { regName } = store
-          if(!regName) return store.update({
+          const { regName: name } = store
+          if(!name) return store.update({
             web3Status: {
               logged: false,
               instance: true,
