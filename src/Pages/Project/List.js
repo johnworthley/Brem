@@ -1,5 +1,9 @@
 import React, { Component } from 'react'
 import { css, StyleSheet } from 'aphrodite/no-important'
+import axios from 'axios'
+import config from 'Config'
+
+
 
 import ProjectCard from '../../Components/ProjectCard'
 
@@ -30,6 +34,7 @@ const style = StyleSheet.create({
 class List extends Component {
 	state = {
 		struct : {
+			page: 0,
 			showMore: true,
 			cards: [{
 				name: 'Каждой сове по дуплу!',
@@ -51,23 +56,28 @@ class List extends Component {
 		}
 	}
 
-	componentDidMount = () => store.update({
-		currentLocation: 'marketplace'
-	})
+	componentDidMount = async () => {
+		const { host } = config
+		store.update({
+			currentLocation: 'marketplace'
+		})
+		const page = await axios.get(`${host}ico/all?page=${this.state.struct.page}`)
+		console.log(page)
+	}
 
 	render() {
 	const { struct = {} } = this.state
     return (
       <div>
-		<h3>Все проекты</h3>
+		<h3>All projects</h3>
 
 		{
-			struct.cards.map((item,num) => (<ProjectCard struct={item} key={'ProjectCard'+num} />))
+			struct.cards.map((item,num) => (<ProjectCard struct={item} key={'ProjectCard' + num} />))
 		}
 
 		{struct.showMore ? (
 			<div className={css(style.more)}>
-				<button className={css(style.moreButton)}>СМОТРЕТЬ ВСЕ</button>
+				<button className={css(style.moreButton)}>Load more</button>
 			</div>
 		) : ''}
 

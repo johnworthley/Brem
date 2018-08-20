@@ -4,8 +4,8 @@ import { Editor } from 'react-draft-wysiwyg'
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
 import draftToHtml from 'draftjs-to-html'
 import { convertToRaw, EditorState } from 'draft-js'
-import DatePicker from 'react-datepicker'
-import 'react-datepicker/dist/react-datepicker.css';
+// import DatePicker from 'react-datepicker'
+// import 'react-datepicker/dist/react-datepicker.css'
 import moment from 'moment'
 import { withScriptjs, withGoogleMap, GoogleMap, Marker } from 'react-google-maps'
 
@@ -14,7 +14,7 @@ import config from 'Config'
 import contract from 'truffle-contract'
 import axios from 'axios'
 import BREMContract from "../../../build/contracts/BREM.json"
-import ipfs from "../../Config/ipfs";
+import ipfs from "../../Config/ipfs"
 
 
 import Alert from '../../Components/Alert'
@@ -121,9 +121,9 @@ async function createNewBREMICO({
     }
     const docHash = result[result.length - 1].hash;
 
-
+    console.log('124 ready')
     const TXres = await bremInstance.createBREMICO(name, symbol, rate, capWei, closingTimeWeb3, docHash, { from: coinbase})
-    console.log(TXres)
+    console.log('125', TXres)
         const tx = TXres.tx;
         const status = TXres.receipt.status === "0x1"
         if (!status) {
@@ -156,7 +156,7 @@ async function createNewBREMICO({
 
         try {
           let res = await axios.post(host + "dev/ico", ico)
-          console.log(res);
+          console.log(res)
 
           let formData = new FormData();
           formData.append(
@@ -169,8 +169,8 @@ async function createNewBREMICO({
               "content-type": "multipart/form-data"
             }
           };
-         
-          res = await axios.post(     
+
+          res = await axios.post(
                   host + "dev/image",
                   formData,
                   config

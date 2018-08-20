@@ -63,7 +63,7 @@ const style = StyleSheet.create({
 	progressNum: {
 		fontSize: 24
 	}
-	
+
 })
 
 export default ({ struct }) => {
@@ -84,14 +84,14 @@ export default ({ struct }) => {
 			<div className={css(style.adress)}>{struct.adress}</div>
 			<div className={css(style.deadline)}>{struct.deadline}</div>
 			<div className={css(style.payment)}>
-				Мой взнос &mdash; <span className={css(style.paymentSum)}>{struct.payment.toLocaleString()} ETH</span>
+				My impact &mdash; <span className={css(style.paymentSum)}>{struct.payment.toLocaleString()} ETH</span>
 			</div>
 			<div className={css(style.progress)}>
-				Собрано <span className={css(style.progressNum)}>{struct.progress}%</span> из {struct.limit.toLocaleString()} ETH
+				Collected <span className={css(style.progressNum)}>{struct.progress}%</span> из {struct.limit.toLocaleString()} ETH
 			</div>
 			<div className={css(style.progressBar, countStyle.progressLevel)}></div>
-			
-			<button className={css(style.cardButton)}>ВНЕСТИ ETH</button>
+
+			<button className={css(style.cardButton)}>Open</button>
 		</div>
 	</div>
 }
