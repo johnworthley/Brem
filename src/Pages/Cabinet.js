@@ -124,6 +124,61 @@ export default class Cabinet extends Component {
       const icos = res.data //  Read cap and raised for all icos (example in ico form)
 			// console.log(icos)
 			const { struct } = {...this.state}
+			const icosWithWeb3 = await Promise.all(icos.map(ico => new Promise(async resolve => {
+				/*
+				const { web3Instance } = store
+				const { currentProvider, utils, eth } = web3Instance
+				const coinbase = await eth.getCoinbase()
+				const ico = contract(ICOContract)
+				ico.setProvider(currentProvider)
+				const icoInstance = await ico.at(ico.address)
+				const icoBalance = await eth.getBalance(ico.address)
+				const tokenAddress = await icoInstance.token()
+				const wallet = await icoInstance.wallet()
+				const rate = await icoInstance.rate()
+				const weiRaised = await icoInstance.weiRaised()
+				const capWei = await icoInstance.cap()
+				const docHash = await icoInstance.docHash()
+				const closingTimeEpochs = await icoInstance.closingTime()
+				const weiInvested = await icoInstance.getBalance(coinbase, {from: coinbase})
+
+				const token = contract(TokenContract)
+				token.setProvider(currentProvider)
+				const tokenInstance = await token.at(tokenAddress)
+
+				const name = await tokenInstance.name()
+				const symbol = await tokenInstance.symbol()
+				const tokenBalanceRaw = await tokenInstance.balanceOf(coinbase)
+
+				const brem = contract(BREMContract)
+				brem.setProvider(currentProvider)
+				const bremInstance = await brem.deployed()
+
+
+				// Convert values
+				const ethRaised = utils.fromWei(weiRaised.toFixed(), "ether")
+				const capEth = utils.fromWei(capWei.toFixed(), "ether")
+				const ethInvested = utils.fromWei(weiInvested.toFixed(), "ether")
+				const tokenBalance = utils.fromWei(tokenBalanceRaw.toFixed(), "ether")
+				resolve({
+					icoBalance,
+					tokenAddress,
+					rate,
+					capWei,
+					closingTimeEpochs,
+					weiInvested,
+					name,
+					symbol,
+					ethRaised,
+					capEth,
+					ethInvested,
+					tokenBalance,
+					docHash,
+					address: ico.address
+				})
+				*/
+				resolve(ico)
+			})))
 			struct.data = icos.reduce((map, ico) => {
 				map.set('Address', [...(map.get('Address') || []), <Link to={`/project/${ico.address}`}>{ico.address}</Link>])
 				map.set('Deadline', [...(map.get('Deadline') || []), ico.closing_time])
