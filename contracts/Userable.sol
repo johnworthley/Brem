@@ -271,6 +271,10 @@ contract Userable is Auditable {
         return (bytes(_name).length > 0 && usernames[_name] == address(0));
     }
     
+    function getUsername(address _user) public view returns(string) {
+        return users[_user].name;
+    }
+
     function isSignUp() public view returns(bool) {
         return (bytes(users[msg.sender].name).length > 0);
     }

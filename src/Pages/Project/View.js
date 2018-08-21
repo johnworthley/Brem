@@ -187,7 +187,7 @@ class View extends Component {
     // }
     console.log('SERVER:',serverData)
     console.log('INSTANCE:', icoInstance)
-    const { fee_percent: feePercent, loc_address, developer, description } = serverData
+    const { fee_percent: feePercent, location, loc_address, developer, description } = serverData
     const project = {
       feePercent,
       symbol,
@@ -201,7 +201,8 @@ class View extends Component {
       docsUrl: 'https://ipfs.infura.io/ipfs/' + docHash,
       myEmphasis: ethInvested,
       raised: ethRaised,
-      latLng: JSON.parse(loc_address || '{}'),
+      latLng: JSON.parse(location || '{}'),
+      loc_address,
       auditorsList: []
     }
     console.log('VIEW:', this)
@@ -245,20 +246,22 @@ class View extends Component {
     })
 
 
+    // TODO: Асинхронных цикл
     // Read current auditors
     const auditorsAmount = await icoInstance.auditorsAmount()
-    const auditors = []
-    for (let i = 0; i < auditorsAmount; i++) {
-      const auditorAddress = await icoInstance.getAuditor(i)
-      const auditorUsername = await bremInstance.login(auditorAddress)
-      auditors.push({
-        address: auditorAddress,
-        username: auditorUsername
+    const amount = auditorsAmount.toNumber()
+    const auditors = [amount]
+    const auditorsList = await auditors.map((val, i) => {
+      icoInstance.getAuditor(i).then(auditorAddress => {
+        return auditorAddress
+        // Uncomment with new contracts
+        // const username = await bremInstance.getUsername(auditorAddress)
       })
-    }
-
+      .catch(err => console.error(err))
+    })
+    console.log(auditorsList)
     this.setState({
-      auditorsList: auditors
+      auditorsList: auditorsList
     })
 
     // Get user type
@@ -319,18 +322,27 @@ class View extends Component {
 
     // Check for status
     const hasClosed = await icoInstance.hasClosed()
+    if (hasClosed) {
+      if (hasClosed) {
+        // #alertaction [ invest ]
+        alert('Error, ico has closed')
+        return
+      }
+    }
     const auditSelected = await icoInstance.auditSelected()
-    if (!auditSelected || hasClosed) {
-      // Ошибка, нельзя купить
+    if (!auditSelected) {
+      // #alertaction [ invest ]
+      alert('Error, ico not opened')
       return
     }
 
     // Invest
     const depositInWei = utils.toWei(depositValue, "ether")
     try {
-      const txRes = await icoInstance.transfer({from: coinbase, to: ico.address, value: depositInWei})
+      const txRes = await icoInstance.sendTransaction({from: coinbase, value: depositInWei})
       const isSuccessTX = txRes.receipt.status === "0x1"
       const tx = txRes.tx;
+      alert(tx)
       if (isSuccessTX) {
         // Все ок, можно посмотреть на etherscan https://rinkeby.etherscan.io/tx/ + tx
         // Предложить добавить адрус токена в metamask
@@ -342,7 +354,7 @@ class View extends Component {
     }
   }
 
-  withDrawETH = async e => {
+  refundETH = async e => {
     // Кнопка доступна только если isFailed && инвестированый баланс больше 0
     e.preventDefault()
 
@@ -482,8 +494,7 @@ class View extends Component {
   }
 
   superAddAuditor = async () => {
-    const auditorKey = this.newAuditorName.value
-    console.log(auditorKey)
+    const auditorKey = this.newAuditorAddress.value
 
     await getWeb3
     const { host, authConfig } = config
@@ -493,7 +504,7 @@ class View extends Component {
     const coinbase = await eth.getCoinbase()
 
     if (!utils.isAddress(auditorKey)) {
-      // Ошибка
+      alert(auditorKey + 'is not address')
       return
     }
 
@@ -504,14 +515,14 @@ class View extends Component {
     // Check for superuse
     const isSuperuser = await bremInstance.isSuperuser(coinbase)
     if (!isSuperuser) {
-      // TODO
+      alert('Is not superuser')
       return
     }
 
     // Check for global auditor
     const isAuditor = await bremInstance.isAuditor(auditorKey)
     if (!isAuditor) {
-      // Ошибка
+      alert(auditorKey + ' is not auditor')
       return
     }
 
@@ -522,8 +533,8 @@ class View extends Component {
     // Check for status
     const hasClosed = await icoInstance.hasClosed()
     const isCurrentAuditor = await icoInstance.isAuditor(auditorKey)
-    if (hasClosed || isAuditor) {
-      // Ошибка
+    if (hasClosed || isCurrentAuditor) {
+      console.log('Error')
       return
     }
 
@@ -557,8 +568,8 @@ class View extends Component {
 
     await getWeb3
     const { host, authConfig } = config
-    const { web3Instance, web3Account } = store
-    const { currentProvider, utils, eth } = web3Instance
+    const { web3Instance } = store
+    const { currentProvider, eth } = web3Instance
 
     const coinbase = await eth.getCoinbase()
 
@@ -569,7 +580,8 @@ class View extends Component {
     // Check for superuser
     const isSuperuser = await bremInstance.isSuperuser(coinbase)
     if (!isSuperuser) {
-      // TODO
+      // #alertaction [ open ICO ]
+      alert('Error, you are not superuser')
       return
     }
 
@@ -579,9 +591,21 @@ class View extends Component {
 
     // Check for status
     const hasClosed = await icoInstance.hasClosed()
+    if (hasClosed) {
+      // #alertaction [ open ICO]
+      alert('Error, ico has closed')
+      return
+    }
+    const auditSelected = await icoInstance.hasClosed()
+    if (auditSelected) {
+      // #alertaction [ openICO ]
+      alert('You already opened ico')
+      return
+    }
     const auditorsAmount = await icoInstance.auditorsAmount()
-    if (hasClosed || auditorsAmount === 0) {
-      // Ошибка
+    if (auditorsAmount.toNumber() === 0) {
+      // #alertaction [ Open ICO ]
+      alert('Not enaught auditors')
       return
     }
 
@@ -645,7 +669,7 @@ class View extends Component {
       <div className={css(style.main)}>
         <section className={css(style.top)}>
           <div className={css(style.topLeft, style.topPart)}>
-
+            {/* <img src={this.state.img} /> */}
           </div>
           <div className={css(style.topRight, style.topPart)}>
             <div className={css(style.topRightInner)}>
@@ -661,25 +685,36 @@ class View extends Component {
               </div>
             </div>
             <div className={css(style.topButtons)}>
-              <button style={{marginRight: 25}} onClick={this.depositETH}>
+              {isOpened && ( 
+                <button style={{marginRight: 25}} onClick={this.depositETH}>
                  Deposit ETH
-              </button>
-              <button onClick={this.withdrawETH}>
-                Withdraw ETH
-              </button>
+                </button>
+              )}
+              {isFailed && (
+                <button onClick={this.refundETH}>
+                  Refun ETH
+                </button>
+              )}
             </div>
           </div>
         </section>
         <section>
           <p>Project ID: { projectId }</p>
           {
-              isSuperuser && (
+              isSuperuser && isCreated && (
                 <div>
-                  <input ref={elem => this.newAuditorName = elem} type="text" placeholder="Auditor name"/>
-                  <button onClick={this.superAddAuditor}>
-                    Add auditor
+                  <div>
+                    <input ref={elem => this.newAuditorAddress = elem} type="text" placeholder="Auditor address"/>
+                    <button onClick={this.superAddAuditor}>
+                      Add auditor
+                    </button>
+                  </div>
+                  <div>
+                  <button onClick={this.superOpenICO}>
+                    Open ICO
                   </button>
                 </div>
+               </div>
               )
           }
           {
