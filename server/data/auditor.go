@@ -75,7 +75,7 @@ func GetAllAuditors() (auditors []Auditor, err error) {
 
 // GetICOs returns current auditor ICOs
 func (auditor *Auditor) GetICOs() (icos []ICO, err error) {
-	rows, err := db.Query("SELECT id, address, closingTime, feePercent, tokenAddress, name, symbol, status, locAddress FROM ico WHERE status = 'requested' AND"+
+	rows, err := db.Query("SELECT id, address, developerID, closingTime, feePercent, tokenAddress, name, symbol, status FROM ico WHERE status = 'requested' AND"+
 		" id IN (SELECT icoID FROM icoAuditors WHERE auditorID = $1)", auditor.ID)
 	if err != nil {
 		logger.Info(err)
@@ -84,10 +84,15 @@ func (auditor *Auditor) GetICOs() (icos []ICO, err error) {
 	defer rows.Close()
 	for rows.Next() {
 		var ico ICO
-		err = rows.Scan(&ico.ID, &ico.Address, &ico.ClosingTime, &ico.FeePercent, &ico.TokenAddress, &ico.Name, &ico.Symbol, &ico.Status, &ico.LocAddress)
+		err = rows.Scan(&ico.ID, &ico.Address, &ico.Developer.ID, &ico.ClosingTime, &ico.FeePercent, &ico.TokenAddress, &ico.Name, &ico.Symbol, &ico.Status)
 		if err != nil {
 			logger.Info(err)
 			return
+		}
+		err = ico.Developer.GetDeveloperById()
+		if err != nil {
+			logger.Info(err)
+			return 
 		}
 		icos = append(icos, ico)
 	}

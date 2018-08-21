@@ -140,8 +140,43 @@ export default class Cabinet extends Component {
     if (isAuditor) {
       // Get all to ico to confirm
       const res = await axios.get(host + 'audit/ico', authConfig)
-      // Check each for isConfirmed(coinbase) on ico instance
-      
+      const icos = res.data
+      const { struct } = {...this.state}
+      const icosWithWeb3 = await Promise.all(icos.map(ico => new Promise(async resolve => {
+        try {
+          const icoInstance = await bremICO.at(ico.address)
+				  const isConfirmed = await icoInstance.isConfirmed(coinbase)
+				  resolve({
+            isConfirmed,
+            name: ico.name,
+            symbol: ico.symbol,
+            address: ico.address,
+            closing_time: ico.closing_time,
+            status: ico.status
+				  })
+          resolve(ico)
+        } catch(err) {
+          console.error(err)
+          resolve({
+					  isConfirmed: true
+				  })
+          resolve(ico)
+        } 
+			})))
+      struct.data = icosWithWeb3.reduce((map, ico) => {
+        if (!ico.isConfirmed) {
+          map.set('Name', [...(map.get('Name') || []), ico.name])
+          map.set('Address', [...(map.get('Address') || []), <Link to={`/project/${ico.address}`}>{ico.address}</Link>])
+          map.set('Developer', [...(map.get('Developer') || []), ico.developer.username])
+          map.set('Deadline', [...(map.get('Deadline') || []), new Date(ico.closing_time).toString()])
+          map.set('Status', [...(map.get('Status') || []), ico.status])
+          return map
+        }
+				}, new Map()
+			)
+			this.setState({
+				struct
+			})
     }
 
     if (!isAuditor && !isSuperuser) {
@@ -189,7 +224,7 @@ export default class Cabinet extends Component {
         map.set('Token', [...(map.get('Token') || []), ico.symbol])
         map.set('Cap', [...(map.get('Cap') || []), ico.capEth])
         map.set('Collected', [...(map.get('Collected') || []), ico.ethRaised])
-        map.set('Deadline', [...(map.get('Deadline') || []), ico.closing_time])
+        map.set('Deadline', [...(map.get('Deadline') || []), new Date(ico.closing_time).toString()])
         map.set('Status', [...(map.get('Status') || []), ico.status])
 					return map
 				}, new Map()
