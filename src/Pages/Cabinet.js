@@ -114,7 +114,13 @@ export default class Cabinet extends Component {
       })
       // Get all auditors
       const res = await axios.get(host + 'super/audit', authConfig)
-      const auditors = res.data
+      const auditors = res.data 
+
+      // TODO: auditors map
+
+      console.log(auditors)
+
+
 
       // Get all created ICOs
       try {
@@ -341,7 +347,8 @@ export default class Cabinet extends Component {
 	addAuditors = async e => {
 		e.preventDefault()
     const auditor = this.auditors.value
-
+    console.log(auditor)
+    
     const { web3Instance } = store
     const { currentProvider, utils, eth } = web3Instance
 
@@ -357,15 +364,16 @@ export default class Cabinet extends Component {
 
     const bremInstance = await brem.deployed()
     const isSuperuser = await bremInstance.isSuperuser(coinbase)
+
     if (!isSuperuser) {
       // Ошибка, пользователь не админ
       return
     }
 
     // Check for auditor
-    const isAuditor = bremInstance.isAuditor(auditor)
+    const isAuditor = await bremInstance.isAuditor(auditor)
     if (isAuditor) {
-      // Уже аудитор
+      alert('Is auditor already')
       return
     }
     // Add audtor
