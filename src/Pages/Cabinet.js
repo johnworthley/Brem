@@ -9,6 +9,7 @@ import getWebThree from '../util/getweb3'
 import store from 'Store'
 import contract from 'truffle-contract'
 import BREMContract from "../../build/contracts/BREM.json"
+import ICOContract from '../../build/contracts/BREMICO.json'
 import config from 'Config'
 import axios from 'axios'
 
@@ -85,6 +86,8 @@ export default class Cabinet extends Component {
     const { currentProvider, utils, eth } = web3Instance
     const brem = contract(BREMContract)
     brem.setProvider(currentProvider)
+    const bremICO = contract(ICOContract)
+    bremICO.setProvider(currentProvider)
 
     const coinbase = await eth.getCoinbase()
 
@@ -113,13 +116,14 @@ export default class Cabinet extends Component {
       try {
       const res = await axios.get(host + 'super/ico', authConfig)
       const icos = res.data
-      console.log(icos)
+     
       const { struct } = {...this.state}
       struct.data = icos.reduce((map, ico) => {
         map.set('Name', [...(map.get('Name') || []), ico.name])
         map.set('Address', [...(map.get('Address') || []), <Link to={`/project/${ico.address}`}>{ico.address}</Link>])
         map.set('Developer', [...(map.get('Developer') || []), ico.developer.username])
-				map.set('Deadline', [...(map.get('Deadline') || []), new Date(ico.closing_time).toString()])
+        map.set('Deadline', [...(map.get('Deadline') || []), new Date(ico.closing_time).toString()])
+        map.set('Status', [...(map.get('Status') || []), ico.status])
 					return map
 				}, new Map()
 			)
@@ -147,63 +151,46 @@ export default class Cabinet extends Component {
 			// console.log(icos)
 			const { struct } = {...this.state}
 			const icosWithWeb3 = await Promise.all(icos.map(ico => new Promise(async resolve => {
-				/*
-				const { web3Instance } = store
-				const { currentProvider, utils, eth } = web3Instance
-				const coinbase = await eth.getCoinbase()
-				const ico = contract(ICOContract)
-				ico.setProvider(currentProvider)
-				const icoInstance = await ico.at(ico.address)
-				const icoBalance = await eth.getBalance(ico.address)
-				const tokenAddress = await icoInstance.token()
-				const wallet = await icoInstance.wallet()
-				const rate = await icoInstance.rate()
-				const weiRaised = await icoInstance.weiRaised()
-				const capWei = await icoInstance.cap()
-				const docHash = await icoInstance.docHash()
-				const closingTimeEpochs = await icoInstance.closingTime()
-				const weiInvested = await icoInstance.getBalance(coinbase, {from: coinbase})
+        try {
+				  const icoInstance = await bremICO.at(ico.address)
+				  const weiRaised = await icoInstance.weiRaised()
+				  const capWei = await icoInstance.cap()
 
-				const token = contract(TokenContract)
-				token.setProvider(currentProvider)
-				const tokenInstance = await token.at(tokenAddress)
-
-				const name = await tokenInstance.name()
-				const symbol = await tokenInstance.symbol()
-				const tokenBalanceRaw = await tokenInstance.balanceOf(coinbase)
-
-				const brem = contract(BREMContract)
-				brem.setProvider(currentProvider)
-				const bremInstance = await brem.deployed()
-
-
-				// Convert values
-				const ethRaised = utils.fromWei(weiRaised.toFixed(), "ether")
-				const capEth = utils.fromWei(capWei.toFixed(), "ether")
-				const ethInvested = utils.fromWei(weiInvested.toFixed(), "ether")
-				const tokenBalance = utils.fromWei(tokenBalanceRaw.toFixed(), "ether")
-				resolve({
-					icoBalance,
-					tokenAddress,
-					rate,
-					capWei,
-					closingTimeEpochs,
-					weiInvested,
-					name,
-					symbol,
-					ethRaised,
-					capEth,
-					ethInvested,
-					tokenBalance,
-					docHash,
-					address: ico.address
-				})
-				*/
-				resolve(ico)
+				  // Convert values
+				  const ethRaised = utils.fromWei(weiRaised.toFixed(), "ether")
+				  const capEth = utils.fromWei(capWei.toFixed(), "ether")
+				  resolve({
+					  ethRaised,
+            capEth,
+            name: ico.name,
+            symbol: ico.symbol,
+            address: ico.address,
+            closing_time: ico.closing_time,
+            status: ico.status
+				  })
+          resolve(ico)
+        } catch(err) {
+          console.error(err)
+          resolve({
+					  ethRaised: 'NA',
+            capEth: 'NA',
+            name: ico.name,
+            symbol: ico.symbol,
+            address: ico.address,
+            closing_time: ico.closing_time,
+            status: ico.status
+				  })
+          resolve(ico)
+        } 
 			})))
-			struct.data = icos.reduce((map, ico) => {
-				map.set('Address', [...(map.get('Address') || []), <Link to={`/project/${ico.address}`}>{ico.address}</Link>])
-				map.set('Deadline', [...(map.get('Deadline') || []), ico.closing_time])
+			struct.data = icosWithWeb3.reduce((map, ico) => {
+        map.set('Name', [...(map.get('Name') || []), ico.name])
+        map.set('Address', [...(map.get('Address') || []), <Link to={`/project/${ico.address}`}>{ico.address}</Link>])
+        map.set('Token', [...(map.get('Token') || []), ico.symbol])
+        map.set('Cap', [...(map.get('Cap') || []), ico.capEth])
+        map.set('Collected', [...(map.get('Collected') || []), ico.ethRaised])
+        map.set('Deadline', [...(map.get('Deadline') || []), ico.closing_time])
+        map.set('Status', [...(map.get('Status') || []), ico.status])
 					return map
 				}, new Map()
 			)
