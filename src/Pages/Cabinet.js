@@ -149,7 +149,7 @@ export default class Cabinet extends Component {
     console.log(isAuditor)
     if (isAuditor) {
       // Get all to ico to confirm
-      const res = await axios.get(host + 'audit/ico', authConfig)
+      const res = await axios.get(host + 'auditor/ico', authConfig)
       const icos = res.data
       const { struct } = {...this.state}
       const icosWithWeb3 = await Promise.all(icos.map(ico => new Promise(async resolve => {
@@ -397,7 +397,7 @@ export default class Cabinet extends Component {
 		const { struct = false } = this.state
 		const { accountType } = store
 		const data = []
-		if(accountType === 'developer') data.push({
+		data.push({
 			name: 'Your projects',
 			default: true,
 			component: () => (
