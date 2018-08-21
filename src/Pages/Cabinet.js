@@ -108,7 +108,9 @@ export default class Cabinet extends Component {
       const feePercent = await feePercentBN.toNumber()
       console.log(feePercent)
       this.setState({
-        factoryAddress: factoryAddress
+        factoryAddress: factoryAddress,
+        collectedEth: collectedEth,
+        feePercent: feePercent
       })
       // Get all auditors
       const res = await axios.get(host + 'super/audit', authConfig)
@@ -317,7 +319,9 @@ export default class Cabinet extends Component {
       const status = txRes.receipt.status
       if (status === "0x1") {
 				alert('Change fee: done')
-        // Можно обновить текущее значение из web3
+        this.setState({
+          feePercent: fee
+        })
       } else{
         alert("Error tx")
       }
@@ -419,8 +423,11 @@ export default class Cabinet extends Component {
 									{this.state.factoryAddress}
 								</div>
 							</div>
+              <div>
+								Fee percent {this.state.feePercent} %
+							</div>
 							<div>
-								Ether collected 1000 ETH
+								Ether collected {this.state.collectedEth} ETH
 							</div>
 						</div>
 						<div className={css(style.settingsTopPart)}>
