@@ -57,6 +57,7 @@ class Tabs extends Component {
   }
   componentWillMount = () => {
     const { data = [], maxWidth = 500 } = this.props
+    if(!data) return
     const TabComponent = data.find(tab => tab.default).component ||
       data[0] ? data[0].component : <div>DEV: Your tab list is empty!</div>
     this.setState({

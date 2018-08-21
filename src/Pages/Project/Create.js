@@ -66,7 +66,7 @@ async function createNewBREMICO({
   closingTime,
   description,
   files,
-  image,
+  thumbnail: image,
   location,
   locAddress
 }) {
@@ -155,6 +155,15 @@ async function createNewBREMICO({
         };
 
         try {
+          const data = new FormData()
+          data.append('image', image)
+          data.append('address', icoAddress)
+          let img = axios.post(host + "dev/image", data, {
+            withCredentials: true,
+            headers: {
+              "content-type": "multipart/form-data"
+            }
+          })
           let res = await axios.post(host + "dev/ico", ico, authConfig)
           console.log(res)
 
@@ -203,7 +212,6 @@ class Create extends Component {
     //     heading: 'Wrong date!'
     //   }
     // })
-    console.log(date)
     this.setState({
       selectedDate: date
     })
@@ -219,7 +227,7 @@ class Create extends Component {
       thumbnail: thumbnail.files[0],
       description: draftToHtml(convertToRaw(editorState.getCurrentContent())),
       // time: time.value,
-      locaAddress: street.value,
+      locAddress: street.value,
       symbol: token.value,
       cap: cap.value,
       rate: ratio.value,

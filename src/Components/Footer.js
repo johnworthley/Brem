@@ -38,7 +38,7 @@ class Footer extends Component {
             Мы в социальных сетях
           </div>
           <div>
-            "Brem" (c) 2000-2018
+            «Brem» © 2000-2018
           </div>
         </div>
       </footer>

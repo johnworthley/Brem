@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import { css, StyleSheet } from 'aphrodite/no-important'
 
+import { Link } from 'react-router-dom'
+
 const style = StyleSheet.create({
 	card: {
 		height: 558,
@@ -91,7 +93,9 @@ export default ({ struct }) => {
 			</div>
 			<div className={css(style.progressBar, countStyle.progressLevel)}></div>
 
-			<button className={css(style.cardButton)}>Open</button>
+			<Link to={`/project/${struct.address}`}>
+				<button className={css(style.cardButton)}>Open</button>
+			</Link>
 		</div>
 	</div>
 }
