@@ -38,7 +38,8 @@ class List extends Component {
 	state = {
 		page: 0,
 		showMore: true,
-		cards: []
+		cards: [],
+		loading: true
 		//CARDS
 		/*
 		{
@@ -83,7 +84,6 @@ class List extends Component {
 	    const docHash = await icoInstance.docHash()
 	    const closingTimeEpochs = await icoInstance.closingTime()
 	    const weiInvested = await icoInstance.getBalance(coinbase, {from: coinbase})
-
 	    const token = contract(TokenContract)
 	    token.setProvider(currentProvider)
 	    const tokenInstance = await token.at(tokenAddress)
@@ -115,11 +115,10 @@ class List extends Component {
 				capEth,
 				ethInvested,
 				tokenBalance,
-				docHash,
+				//docHash,
 				address: card.address
 			})
 		})))
-		console.log(cards)
 		this.setState({
 			cards: [...this.state.cards, ...cards.map(item => {
 				return {
@@ -127,10 +126,13 @@ class List extends Component {
 					payment: item.ethInvested,
 					progress: item.ethRaised,
 					limit: item.capEth,
-					imageUrl: `${host}ico/image?address=${item.address}`
+					imageUrl: `${host}ico/image?address=${item.address}`,
 				}
 			})],
-			page: this.state.page + 1
+			page: this.state.page + 1,
+			showMore: cards.length,
+			loading: false
+			
 		})
 	}
 	componentDidMount = async () => {
@@ -142,13 +144,17 @@ class List extends Component {
 	}
 
 	render() {
-	const { cards = [], showMore = false } = this.state
+	const { cards = [], showMore = false, loading } = this.state
     return (
       <div>
 		<h3>All projects</h3>
 
 		{
-			cards.map((item,num) => (<ProjectCard struct={item} key={'ProjectCard' + num} />))
+			loading ? (
+				<p>Loading...</p>
+			) : cards.length ? (
+				cards.map((item,num) => (<ProjectCard struct={item} key={'ProjectCard' + num} />))
+			) : 'No projects here. Create one to be first!'
 		}
 
 		{showMore ? (

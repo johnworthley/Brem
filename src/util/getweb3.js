@@ -97,6 +97,8 @@ let getWeb3 = () => new Promise((resolve, reject) => {
 
       const init = web3Initialized(results)
       const instance = init.payload.web3Instance
+      console.log('ETH CAP:::::::', instance.utils.fromWei("100", "ether"))
+      
       const account = await instance.eth.getCoinbase()
       resolve(store.update({
         web3Init: init,

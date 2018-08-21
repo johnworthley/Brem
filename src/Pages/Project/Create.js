@@ -143,7 +143,7 @@ async function createNewBREMICO({
           developer: {
             address: coinbase
           },
-          description: description,
+          description,
           closing_time: closingTimeISO,
           fee_percent: feePercent,
           token_address: tokenAddress,
@@ -157,9 +157,9 @@ async function createNewBREMICO({
           let res = await axios.post(host + "dev/ico", ico, authConfig)
           console.log(res)
 
-          let formData = new FormData();
+          const formData = new FormData();
           formData.append(
-            "address",
+            'address',
             icoAddress
           );
           formData.append("image", image);

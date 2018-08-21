@@ -14,6 +14,7 @@ export default async () => {
   const { web3Instance, web3Account } = store
   if(!web3Instance && !web3Account) return
   const { currentProvider, utils, eth } = web3Instance
+
   const brem = contract(BREMContract);
   brem.setProvider(currentProvider)
   const coinbase = await eth.getCoinbase()

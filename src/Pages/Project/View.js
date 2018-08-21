@@ -11,6 +11,8 @@ import TokenContract from "../../../build/contracts/BREMToken.json"
 import BREMContract from "../../../build/contracts/BREM.json"
 import axios from 'axios'
 
+console.log(store)
+
 const Maps = withScriptjs(withGoogleMap((props) =>
   <GoogleMap
     onClick={props.clickHandler}
@@ -75,31 +77,31 @@ class View extends Component {
   state = {
     projectId: '',
     project: {
-      name: 'Neva Towers',
-      company: 'Company name',
-      address: 'Ul pidora, 12c4',
-      closingDate: moment(),
-      myEmphasis: 50, // How much eth was given to project by user
-      softCap: 1000,
-      status: 'Opened',
-      icoBalance: 400,
-      withDrawRequest: 0,
-      goal: 2000,
-      auditorsList: [],
-      description: '<div style="color: green;">HTML EEEE</div>',
-      latLng: {
-        lat: 2, lng: 50
-      }
+      // name: 'Neva Towers',
+      // company: 'Company name',
+      // address: 'Ul pidora, 12c4',
+      // closingDate: moment(),
+      // myEmphasis: 50, // How much eth was given to project by user
+      // softCap: 1000,
+      // status: 'Opened',
+      // icoBalance: 400,
+      // withDrawRequest: 0,
+      // goal: 2000,
+      // auditorsList: [],
+      // description: '<div style="color: green;">HTML EEEE</div>',
+      // latLng: {
+      //   lat: 2, lng: 50
+      // }
     }
   }
 
   componentDidMount = async () => {
     const icoAddress = this.props.match.params.id;
-   
+
     this.setState({
       projectId: icoAddress
     })
-
+    let serverData
 
     // Get description, image, location, address and dev name
     const { host } = config
@@ -108,22 +110,24 @@ class View extends Component {
       params: {
         address: icoAddress
       }
-    }).then(res => {
-      console.log(res.data)
+    })
+    .then(res => {
+      serverData = res.data
       // get image
       axios.get(host + 'ico/image', {
         params:{
           address: icoAddress,
         },
         responseType: "arraybuffer"
-      }).then(res => {
+      })
+      .then(res => {
           const base64 = Buffer.from(res.data, "binary").toString("base64");
           this.setState({ img: "data:image/jpeg;base64," + base64 });
         })
         .catch(err => console.error(err))
     })
     .catch(err => console.error(err))
-  
+
     // Get all data here and push it to state.project object
     const { web3Instance, web3Account } = store
     const { currentProvider, utils, eth } = web3Instance
@@ -147,7 +151,7 @@ class View extends Component {
     const token = contract(TokenContract)
     token.setProvider(currentProvider)
     const tokenInstance = await token.at(tokenAddress)
-  
+
     const name = await tokenInstance.name()
     const symbol = await tokenInstance.symbol()
     const tokenBalanceRaw = await tokenInstance.balanceOf(coinbase)
@@ -156,15 +160,55 @@ class View extends Component {
     brem.setProvider(currentProvider)
     const bremInstance = await brem.deployed()
 
- 
+
     // Convert values
     const ethRaised = utils.fromWei(weiRaised.toFixed(), "ether")
     const capEth = utils.fromWei(capWei.toFixed(), "ether")
     const ethInvested = utils.fromWei(weiInvested.toFixed(), "ether")
     const tokenBalance = utils.fromWei(tokenBalanceRaw.toFixed(), "ether")
-
+    // projectId: '',
+    // project: {
+    //   name: 'Neva Towers',
+    //   company: 'Company name',
+    //   address: 'Ul pidora, 12c4',
+    //   closingDate: moment(),
+    //   myEmphasis: 50, // How much eth was given to project by user
+    //   softCap: 1000,
+    //   status: 'Opened',
+    //   icoBalance: 400,
+    //   withDrawRequest: 0,
+    //   goal: 2000,
+    //   auditorsList: [],
+    //   description: '<div style="color: green;">HTML EEEE</div>',
+    //   latLng: {
+    //     lat: 2, lng: 50
+    //   }
+    // }
+    console.log('SERVER:',serverData)
+    console.log('INSTANCE:', icoInstance)
+    const { fee_percent: feePercent, loc_address, developer, description } = serverData
+    const project = {
+      feePercent,
+      symbol,
+      description,
+      name,
+      company: developer.username,
+      softCap: capEth,
+      icoBalance,
+      status,
+      closingTime: moment(new Date(closingTimeEpochs.toNumber() * 1000)),
+      docsUrl: 'https://ipfs.infura.io/ipfs/' + docHash,
+      myEmphasis: ethInvested,
+      raised: ethRaised,
+      latLng: JSON.parse(loc_address || '{}'),
+      auditorsList: []
+    }
+    console.log('VIEW:', this)
 
     this.setState({
+      project,
+      /*
+
       name: name,
       tokenAddress: tokenAddress,
       icoBalance: utils.fromWei(icoBalance, "ether"),
@@ -177,6 +221,8 @@ class View extends Component {
       ethInvested: ethInvested,
       symbol: symbol,
       tokenBalance: tokenBalance
+
+      */
     })
 
     // Read status
@@ -209,7 +255,7 @@ class View extends Component {
         username: auditorUsername
       })
     }
-  
+
     this.setState({
       auditorsList: auditors
     })
@@ -246,6 +292,7 @@ class View extends Component {
         isConfirmed: isConfirmed
       })
     }
+    console.log(store)
   }
 
   depositETH = async e => {
@@ -557,20 +604,39 @@ class View extends Component {
 
   render() {
     const {
+      isAuditor,
+      isCreated,
+      isDeveloper,
+      isFailed,
+      isOpened,
+      isOverdue,
+      isRequested,
+      isSuccess,
+      isSuperuser,
+      isWithdrawn,
+      project
+    } = this.state
+
+    const {
       projectId,
-      name,
-      company,
-      address,
-      closingDate,
-      myEmphasis,
-      softCap,
-      status,
-      icoBalance,
-      withDrawRequest,
-      goal,
-      auditorsList,
-      description
-    } = this.state.project
+      name = 'Loading...',
+      company = '',
+      address = '',
+      closingDate = '',
+      myEmphasis = 0,
+      softCap = 0,
+      status = '',
+      icoBalance = 0,
+      withDrawRequest = false,
+      goal = 0,
+      auditorsList = [],
+      description = ''
+    } = project
+
+
+
+    console.log(this.state)
+
     const html = {__html: description}
     return (
       <div className={css(style.main)}>
@@ -601,6 +667,35 @@ class View extends Component {
             </div>
           </div>
         </section>
+        <section>
+          <p>Project ID: { projectId }</p>
+          {
+              isSuperuser && (
+                <div>
+                  <input ref={elem => this.newAuditorName = elem} type="text" placeholder="Auditor name"/>
+                  <button onClick={this.superAddAuditor}>
+                    Add auditor
+                  </button>
+                </div>
+              )
+          }
+          {
+            isAuditor && isRequested && (
+              <div>
+                <button onClick={this.auditorConfirmRequest}>
+                  Confirm Request
+                </button>
+              </div>
+            )
+          }
+          {
+            isDeveloper && isSuccess && (
+              <button onClick={this.devWithdrawETH}>
+                Withdraw eth
+              </button>
+            )
+          }
+        </section>
         <section className={css(style.description)}>
           <div dangerouslySetInnerHTML={html} />
         </section>
@@ -614,18 +709,11 @@ class View extends Component {
             mapElement={<div style={{ height: `100%` }} />}
           />
         </section>
-        Project ID: { projectId }
 
-        <button onClick={this.auditorConfirmRequest}>
-          Auditor Confirm Request
-        </button>
-        <button onClick={this.devWithdrawETH}>
-          Dev withdraw eth
-        </button>
-        <input ref={elem => this.newAuditorName = elem} type="text" placeholder="Auditor name"/>
-        <button onClick={this.superAddAuditor}>
-          SuperUser Add auditor
-        </button>
+
+
+
+
       </div>
     )
   }
