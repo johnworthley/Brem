@@ -51,7 +51,7 @@ func (auditor *Auditor) GetAuditor() (err error) {
 
 //GetAllAuditors making query and return all auditors addresses (with usernames)
 func GetAllAuditors() (auditors []Auditor, err error) {
-	rows, err := db.Query("SELECT * FROM auditors WHERE LENGTH(username) > 0")
+	rows, err := db.Query("SELECT * FROM auditors")
 	if err != nil {
 		logger.Info(err)
 		return

@@ -63,7 +63,7 @@ func IsSuperuser(address string) (isSuperuser bool, err error) {
 }
 
 func GetSuperuserICOs() (icos []ICO, err error) {
-	rows, err := db.Query("SELECT id, address, closingTime, feePercent, tokenAddress, name, symbol, status, locAddress FROM ico WHERE status = 'created'")
+	rows, err := db.Query("SELECT id, address, developerid, closingTime, feePercent, tokenAddress, name, symbol, status, locAddress FROM ico WHERE status = 'created'")
 	if err != nil {
 		logger.Info(err)
 		return
@@ -72,7 +72,7 @@ func GetSuperuserICOs() (icos []ICO, err error) {
 	for rows.Next() {
 		var ico ICO
 		var locAddress sql.NullString
-		err = rows.Scan(&ico.ID, &ico.Address, &ico.ClosingTime, &ico.FeePercent, &ico.TokenAddress, &ico.Name, &ico.Symbol, &ico.Status, &locAddress)
+		err = rows.Scan(&ico.ID, &ico.Address, &ico.Developer.ID, &ico.ClosingTime, &ico.FeePercent, &ico.TokenAddress, &ico.Name, &ico.Symbol, &ico.Status, &locAddress)
 		if err != nil {
 			logger.Info(err)
 			return
