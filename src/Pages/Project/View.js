@@ -113,6 +113,7 @@ class View extends Component {
     })
     .then(res => {
       serverData = res.data
+      console.log(serverData)
       // get image
       axios.get(host + 'ico/image', {
         params:{

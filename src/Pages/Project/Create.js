@@ -116,11 +116,13 @@ async function createNewBREMICO({
   console.log("Waiting for IPFS")
 
   ipfs.files.add(files, async (error, result) => {
+    let docHash = "123"
     if (error) {
       console.log(error);
-      return;
+      // return;
+    } else {
+      docHash = result[result.length - 1].hash
     }
-    const docHash = result[result.length - 1].hash;
 
     const TXres = await bremInstance.createBREMICO(name, symbol, rate, capWei, closingTimeWeb3, docHash, { from: coinbase })
         const tx = TXres.tx;
@@ -143,7 +145,7 @@ async function createNewBREMICO({
           developer: {
             address: coinbase
           },
-          description,
+          description: description,
           closing_time: closingTimeISO,
           fee_percent: feePercent,
           token_address: tokenAddress,
