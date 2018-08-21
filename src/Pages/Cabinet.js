@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { css, StyleSheet } from 'aphrodite/no-important'
+import { Link } from 'react-router-dom'
 
 import Tabs from '../Components/Tabs'
 import Table from '../Components/Table'
@@ -9,7 +10,7 @@ import store from 'Store'
 import contract from 'truffle-contract'
 import BREMContract from "../../build/contracts/BREM.json"
 import config from 'Config'
-import axios from 'axios';
+import axios from 'axios'
 
 const style = StyleSheet.create({
 	main: {
@@ -21,7 +22,7 @@ const style = StyleSheet.create({
 		width: '100%'
 	},
 	settingsTopPart: {
-		width: 'calc(50% - 15px)',
+		width: 'calc(50% - 50px)',
 		minHeight: 150,
 		display: 'flex',
 		justifyContent: 'space-between',
@@ -34,7 +35,7 @@ const style = StyleSheet.create({
 		padding: 20
 	},
 	settingsTopForm: {
-		minHeight: 150,
+		minHeight: 192,
 		display: 'flex',
 		justifyContent: 'space-between',
 		flexDirection: 'column',
@@ -43,7 +44,8 @@ const style = StyleSheet.create({
 		height: 35,
     borderRadius: 3,
     border: 'solid 1px lightgray',
-    padding: '0 15px'
+    padding: '0 15px',
+		marginRight: 15
 	},
 	button: {
 		width: 150,
@@ -65,11 +67,11 @@ export default class Cabinet extends Component {
 					}
 				}
 			},
-			data : new Map([
-				['First row', ['Row 1 first value','Second one','And last']],
-				['Second row', [10,33,30]],
-				['Last row', [1101.786,44444.99,'550.2']]
-			])
+			data : new Map(
+				// ['First row', ['Row 1 first value','Second one','And last']],
+				// ['Second row', [10,33,30]],
+				// ['Last row', [1101.786,44444.99,'550.2']]
+			)
 		}
   }
 
@@ -105,22 +107,33 @@ export default class Cabinet extends Component {
 
       // Get all auditors
       const res = await axios.get(host + 'super/audit', authConfig)
-      const auditors = res.data 
+      const auditors = res.data
     }
 
     const isAuditor = await bremInstance.isAuditor(coinbase)
     console.log(isAuditor)
     if (isAuditor) {
       // Get all to ico to confirm
-      const res = await axios.get(host + 'audit/ico')
+      const res = await axios.get(host + 'audit/ico', authConfig)
       // Check each for isConfirmed(coinbase) on ico instance
     }
 
     if (!isAuditor && !isSuperuser) {
       // Get current dev ico's
-      const res = await axios.get(host + '/dev/ico')
+      const res = await axios.get(host + 'dev/ico', authConfig)
       const icos = res.data //  Read cap and raised for all icos (example in ico form)
-    }
+			// console.log(icos)
+			const { struct } = {...this.state}
+			struct.data = icos.reduce((map, ico) => {
+				map.set('Address', [...(map.get('Address') || []), <Link to={`/project/${ico.address}`}>{ico.address}</Link>])
+				map.set('Deadline', [...(map.get('Deadline') || []), ico.closing_time])
+					return map
+				}, new Map()
+			)
+			this.setState({
+				struct
+			})
+		}
 }
 
   withdrawFees = async e => {
@@ -128,7 +141,7 @@ export default class Cabinet extends Component {
     const withdrawValue = this.withdrawFees.value; // Значение в Ether
 
     await getWebThree()
-    const { web3Instance, web3Account } = store
+    const { web3Instance } = store
     const { currentProvider, utils, eth } = web3Instance
     const brem = contract(BREMContract)
     brem.setProvider(currentProvider)
@@ -158,7 +171,7 @@ export default class Cabinet extends Component {
       const tx = txRes.tx
       const status = txRes.receipt.status
       if (status === "0x1") {
-        alert(tx)
+        alert('Withdraw fees: done')
         // Можно обновить текущее значение баланса контракта из web3d
       } else{
         alert("Error tx")
@@ -175,7 +188,6 @@ export default class Cabinet extends Component {
       return alert('Error')
     }
 
-    await getWebThree()
     const { web3Instance, web3Account } = store
     const { currentProvider, utils, eth } = web3Instance
     const brem = contract(BREMContract)
@@ -203,7 +215,7 @@ export default class Cabinet extends Component {
       const tx = txRes.tx
       const status = txRes.receipt.status
       if (status === "0x1") {
-        alert(tx)
+				alert('Change fee: done')
         // Можно обновить текущее значение из web3
       } else{
         alert("Error tx")
@@ -225,12 +237,11 @@ export default class Cabinet extends Component {
 		e.preventDefault()
     const auditor = this.auditors.value
 
-    await getWebThree()
-    const { web3Instance, web3Account } = store
+    const { web3Instance } = store
     const { currentProvider, utils, eth } = web3Instance
 
     if (!utils.isAddress(auditor)) {
-      return alert("Error")
+      return alert("Wrong auditor name")
     }
 
     const brem = contract(BREMContract)
@@ -258,7 +269,7 @@ export default class Cabinet extends Component {
       const tx = txRes.tx
       const status = txRes.receipt.status
       if (status === "0x1") {
-        alert(tx)
+        alert('addAuditors: done')
         // Сообщение, что аудитор появиться в списке после регистрации
       } else{
         alert("Error tx") // Можно добавить ссылку на etherscan
@@ -270,29 +281,31 @@ export default class Cabinet extends Component {
 
 	render = () => {
 		//const { struct } = this.props
-		const { struct } = this.state
+		const { struct = false } = this.state
 		const { accountType } = store
-		const data = [
-			{
-				name: 'Your projects',
-				default: true,
-				component: () => (
-					<div>
-						<div className={css(style.projectsTop)}>
+		const data = []
+		if(accountType === 'developer') data.push({
+			name: 'Your projects',
+			default: true,
+			component: () => (
+				<div>
+					<div className={css(style.projectsTop)}>
+						<Link to="/project/new">
 							<button className={css(style.button)} style={{marginRight: 25}} onClick={this.addNewProject}>
 								Add new
 							</button>
-							<button className={css(style.button)} onClick={this.loadMoreProjects}>
-								Load more
-							</button>
-						</div>
-						<Table struct={struct} />
+						</Link>
+						{/* <button className={css(style.button)} onClick={this.loadMoreProjects}>
+							Load more
+						</button> */}
 					</div>
-				)
-			}
-		]
+					<Table struct={struct} />
+				</div>
+			)
+		})
 		if(accountType !== 'developer') data.push({
 			name: 'Settings',
+			default: true,
 			component: () => (
 				<div>
 					<div className={css(style.settingsTop)} style={{marginBottom: 100}}>

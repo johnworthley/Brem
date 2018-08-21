@@ -155,7 +155,7 @@ export default async () => {
               // Write cookies
               axios.post(host + "session", {
                 address: coinbase,
-                sign: sign
+                sign: sign,
               }, authConfig)
               developer = res.data
               store.update({

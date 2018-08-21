@@ -67,7 +67,6 @@ export default class Table extends Component {
 			})
 			colNum++
 		}))
-
 		return (
 		<div>
 			{
