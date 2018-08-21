@@ -107,7 +107,8 @@ async function createNewBREMICO({
     return;
   }
 
-  const feePercent = await bremInstance.withdrawFeePercent();
+  const feePercentBN = await bremInstance.withdrawFeePercent();
+  const feePercent = feePercentBN.toNumber()
   const closingTimeWeb3 = (closingTime.getTime() / 1000).toString();
   const closingTimeISO = closingTime.toISOString()
   const capWei = utils.toWei(cap, "ether")
@@ -121,9 +122,7 @@ async function createNewBREMICO({
     }
     const docHash = result[result.length - 1].hash;
 
-    console.log('124 ready')
-    const TXres = await bremInstance.createBREMICO(name, symbol, rate, capWei, closingTimeWeb3, docHash, { from: coinbase})
-    console.log('125', TXres)
+    const TXres = await bremInstance.createBREMICO(name, symbol, rate, capWei, closingTimeWeb3, docHash, { from: coinbase })
         const tx = TXres.tx;
         const status = TXres.receipt.status === "0x1"
         if (!status) {
@@ -161,16 +160,16 @@ async function createNewBREMICO({
           let formData = new FormData();
           formData.append(
             "address",
-            TXres.logs[0].args.icoAddress
+            icoAddress
           );
           formData.append("image", image);
+
           const reqConfig = {
-            withCredentials: true,
             headers: {
               "content-type": "multipart/form-data"
-            }
+            },
+            withCredentials: true,
           };
-
           res = await axios.post(
                   host + "dev/image",
                   formData,
@@ -211,7 +210,7 @@ class Create extends Component {
 
   handleProjectCreate = async e => {
     e.preventDefault()
-    const { state, name, thumbnail, files, street, token, cap, ratio, selectedDate } = this
+    const { state, name, thumbnail, files, street, token, cap, ratio, selectedDate, } = this
     const { marker = {}, editorState } = state
     const { lat, lng } = marker
     const data = {
@@ -219,16 +218,16 @@ class Create extends Component {
       thumbnail: thumbnail.files[0],
       description: draftToHtml(convertToRaw(editorState.getCurrentContent())),
       // time: time.value,
-      locaAddress: street.value,
+      locAddress: street.value,
       symbol: token.value,
       cap: cap.value,
       rate: ratio.value,
       files: files.files,
       closingTime: new Date(selectedDate.value),
-      location: {
+      location: JSON.stringify({
         lat,
         lng
-      }
+      }),
     }
     if(data.description.length < 45 && data.description.includes('An actual description')) return this.setState({
       shouldAlert: {
@@ -261,26 +260,15 @@ class Create extends Component {
         resolve(Buffer(reader.result))
       }
     })))
-    data.thumbnail = await new Promise(resolve => {
+    data.image = await new Promise(resolve => {
       const thumbnail= data.thumbnail
       const reader = new window.FileReader()
       reader.readAsArrayBuffer(thumbnail)
       reader.onloadend = () => {
-        resolve(Buffer(reader.result))
+        resolve(thumbnail)
       }
     })
-    /*
-    name,
-    symbol,
-    rate,
-    cap,
-    closingTime,
-    description,
-    files,
-    image,
-    location,
-    locAddress
-    */
+
     createNewBREMICO(data)
   }
 
@@ -329,7 +317,7 @@ class Create extends Component {
             <label className={css(style.label)}>
               Thumbnail<span style={{color: 'red'}}>*</span>
             </label>
-            <input required style={{color: 'gray'}} ref={this.setRef('thumbnail')} type="file"/>
+            <input required style={{color: 'gray'}} ref={this.setRef('thumbnail')} type="file" accept="image/*"/>
           </div>
           <div className={css(style.row)}>
             <label className={css(style.label)}>
