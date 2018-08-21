@@ -298,7 +298,9 @@ class View extends Component {
   depositETH = async e => {
     // Здесь нужна отдельная форма с расчетом количества токенов
     e.preventDefault()
-    const depositValue = this.state.depositValue
+
+    // const depositValue = this.state.depositValue
+    const depositValue = prompt('Please enter amount of wei you want to deposit')
     if (depositValue <= 0) {
       // Ошибка
       return
