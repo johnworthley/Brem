@@ -48,10 +48,8 @@ let getWeb3 = () => new Promise((resolve, reject) => {
       instance.currentProvider.publicConfigStore.on('update', async ({ selectedAddress: address }) => {
 
         const { web3Account: account } = store
-        console.log(await instance.eth.getBalance(account))
         if(address !== account) {
           const web3EthAmount = instance.utils.fromWei(await instance.eth.getBalance(account), "ether")
-          console.log(web3EthAmount)
           store.update({
             web3Account: address,
             web3EthAmount,
