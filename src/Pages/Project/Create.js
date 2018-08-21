@@ -133,7 +133,7 @@ async function createNewBREMICO({
           return
         }
 
-        const icoAddress = TXres.logs[0].args.tokenAddress
+        const icoAddress = TXres.logs[0].args.icoAddress
         const tokenAddress = TXres.logs[0].args.tokenAddress
         // TODO: message
         console.log(icoAddress)

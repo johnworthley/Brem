@@ -107,7 +107,9 @@ export default class Cabinet extends Component {
       const feePercentBN = await bremInstance.withdrawFeePercent()
       const feePercent = await feePercentBN.toNumber()
       console.log(feePercent)
-
+      this.setState({
+        factoryAddress: factoryAddress
+      })
       // Get all auditors
       const res = await axios.get(host + 'super/audit', authConfig)
       const auditors = res.data
@@ -414,7 +416,7 @@ export default class Cabinet extends Component {
 									Factory address
 								</div>
 								<div>
-									qwkeqlwkqlkwmelqwe
+									{this.state.factoryAddress}
 								</div>
 							</div>
 							<div>
