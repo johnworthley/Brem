@@ -120,7 +120,7 @@ func addICOImage(c *gin.Context) {
 		return
 	}
 	file.Close()
-	resizedImg := resize.Resize(400, 260, img, resize.Lanczos3)
+	resizedImg := resize.Resize(600, 300, img, resize.Lanczos3)
 
 	out, err := os.Create(imagesDir + address + ".jpeg")
 	if err != nil {

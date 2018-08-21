@@ -92,7 +92,7 @@ func (auditor *Auditor) GetICOs() (icos []ICO, err error) {
 		err = ico.Developer.GetDeveloperById()
 		if err != nil {
 			logger.Info(err)
-			return 
+			return
 		}
 		icos = append(icos, ico)
 	}
