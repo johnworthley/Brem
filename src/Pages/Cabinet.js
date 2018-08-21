@@ -108,6 +108,27 @@ export default class Cabinet extends Component {
       // Get all auditors
       const res = await axios.get(host + 'super/audit', authConfig)
       const auditors = res.data
+
+      // Get all created ICOs
+      try {
+      const res = await axios.get(host + 'super/ico', authConfig)
+      const icos = res.data
+      console.log(icos)
+      const { struct } = {...this.state}
+      struct.data = icos.reduce((map, ico) => {
+        map.set('Name', [...(map.get('Name') || []), ico.name])
+        map.set('Address', [...(map.get('Address') || []), <Link to={`/project/${ico.address}`}>{ico.address}</Link>])
+        map.set('Developer', [...(map.get('Developer') || []), ico.developer.username])
+				map.set('Deadline', [...(map.get('Deadline') || []), new Date(ico.closing_time).toString()])
+					return map
+				}, new Map()
+			)
+			this.setState({
+				struct
+			})
+      } catch(err) {
+        console.error(err)
+      }
     }
 
     const isAuditor = await bremInstance.isAuditor(coinbase)
@@ -116,6 +137,7 @@ export default class Cabinet extends Component {
       // Get all to ico to confirm
       const res = await axios.get(host + 'audit/ico', authConfig)
       // Check each for isConfirmed(coinbase) on ico instance
+      
     }
 
     if (!isAuditor && !isSuperuser) {

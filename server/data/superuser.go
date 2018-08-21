@@ -80,6 +80,11 @@ func GetSuperuserICOs() (icos []ICO, err error) {
 		if locAddress.Valid {
 			ico.LocAddress = locAddress.String
 		}
+		err = ico.Developer.GetDeveloperById()
+		if err != nil {
+			logger.Info(err)
+			return
+		}
 		icos = append(icos, ico)
 	}
 	return
