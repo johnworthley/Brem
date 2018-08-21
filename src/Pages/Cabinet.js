@@ -162,7 +162,8 @@ export default class Cabinet extends Component {
             symbol: ico.symbol,
             address: ico.address,
             closing_time: ico.closing_time,
-            status: ico.status
+            status: ico.status,
+            companyName: ico.developer.username
 				  })
           resolve(ico)
         } catch(err) {
@@ -177,7 +178,7 @@ export default class Cabinet extends Component {
         if (!ico.isConfirmed) {
           map.set('Name', [...(map.get('Name') || []), ico.name])
           map.set('Address', [...(map.get('Address') || []), <Link to={`/project/${ico.address}`}>{ico.address}</Link>])
-          map.set('Developer', [...(map.get('Developer') || []), ico.developer.username])
+          map.set('Developer', [...(map.get('Developer') || []), ico.companyName])
           map.set('Deadline', [...(map.get('Deadline') || []), new Date(ico.closing_time).toString()])
           map.set('Status', [...(map.get('Status') || []), ico.status])
           return map

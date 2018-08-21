@@ -277,7 +277,7 @@ class View extends Component {
 
     if (isRequested) {
       const request = await icoInstance.request()
-      const requestedValue = utils.fromWei(request[0], "ether")
+      const requestedValue = utils.fromWei(request[0].toFixed(), "ether")
       this.setState({
         requestedValue: requestedValue
       })
@@ -373,8 +373,8 @@ class View extends Component {
     const capReached = await icoInstance.capReached()
     const weiInvestedBN = await icoInstance.getBalance({from: coinbase})
     const weiInvested = weiInvestedBN.toNumber()
-    if (hasClosed && !capReached && weiInvested <= 0) {
-      // Ошибка, нельзя купить
+    if (!hasClosed || capReached || weiInvested <= 0) {
+      alert('You dont have value to refund')
       return
     }
 
@@ -443,9 +443,8 @@ class View extends Component {
         // Кнопка доступна только если isSuccess && !isWithdrawn && wallet == coinbase && !isRequested
         e.preventDefault()
 
-        const requestEthValue = this.state.devRequestValue
-
-        await getWeb3
+        const withdrawValue = prompt('Please enter amount of wei you want to deposit')
+      
         const { host, authConfig } = config
         const { web3Instance, web3Account } = store
         const { currentProvider, utils, eth } = web3Instance
@@ -462,8 +461,8 @@ class View extends Component {
         const isRequested = await icoInstance.isRequested()
         const isWithdrawn = await icoInstance.isWithdrawn()
         const wallet = await icoInstance.wallet()
-        let requestValue = utils.toWei(requestEthValue, "ether")
-        const contractBalance = await eth.getBalance(ico.address)
+        let requestValue = utils.toWei(withdrawValue, "ether")
+        const contractBalance = await eth.getBalance(icoInstance.address)
         if (!hasClosed || !capReached || isRequested || isWithdrawn || contractBalance < requestValue || coinbase !== wallet) {
           // Ошибка, нельзя сделать запрос
           return
@@ -482,7 +481,7 @@ class View extends Component {
             // Все ок, можно посмотреть на etherscan https://rinkeby.etherscan.io/tx/ + tx
             // Предложить добавить адрус токена в metamask
             axios.put(host + '/ico/request', {
-              address: ico.address
+              address: icoInstance.address
             }, authConfig)
 
           } else {
@@ -546,9 +545,9 @@ class View extends Component {
       if (isSuccessTX) {
         // Все ок, можно посмотреть на etherscan https://rinkeby.etherscan.io/tx/ + tx
         // Предложить добавить адрус токена в metamask
-        const res = await axios.post(host + '/super/ico/audit', {
+        const res = await axios.post(host + 'super/ico/audit', {
           ico: {
-            address: ico.address
+            address: icoInstance.address
           },
           auditor: {
             address: auditorKey
@@ -618,7 +617,7 @@ class View extends Component {
         // Все ок, можно посмотреть на etherscan https://rinkeby.etherscan.io/tx/ + tx
         // Предложить добавить адрус токена в metamask
         const res = await axios.put(host + 'super/ico/open', {
-          address: ico.address
+          address: icoInstance.address
         }, authConfig)
         console.log(res)
       } else {
@@ -669,7 +668,7 @@ class View extends Component {
       <div className={css(style.main)}>
         <section className={css(style.top)}>
           <div className={css(style.topLeft, style.topPart)}>
-            {/* <img src={this.state.img} /> */}
+            <img src={this.state.img} />
           </div>
           <div className={css(style.topRight, style.topPart)}>
             <div className={css(style.topRightInner)}>
@@ -692,7 +691,7 @@ class View extends Component {
               )}
               {isFailed && (
                 <button onClick={this.refundETH}>
-                  Refun ETH
+                  Refund ETH
                 </button>
               )}
             </div>
@@ -718,7 +717,7 @@ class View extends Component {
               )
           }
           {
-            isAuditor && isRequested && (
+            isAuditor && isRequested && this.state.isConfirmed === false && (
               <div>
                 <button onClick={this.auditorConfirmRequest}>
                   Confirm Request
