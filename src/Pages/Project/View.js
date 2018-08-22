@@ -11,8 +11,6 @@ import TokenContract from "../../../build/contracts/BREMToken.json"
 import BREMContract from "../../../build/contracts/BREM.json"
 import axios from 'axios'
 
-console.log(store)
-
 const Maps = withScriptjs(withGoogleMap((props) =>
   <GoogleMap
     onClick={props.clickHandler}
@@ -29,12 +27,13 @@ const style = StyleSheet.create({
   },
   top: {
     display: 'flex',
-    minHeight: 300,
+    minHeight: 282,
     marginBottom: 75
   },
   topPart: {
     width: '50%',
-    minHeight: 300
+	boxSizing: 'border-box',
+    minWidth: 300
   },
   topRight: {
     display: 'flex',
@@ -46,14 +45,16 @@ const style = StyleSheet.create({
     display: 'flex',
     flexDirection: 'column',
     ':active > span': { // fun hack
-      marginBottom: 15
+      marginBottom: 13
     },
     ':not(:active) > span': { // fun hack
-      marginBottom: 15
+      marginBottom: 13
     },
   },
   topLeft: {
-    backgroundColor: 'lightgray'
+	height: 282,
+	background: '#a8a8a8 center',
+	backgroundSize: 'cover'
   },
   progressBar: {
     backgroundColor: 'lightgray',
@@ -70,6 +71,9 @@ const style = StyleSheet.create({
   description: {
     marginBottom: 30,
     lineHeight: 1.4
+  },
+  map: {
+	  marginBottom: 75
   }
 })
 
@@ -105,7 +109,7 @@ class View extends Component {
 
     // Get description, image, location, address and dev name
     const { host } = config
-    console.log(host)
+
     axios.get(host + 'ico/', {
       params: {
         address: icoAddress
@@ -113,7 +117,6 @@ class View extends Component {
     })
     .then(res => {
       serverData = res.data
-      console.log(serverData)
       // get image
       axios.get(host + 'ico/image', {
         params:{
@@ -185,10 +188,10 @@ class View extends Component {
     //     lat: 2, lng: 50
     //   }
     // }
-    console.log('SERVER:',serverData)
-    console.log('INSTANCE:', icoInstance)
+
     const { fee_percent: feePercent, location, loc_address, developer, description } = serverData
     const project = {
+	  projectId: icoAddress,
       feePercent,
       symbol,
       description,
@@ -197,7 +200,7 @@ class View extends Component {
       softCap: capEth,
       icoBalance,
       status,
-      closingTime: moment(new Date(closingTimeEpochs.toNumber() * 1000)),
+      closingTime: moment(new Date(closingTimeEpochs.toNumber() * 1000)).format('DD.MM.YYYY'),
       docsUrl: 'https://ipfs.infura.io/ipfs/' + docHash,
       myEmphasis: ethInvested,
       raised: ethRaised,
@@ -205,7 +208,7 @@ class View extends Component {
       loc_address,
       auditorsList: []
     }
-    console.log('VIEW:', this)
+
 
     this.setState({
       project,
@@ -259,7 +262,7 @@ class View extends Component {
       })
       .catch(err => console.error(err))
     })
-    console.log(auditorsList)
+
     this.setState({
       auditorsList: auditorsList
     })
@@ -296,7 +299,7 @@ class View extends Component {
         isConfirmed: isConfirmed
       })
     }
-    console.log(store)
+
   }
 
   depositETH = async e => {
@@ -553,7 +556,7 @@ class View extends Component {
             address: auditorKey
           }
         }, authConfig)
-        console.log(res)
+
       } else {
         // Ошибка, можно посмотреть на etherscan https://rinkeby.etherscan.io/tx/ + tx
       }
@@ -619,7 +622,7 @@ class View extends Component {
         const res = await axios.put(host + 'super/ico/open', {
           address: icoInstance.address
         }, authConfig)
-        console.log(res)
+
       } else {
         // Ошибка, можно посмотреть на etherscan https://rinkeby.etherscan.io/tx/ + tx
       }
@@ -644,11 +647,11 @@ class View extends Component {
     } = this.state
 
     const {
-      projectId,
+      projectId = '',
       name = 'Loading...',
       company = '',
       address = '',
-      closingDate = '',
+      closingTime = '',
       myEmphasis = 0,
       softCap = 0,
       status = '',
@@ -656,31 +659,35 @@ class View extends Component {
       withDrawRequest = false,
       goal = 0,
       auditorsList = [],
-      description = ''
+      description = '',
+	  loc_address = '',
+	  raised = 0
     } = project
 
 
 
-    console.log(this.state)
+    console.log(this.state,project)
 
     const html = {__html: description}
     return (
       <div className={css(style.main)}>
+	  
+		<h1 style={{fontSize: 48, fontWeight: 'normal'}}>{ name }</h1>
+	  
         <section className={css(style.top)}>
-          <div className={css(style.topLeft, style.topPart)}>
-            <img src={this.state.img} />
-          </div>
+          <div className={css(style.topLeft, style.topPart)}  style={{backgroundImage: 'url("'+this.state.img+'")' }}></div>
           <div className={css(style.topRight, style.topPart)}>
             <div className={css(style.topRightInner)}>
               <span>{ company }</span>
               <span style={{textTransform: 'uppercase', fontSize: 18}}>{ name }</span>
-              <span> { closingDate + '' } </span>
+			  <span> { loc_address } </span>
+              <span> { closingTime + '' } </span>
               <span>My funds: <span style={{color: 'red', }}>{ myEmphasis }</span><span style={{fontSize: 12, color: 'red', marginLeft: 3}}>ETH</span></span>
               <span>
                 Soft-cap: { softCap } ETH
               </span>
-              <div className={css(style.progressBar)}>
-                <div className={css(style.progress)} />
+              <div className={css(style.progressBar)}
+				style={{background: '#e8e5e5 linear-gradient(to left, transparent '+(100-raised*100)+'%, #f0723b '+(raised*100)+'%)'}}>
               </div>
             </div>
             <div className={css(style.topButtons)}>
@@ -739,7 +746,7 @@ class View extends Component {
         <section className={css(style.map)}>
           <Maps
             googleMapURL="https://maps.googleapis.com/maps/api/js?key=AIzaSyCuwdVfYrdvKY_TSJKHIq27jSaz-i3f55Y&v=3.exp&libraries=geometry,drawing,places"
-            loadingElement={<div style={{ height: '400px', background: 'gray', display: 'flex' }}>
+            loadingElement={<div style={{ height: '400px', background: 'gray', display: 'flex'}}>
               <span style={{margin: 'auto', fontSize: '14px'}}>Maps are loading</span>
             </div>}
             containerElement={<div style={{ height: `400px` }} />}
