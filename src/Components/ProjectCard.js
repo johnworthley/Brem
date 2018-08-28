@@ -77,7 +77,7 @@ export default ({ struct }) => {
 			background: "#e8e5e5 linear-gradient(to left, transparent "+(100-struct.progress)+"%, #f0723b "+struct.progress+"%)"
 		}
 	});
-
+	console.log(struct)
 	return <div className={css(style.card)}>
 		<div className={css(style.cardImage, countStyle.cardImage)}></div>
 		<div className={css(style.cardData)}>
@@ -86,10 +86,10 @@ export default ({ struct }) => {
 			<div className={css(style.adress)}>{struct.adress}</div>
 			<div className={css(style.deadline)}>{struct.deadline}</div>
 			<div className={css(style.payment)}>
-				My impact &mdash; <span className={css(style.paymentSum)}>{struct.payment.toLocaleString()} ETH</span>
+				My payments &mdash; <span className={css(style.paymentSum)}>{struct.payment.toLocaleString()} ETH</span>
 			</div>
 			<div className={css(style.progress)}>
-				Collected <span className={css(style.progressNum)}>{struct.progress}%</span> из {struct.limit.toLocaleString()} ETH
+				Collected <span className={css(style.progressNum)}>{struct.progress >= 100 ? 'Softcap reached' : `${struct.progress}%`}</span> {struct.progress >= 100 ? `(${struct.limit.toLocaleString()} ETH)` : `из ${struct.limit.toLocaleString()} ETH`}
 			</div>
 			<div className={css(style.progressBar, countStyle.progressLevel)}></div>
 

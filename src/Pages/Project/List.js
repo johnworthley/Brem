@@ -69,28 +69,43 @@ class List extends Component {
 		console.log(data, this)
 
 		const cards = await Promise.all(data.map(card => new Promise(async resolve => {
-			const { web3Instance } = store
+		const { web3Instance } = store
 	    const { currentProvider, utils, eth } = web3Instance
-	    const coinbase = await eth.getCoinbase()
+	    const coinbasePromise = eth.getCoinbase()
 	    const ico = contract(ICOContract)
-	    ico.setProvider(currentProvider)
-	    const icoInstance = await ico.at(card.address)
-	    const icoBalance = await eth.getBalance(card.address)
-	    const tokenAddress = await icoInstance.token()
-	    const wallet = await icoInstance.wallet()
-	    const rate = await icoInstance.rate()
-	    const weiRaised = await icoInstance.weiRaised()
-	    const capWei = await icoInstance.cap()
-	    const docHash = await icoInstance.docHash()
-	    const closingTimeEpochs = await icoInstance.closingTime()
-	    const weiInvested = await icoInstance.getBalance(coinbase, {from: coinbase})
+		ico.setProvider(currentProvider)
+
+	    const icoInstancePromise = ico.at(card.address)
+		const icoBalancePromise = eth.getBalance(card.address)
+		const [icoInstance, icoBalance, coinbase] = await Promise.all([icoInstancePromise, icoBalancePromise, coinbasePromise])
+
+	    const tokenAddressPromise = icoInstance.token()
+	    // const wallet = await icoInstance.wallet()
+	    const ratePromise = icoInstance.rate()
+	    const weiRaisedPromise = icoInstance.weiRaised()
+	    const capWeiPromise = icoInstance.cap()
+	    const docHashPromise = icoInstance.docHash()
+	    const closingTimeEpochsPromise = icoInstance.closingTime()
+		const weiInvestedPromise = icoInstance.getBalance(coinbase, {from: coinbase})
+		const [ tokenAddress, rate, weiRaised, capWei, docHash, closingTimeEpochs, weiInvested ] = await Promise.all([
+			tokenAddressPromise,
+			ratePromise,
+			weiRaisedPromise,
+			capWeiPromise,
+			docHashPromise,
+			closingTimeEpochsPromise,
+			weiInvestedPromise
+		])
+		
 	    const token = contract(TokenContract)
 	    token.setProvider(currentProvider)
 	    const tokenInstance = await token.at(tokenAddress)
 
-	    const name = await tokenInstance.name()
-	    const symbol = await tokenInstance.symbol()
-	    const tokenBalanceRaw = await tokenInstance.balanceOf(coinbase)
+	    const np = tokenInstance.name()
+	    const sp = tokenInstance.symbol()
+		const tbrp = tokenInstance.balanceOf(coinbase)
+		
+		const [ name, symbol, tokenBalanceRaw ] = await Promise.all([np, sp, tbrp])
 
 	    const brem = contract(BREMContract)
 	    brem.setProvider(currentProvider)
@@ -124,7 +139,7 @@ class List extends Component {
 				return {
 					...item,
 					payment: item.ethInvested,
-					progress: item.ethRaised,
+					progress: (item.ethRaised / item.capEth) * 100,
 					limit: item.capEth,
 					imageUrl: `${host}ico/image?address=${item.address}`,
 				}
@@ -136,7 +151,7 @@ class List extends Component {
 		})
 	}
 	componentDidMount = async () => {
-		const { host } = config
+		// const { host } = config
 		store.update({
 			currentLocation: 'marketplace'
 		})
@@ -153,7 +168,7 @@ class List extends Component {
 			loading ? (
 				<p>Loading...</p>
 			) : cards.length ? (
-				cards.map((item,num) => (<ProjectCard struct={item} key={'ProjectCard' + num} />))
+				cards.map((item, num) => <ProjectCard struct={item} key={'ProjectCard' + num} />)
 			) : 'No projects here. Create one to be first!'
 		}
 
