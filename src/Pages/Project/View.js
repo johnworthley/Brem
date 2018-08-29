@@ -140,25 +140,38 @@ class View extends Component {
 
     const ico = contract(ICOContract)
     ico.setProvider(currentProvider)
-    const icoInstance = await ico.at(this.state.projectId)
+    const icoInstancePromise = ico.at(this.state.projectId)
+    const icoBalancePromise = eth.getBalance(this.state.projectId)
+    const [icoInstance, icoBalance] = await Promise.all([icoInstancePromise, icoBalancePromise])
 
-    const icoBalance = await eth.getBalance(this.state.projectId)
-    const tokenAddress = await icoInstance.token()
-    const wallet = await icoInstance.wallet()
-    const rate = await icoInstance.rate()
-    const weiRaised = await icoInstance.weiRaised()
-    const capWei = await icoInstance.cap()
-    const docHash = await icoInstance.docHash()
-    const closingTimeEpochs = await icoInstance.closingTime()
-    const weiInvested = await icoInstance.getBalance(coinbase, {from: coinbase})
+    const tokenAddressPromise = icoInstance.token()
+    const ratePromise = icoInstance.rate()
+    const weiRaisedPromise = icoInstance.weiRaised()
+    const capWeiPromise = icoInstance.cap()
+    const docHashPromise = icoInstance.docHash()
+    const closingTimeEpochsPromise = icoInstance.closingTime()
+    const weiInvestedPromise = icoInstance.getBalance(coinbase, { from: coinbase })
+    const walletPromise = icoInstance.wallet()
+    const [tokenAddress, rate, weiRaised, capWei, docHash, closingTimeEpochs, weiInvested, wallet] = await Promise.all([
+      tokenAddressPromise,
+      ratePromise,
+      weiRaisedPromise,
+      capWeiPromise,
+      docHashPromise,
+      closingTimeEpochsPromise,
+      weiInvestedPromise,
+      walletPromise
+    ])
 
     const token = contract(TokenContract)
     token.setProvider(currentProvider)
     const tokenInstance = await token.at(tokenAddress)
 
-    const name = await tokenInstance.name()
-    const symbol = await tokenInstance.symbol()
-    const tokenBalanceRaw = await tokenInstance.balanceOf(coinbase)
+    const np = tokenInstance.name()
+    const sp = tokenInstance.symbol()
+    const tbrp = tokenInstance.balanceOf(coinbase)
+
+    const [name, symbol, tokenBalanceRaw] = await Promise.all([np, sp, tbrp])
 
     const brem = contract(BREMContract)
     brem.setProvider(currentProvider)
