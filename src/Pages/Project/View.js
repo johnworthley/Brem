@@ -21,9 +21,18 @@ const Maps = withScriptjs(withGoogleMap((props) =>
   </GoogleMap>
 ))
 
+
 const style = StyleSheet.create({
   main: {
 
+  },
+  disabledButton: {
+    pointerEvents: 'none',
+    background: 'lightgray',
+    opacity: .5,
+    ':hover': {
+      background: 'lightgray',
+    }
   },
   top: {
     display: 'flex',
@@ -50,31 +59,32 @@ const style = StyleSheet.create({
     ':not(:active) > span': { // fun hack
       marginBottom: 13
     },
-  },
-  topLeft: {
-	height: 282,
-	background: '#a8a8a8 center',
-	backgroundSize: 'cover'
-  },
-  progressBar: {
-    backgroundColor: 'lightgray',
-    width: '100%',
-    height: 8,
-    borderRadius: 4,
-    overflow: 'hidden'
-  },
-  progress: {
-    backgroundColor: 'rgb(240, 114, 59)',
-    height: '100%',
-    width: '50%'
-  },
-  description: {
-    marginBottom: 30,
-    lineHeight: 1.4
-  },
-  map: {
-	  marginBottom: 75
-  }
+    },
+    topLeft: {
+    height: 282,
+    background: '#a8a8a8 center',
+    backgroundSize: 'cover'
+    },
+    progressBar: {
+      backgroundColor: 'lightgray',
+      width: '100%',
+      height: 8,
+      borderRadius: 4,
+      overflow: 'hidden'
+    },
+    progress: {
+      backgroundColor: 'rgb(240, 114, 59)',
+      height: '100%',
+      width: '50%'
+    },
+    description: {
+      marginBottom: 30,
+      lineHeight: 1.4,
+      marginTop: 30
+    },
+    map: {
+      marginBottom: 75
+    }
 })
 
 class View extends Component {
@@ -672,14 +682,13 @@ class View extends Component {
       withDrawRequest = false,
       goal = 0,
       auditorsList = [],
+      latLng: marker = {},
       description = '',
 	  loc_address = '',
 	  raised = 0
     } = project
 
 
-
-    console.log(this.state,project)
 
     const html = {__html: description}
     return (
@@ -704,16 +713,12 @@ class View extends Component {
               </div>
             </div>
             <div className={css(style.topButtons)}>
-              {isOpened && ( 
-                <button style={{marginRight: 25}} onClick={this.depositETH}>
-                 Deposit ETH
-                </button>
-              )}
-              {isFailed && (
-                <button onClick={this.refundETH}>
-                  Refund ETH
-                </button>
-              )}
+              <button style={{ marginRight: 25 }} className={css(isOpened ? '' : style.disabledButton)}  onClick={this.depositETH}>
+                Deposit ETH
+              </button>
+              <button className={css(isFailed ? '' : style.disabledButton)} onClick={this.refundETH}>
+                Refund ETH
+              </button>
             </div>
           </div>
         </section>
@@ -746,18 +751,19 @@ class View extends Component {
             )
           }
           {
-            isDeveloper && isSuccess && (
-              <button onClick={this.devWithdrawETH}>
+            isDeveloper && (
+              <button className={css(isSuccess ? '' : style.disabledButton)} onClick={this.devWithdrawETH} >
                 Withdraw eth
               </button>
             )
           }
         </section>
         <section className={css(style.description)}>
-          <div dangerouslySetInnerHTML={html} />
+          <div style={{ wordWrap: 'break-word' }} dangerouslySetInnerHTML={html} />
         </section>
         <section className={css(style.map)}>
           <Maps
+            marker={marker.lat ? marker : ''}
             googleMapURL="https://maps.googleapis.com/maps/api/js?key=AIzaSyCuwdVfYrdvKY_TSJKHIq27jSaz-i3f55Y&v=3.exp&libraries=geometry,drawing,places"
             loadingElement={<div style={{ height: '400px', background: 'gray', display: 'flex'}}>
               <span style={{margin: 'auto', fontSize: '14px'}}>Maps are loading</span>
