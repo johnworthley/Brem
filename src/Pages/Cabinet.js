@@ -92,7 +92,49 @@ export default class Cabinet extends Component {
     const coinbase = await eth.getCoinbase()
 
     const bremInstance = await brem.deployed()
-
+    const isAuditor = await bremInstance.isAuditor(coinbase)
+    if (isAuditor) {
+      // Get all to ico to confirm
+      const res = await axios.get(host + 'auditor/ico', authConfig)
+      const icos = res.data
+      const { struct } = { ...this.state }
+      const icosWithWeb3 = await Promise.all(icos.map(ico => new Promise(async resolve => {
+        try {
+          const icoInstance = await bremICO.at(ico.address)
+          const isConfirmed = await icoInstance.isConfirmed(coinbase)
+          resolve({
+            isConfirmed,
+            name: ico.name,
+            symbol: ico.symbol,
+            address: ico.address,
+            closing_time: ico.closing_time,
+            status: ico.status,
+            companyName: ico.developer.username
+          })
+          resolve(ico)
+        } catch (err) {
+          console.error(err)
+          resolve({
+            isConfirmed: true
+          })
+          resolve(ico)
+        }
+      })))
+      struct.data = icosWithWeb3.reduce((map, ico) => {
+        if (!ico.isConfirmed) {
+          map.set('Name', [...(map.get('Name') || []), ico.name])
+          map.set('Address', [...(map.get('Address') || []), <Link to={`/project/${ico.address}`}>{ico.address}</Link>])
+          map.set('Developer', [...(map.get('Developer') || []), ico.companyName])
+          map.set('Deadline', [...(map.get('Deadline') || []), new Date(ico.closing_time).toString()])
+          map.set('Status', [...(map.get('Status') || []), ico.status])
+          return map
+        }
+      }, new Map()
+      )
+      this.setState({
+        struct
+      })
+    }
     const isSuperuser = await bremInstance.isSuperuser(coinbase)
     if (isSuperuser) {
       const factoryAddress = brem.address
@@ -156,51 +198,55 @@ export default class Cabinet extends Component {
       }
     }
 
-    const isAuditor = await bremInstance.isAuditor(coinbase)
-    if (isAuditor) {
-      // Get all to ico to confirm
-      const res = await axios.get(host + 'auditor/ico', authConfig)
-      const icos = res.data
-      const { struct } = {...this.state}
-      const icosWithWeb3 = await Promise.all(icos.map(ico => new Promise(async resolve => {
-        try {
-          const icoInstance = await bremICO.at(ico.address)
-				  const isConfirmed = await icoInstance.isConfirmed(coinbase)
-				  resolve({
-            isConfirmed,
-            name: ico.name,
-            symbol: ico.symbol,
-            address: ico.address,
-            closing_time: ico.closing_time,
-            status: ico.status,
-            companyName: ico.developer.username
-				  })
-          resolve(ico)
-        } catch(err) {
-          console.error(err)
-          resolve({
-					  isConfirmed: true
-				  })
-          resolve(ico)
-        } 
-			})))
-      struct.data = icosWithWeb3.reduce((map, ico) => {
-        if (!ico.isConfirmed) {
-          map.set('Name', [...(map.get('Name') || []), ico.name])
-          map.set('Address', [...(map.get('Address') || []), <Link to={`/project/${ico.address}`}>{ico.address}</Link>])
-          map.set('Developer', [...(map.get('Developer') || []), ico.companyName])
-          map.set('Deadline', [...(map.get('Deadline') || []), new Date(ico.closing_time).toString()])
-          map.set('Status', [...(map.get('Status') || []), ico.status])
-          return map
-        }
-				}, new Map()
-			)
-			this.setState({
-				struct
-			})
-    }
+    
+
+    // if (isSuperuser) {
+    //   console.log('qwe')
+    //   // Get all to ico to confirm
+    //   const res = await axios.get(host + 'super/ico', authConfig)
+    //   const icos = res.data
+    //   const { struct } = { ...this.state }
+    //   const icosWithWeb3 = await Promise.all(icos.map(ico => new Promise(async resolve => {
+    //     try {
+    //       const icoInstance = await bremICO.at(ico.address)
+    //       const isConfirmed = await icoInstance.isConfirmed(coinbase)
+    //       resolve({
+    //         isConfirmed,
+    //         name: ico.name,
+    //         symbol: ico.symbol,
+    //         address: ico.address,
+    //         closing_time: ico.closing_time,
+    //         status: ico.status,
+    //         companyName: ico.developer.username
+    //       })
+    //       resolve(ico)
+    //     } catch (err) {
+    //       console.error(err)
+    //       resolve({
+    //         isConfirmed: true
+    //       })
+    //       resolve(ico)
+    //     }
+    //   })))
+    //   console.log(icosWithWeb3)
+    //   struct.data = icosWithWeb3.reduce((map, ico) => {
+    //     if (!ico.isConfirmed) {
+    //       map.set('Name', [...(map.get('Name') || []), ico.name])
+    //       map.set('Address', [...(map.get('Address') || []), <Link to={`/project/${ico.address}`}>{ico.address}</Link>])
+    //       map.set('Developer', [...(map.get('Developer') || []), ico.companyName])
+    //       map.set('Deadline', [...(map.get('Deadline') || []), new Date(ico.closing_time).toString()])
+    //       map.set('Status', [...(map.get('Status') || []), ico.status])
+    //       return map
+    //     }
+    //   }, new Map()
+    //   )
+    //   this.setState({
+    //     struct
+    //   })
+    // }
 
     if (!isAuditor && !isSuperuser) {
+      this.setState({ developer: true })
       // Get current dev ico's
       const res = await axios.get(host + 'dev/ico', authConfig)
       const icos = res.data //  Read cap and raised for all icos (example in ico form)
@@ -405,10 +451,11 @@ export default class Cabinet extends Component {
 
 	render = () => {
 		//const { struct } = this.props
-		const { struct = false } = this.state
+		const { struct = false, developer } = this.state
     const { accountType } = store
     console.log(accountType)
-		const data = []
+    const data = []
+    console.log('struct', struct)
 		data.push({
 			name: 'Your projects',
 			default: true,
@@ -416,9 +463,13 @@ export default class Cabinet extends Component {
 				<div>
 					<div className={css(style.projectsTop)}>
 						<Link to="/project/new">
-							<button className={css(style.button)} style={{marginRight: 25}} onClick={this.addNewProject}>
-								Add new
-							</button>
+							{
+                developer ? (
+                  <button className={css(style.button)} style={{ marginRight: 25 }} onClick={this.addNewProject}>
+                    Add new
+                  </button>
+                ) : ''
+              }
 						</Link>
 						{/* <button className={css(style.button)} onClick={this.loadMoreProjects}>
 							Load more

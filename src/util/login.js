@@ -19,12 +19,10 @@ export default async () => {
   if(!testInstance) await getWebThree()
   const { web3Instance, web3Account } = store
   if(!web3Instance && !web3Account) return
-  
   // console.log(JSON.stringify(web3Instance), web3Account)
-  localStorage.setItem('web3', JSON.stringify(testInstance))
-  localStorage.setItem('web3account', JSON.stringify(web3Account))
+  // localStorage.setItem('web3account', JSON.stringify(web3Account))
   const { currentProvider, utils, eth } = web3Instance
-
+  
   const brem = contract(BREMContract);
   brem.setProvider(currentProvider)
   const coinbase = await eth.getCoinbase()
@@ -35,9 +33,11 @@ export default async () => {
 
   currentProvider.sendAsync({
       method: "personal_sign",
-      params: [utils.utf8ToHex(coinbase), coinbase],
+      params: [utils.utf8ToHex(coinbase), coinbase, ''],
       from: coinbase
     }, async (err, res) => {
+      console.log(currentProvider)
+
       if(err) return console.error(err)
       const { result: sign } = res
       const bremInstance = await brem.deployed()

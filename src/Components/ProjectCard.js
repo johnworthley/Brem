@@ -77,7 +77,7 @@ export default ({ struct }) => {
 			background: "#e8e5e5 linear-gradient(to left, transparent "+(100-struct.progress)+"%, #f0723b "+struct.progress+"%)"
 		}
 	});
-	console.log(struct)
+	// console.log(struct)
 	return <div className={css(style.card)}>
 		<div className={css(style.cardImage, countStyle.cardImage)}></div>
 		<div className={css(style.cardData)}>
