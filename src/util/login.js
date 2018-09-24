@@ -10,9 +10,19 @@ export default async () => {
   document.cookie = '__cfduid=; expires=Thu, 01 Jan 1970 00:00:01 GMT;'
   const { host, authConfig } = config
   const { web3Instance: testInstance } = store
+  const w3i = localStorage.getItem('web3')
+  const w3a = localStorage.getItem('web3account')
+  // if(w3i && w3a) store.update({
+  //   web3Instance: JSON.parse(w3i),
+  //   web3Account: JSON.parse(w3a)
+  // })
   if(!testInstance) await getWebThree()
   const { web3Instance, web3Account } = store
   if(!web3Instance && !web3Account) return
+  
+  // console.log(JSON.stringify(web3Instance), web3Account)
+  localStorage.setItem('web3', JSON.stringify(testInstance))
+  localStorage.setItem('web3account', JSON.stringify(web3Account))
   const { currentProvider, utils, eth } = web3Instance
 
   const brem = contract(BREMContract);

@@ -64,6 +64,12 @@ class List extends Component {
 	getPageData = async () => {
 		const { host } = config
 		const { page } = this.state
+		const storedCards = localStorage.getItem('icolistcards')
+		console.log(storedCards)
+		if(storedCards) this.setState({
+			cards: JSON.parse(storedCards),
+			loading: false
+		})
 		const res = await axios.get(`${host}ico/all?page=${this.state.page}`)
 		const { data } = res
 		console.log(data, this)
@@ -147,8 +153,8 @@ class List extends Component {
 			page: this.state.page + 1,
 			showMore: cards.length,
 			loading: false
-			
 		})
+		localStorage.setItem('icolistcards', JSON.stringify(this.state.cards))
 	}
 	componentDidMount = async () => {
 		// const { host } = config

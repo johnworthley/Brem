@@ -94,19 +94,14 @@ export default class Cabinet extends Component {
     const bremInstance = await brem.deployed()
 
     const isSuperuser = await bremInstance.isSuperuser(coinbase)
-    console.log(isSuperuser)
     if (isSuperuser) {
       const factoryAddress = brem.address
-      console.log(factoryAddress)
 
       const collectedWei = await eth.getBalance(brem.address)
-      console.log(collectedWei)
       const collectedEth = utils.fromWei(collectedWei, "ether")
-      console.log(collectedEth)
 
       const feePercentBN = await bremInstance.withdrawFeePercent()
       const feePercent = await feePercentBN.toNumber()
-      console.log(feePercent)
       this.setState({
         factoryAddress: factoryAddress,
         collectedEth: collectedEth,
@@ -115,6 +110,22 @@ export default class Cabinet extends Component {
       // Get all auditors
       const res = await axios.get(host + 'super/audit', authConfig)
       const auditors = res.data 
+      const res1 = await axios.get(host + 'super/ico', authConfig)
+      const projects = res1.data 
+      const { struct } = { ...this.state }
+      struct.data = projects.reduce((map, ico) => {
+        map.set('Name', [...(map.get('Name') || []), ico.name])
+        map.set('Address', [...(map.get('Address') || []), <Link to={`/project/${ico.address}`}>{ico.address}</Link>])
+        map.set('Developer', [...(map.get('Developer') || []), ico.developer.username])
+        map.set('Deadline', [...(map.get('Deadline') || []), new Date(ico.closing_time).toString()])
+        map.set('Status', [...(map.get('Status') || []), ico.status])
+        return map
+      }, new Map()
+      )
+      this.setState({
+        struct
+      })
+      console.log('qweqeee')
 
       // TODO: auditors map
 
@@ -146,7 +157,6 @@ export default class Cabinet extends Component {
     }
 
     const isAuditor = await bremInstance.isAuditor(coinbase)
-    console.log(isAuditor)
     if (isAuditor) {
       // Get all to ico to confirm
       const res = await axios.get(host + 'auditor/ico', authConfig)
@@ -396,7 +406,8 @@ export default class Cabinet extends Component {
 	render = () => {
 		//const { struct } = this.props
 		const { struct = false } = this.state
-		const { accountType } = store
+    const { accountType } = store
+    console.log(accountType)
 		const data = []
 		data.push({
 			name: 'Your projects',
@@ -419,7 +430,7 @@ export default class Cabinet extends Component {
 		})
 		if(accountType !== 'developer') data.push({
 			name: 'Settings',
-			default: true,
+			default: false,
 			component: () => (
 				<div>
 					<div className={css(style.settingsTop)} style={{marginBottom: 100}}>
